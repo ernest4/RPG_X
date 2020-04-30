@@ -1,16 +1,11 @@
 exports.notFound = (res) => {
-  res.writeHead(404, { "Content-Type": "text/html" });
+  res.writeHead(404, "Not Found");
   res.write("404: File Not Found!");
   return res.end();
 };
 
-// const CONTENT_TYPE = {
-//   json: { "Content-Type": "application/json" },
-//   html: { "Content-Type": "text/html" },
-// };
-
-exports.render = ({ status, json, html, res }) => {
-  res.writeHead(status || 200, { "Content-Type": "text/html" });
-  res.write(html);
+exports.render = ({ status, data, res }) => {
+  res.statusCode = status || 200;
+  res.write(data);
   return res.end();
 };

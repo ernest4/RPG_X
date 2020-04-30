@@ -10,31 +10,32 @@ const assets = process.env.NODE_ENV == "production" ? "build" : "public";
 const publicPath = path.join(__dirname, assets);
 const port = process.env.PORT || 3001;
 
-const frontEndRootFilePath = path.join(publicPath, "index.html");
+// const frontEndRootFilePath = path.join(publicPath, "index.html");
 
 let cache = {};
 
 const server = (req, res) => {
   const query = url.parse(req.url, false);
 
-  if (query.pathname !== "/") return notFound(res);
+  if (query.pathname === "/") query.pathname = "index.html";
+  debugLog(`[Pulse]: requesting ${query.pathname}`);
 
-  const fileLoc = frontEndRootFilePath;
+  const fileLoc = path.join(publicPath, query.pathname);
 
   // Check the cache first...
   if (cache[fileLoc] !== undefined) {
-    debugLog("returning cached");
-    return render({ html: cache[fileLoc], res });
+    debugLog(`[Pulse]: returning cached ${fileLoc}`);
+    return render({ data: cache[fileLoc], res });
   }
 
   // ...otherwise load the file, save to the cache and return
   fs.readFile(fileLoc, (err, data) => {
     if (err) return notFound(res);
 
-    debugLog("caching");
+    debugLog(`[Pulse]: caching ${fileLoc}`);
     cache[fileLoc] = data;
 
-    return render({ html: cache[fileLoc], res });
+    return render({ data: cache[fileLoc], res });
   });
 };
 
