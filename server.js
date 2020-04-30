@@ -3,7 +3,7 @@ const http = require("http");
 const url = require("url");
 const fs = require("fs");
 
-const response = require("./server/response");
+const { notFound, render } = require("./server/response");
 
 const assets = process.env.NODE_ENV == "production" ? "build" : "public";
 const publicPath = path.join(__dirname, assets);
@@ -14,29 +14,23 @@ const frontEndRootFilePath = path.join(publicPath, "index.html");
 let cache = {};
 
 const server = (req, res) => {
-  const query = url.parse(req.url, true);
+  const query = url.parse(req.url, false);
 
-  if (query.pathname !== "/") return response.notFound(res);
+  if (query.pathname !== "/") return notFound(res);
 
   const fileLoc = frontEndRootFilePath;
 
   // Check the cache first...
-  if (cache[fileLoc] !== undefined) {
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.write(cache[fileLoc]);
-    return res.end();
-  }
+  if (cache[fileLoc] !== undefined) return render({ html: cache[fileLoc], res });
 
   // ...otherwise load the file
   fs.readFile(fileLoc, function (err, data) {
-    if (err) return response.notFound(res);
+    if (err) return notFound(res);
 
     // Save to the cache
     cache[fileLoc] = data;
 
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.write(data);
-    return res.end();
+    return render({ html: cache[fileLoc], res });
   });
 };
 
