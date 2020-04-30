@@ -4,6 +4,7 @@ const url = require("url");
 const fs = require("fs");
 
 const { notFound, render } = require("./server/response");
+const { debugLog, log } = require("./server/debug");
 
 const assets = process.env.NODE_ENV == "production" ? "build" : "public";
 const publicPath = path.join(__dirname, assets);
@@ -21,13 +22,16 @@ const server = (req, res) => {
   const fileLoc = frontEndRootFilePath;
 
   // Check the cache first...
-  if (cache[fileLoc] !== undefined) return render({ html: cache[fileLoc], res });
+  if (cache[fileLoc] !== undefined) {
+    debugLog("returning cached");
+    return render({ html: cache[fileLoc], res });
+  }
 
-  // ...otherwise load the file
-  fs.readFile(fileLoc, function (err, data) {
+  // ...otherwise load the file, save to the cache and return
+  fs.readFile(fileLoc, (err, data) => {
     if (err) return notFound(res);
 
-    // Save to the cache
+    debugLog("caching");
     cache[fileLoc] = data;
 
     return render({ html: cache[fileLoc], res });
@@ -37,8 +41,8 @@ const server = (req, res) => {
 const httpServer = http.createServer(server);
 
 httpServer.listen(port, () => {
-  console.log(`Server is up! port ${port}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
+  log(`Server is up! port ${port}`);
+  log(`Environment: ${process.env.NODE_ENV}`);
 });
 
 // TODO: set up web socket server
