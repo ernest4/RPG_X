@@ -1,9 +1,4 @@
 import { Engine, PerformanceMonitor } from "babylonjs";
-// import { Engine } from "@babylonjs/core/Engines/engine";
-// import { PerformanceMonitor } from "@babylonjs/core/Misc/performanceMonitor";
-
-// Required side effects to populate the Create methods on the mesh class. Without this, the bundle would be smaller but the createXXX methods from mesh would not be accessible.
-// import "@babylonjs/core/Meshes/meshBuilder";
 
 import { log, debugLog } from "./debug";
 import testScene from "./scenes/testScene";
