@@ -3,7 +3,7 @@ import reduceReducers from "reduce-reducers";
 import produce from "immer";
 
 const initialState = {
-  showUi: false
+  showUi: false,
 };
 
 // const otherReducer = handleActions({
@@ -16,7 +16,7 @@ const gameReducer = handleActions(
   {
     SHOW_UI: produce((state, action) => {
       state.showUi = action.payload;
-    })
+    }),
   },
   initialState
 );
