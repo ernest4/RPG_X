@@ -1,4 +1,4 @@
-const DEBUG = process.env.DEBUG_LOG || false;
+const DEBUG = process.env.DEBUG_LOG === "true" || process.env.NODE_ENV !== "production";
 
 export const log = console.log;
 
