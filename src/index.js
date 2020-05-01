@@ -4,6 +4,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 
 import { GridMaterial } from "@babylonjs/materials/grid";
 
@@ -50,6 +51,19 @@ const material = new GridMaterial("grid", scene);
 // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
 const sphere = Mesh.CreateSphere("sphere1", 16, 2, scene);
 
+sphere.actionManager = new ActionManager(scene);
+// sphere.actionManager.registerAction(); /// WIIIIP
+// TODO: add on click and hook that up to redux to check if that works.
+
+// Then can start building out rudimentary level with camera movement and left click
+// turn based movement using redux to manage game state.
+
+// Once thats ready, start looking at socket server no server.js and how client is gonna
+// communicate with it.
+
+// Finally look at storing game map on server, reading it, updateing based on client movement
+// and persisiting it in the file (later, in DB).
+
 // Move the sphere upward 1/2 its height
 sphere.position.y = 2;
 
@@ -65,4 +79,9 @@ ground.material = material;
 // Render every frame
 engine.runRenderLoop(() => {
   scene.render();
+});
+
+// the canvas/window resize event handler
+window.addEventListener("resize", function () {
+  engine.resize();
 });
