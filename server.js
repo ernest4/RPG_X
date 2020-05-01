@@ -23,6 +23,9 @@ const server = (req, res) => {
 
   const fileLoc = path.join(publicPath, query.pathname);
 
+  // TODOO: implement streaming rather than bulk sending of files https://stackabuse.com/node-http-servers-for-static-file-serving/
+  // to create 'back pressure'. Serves files faster overall when clients are slow.
+
   // Check the cache first...
   if (cache[fileLoc] !== undefined) {
     debugLog(`returning cached ${fileLoc}`);

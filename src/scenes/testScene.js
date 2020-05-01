@@ -1,13 +1,13 @@
 import {
   Scene,
   HemisphericLight,
-  FreeCamera,
   Vector3,
   Mesh,
   StandardMaterial,
   ActionManager,
   ExecuteCodeAction,
   Color3,
+  UniversalCamera,
 } from "babylonjs";
 
 import store from "../store";
@@ -25,27 +25,40 @@ export default ({ engine, canvas }) => {
   const scene = new Scene(engine);
 
   // This creates and positions a free camera (non-mesh)
-  const camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);
+  const camera = new UniversalCamera("camera1", new Vector3(10, 10, 10), scene);
   // This targets the camera to scene origin
   camera.setTarget(Vector3.Zero());
   // This attaches the camera to the canvas
   camera.attachControl(canvas, true);
 
+  // set custom controls for rts style view and movement
+  camera.inputs.clear();
+
   // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
+  // Hemispheric light provides ambient lighting
   const light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
   // Default intensity is 1. Let's dim the light a small amount
   light.intensity = 0.7;
 
-  // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
-  const sphere = Mesh.CreateSphere("sphere1", 16, 2, scene);
+  // Set default ambient lighting. Tweaking this is good way to create moods with
+  // blue lighting for sad, dark, scary.
+  // Orange lighting for light, bright, energetic.
+  // Red light if you're in a building on fire or in a spaceship with hight alert.
+  // Simple black and white if you're in outer space (pich black shadows, i.e. no back light).
+  light.diffuse = new Color3(0.95, 0.95, 0.95);
+  light.specular = new Color3(0.95, 0.95, 0.95);
+  light.groundColor = new Color3(0.3, 0.3, 0.3);
+
+  // Our built-in 'box' shape. Params: name, subdivs, size, scene
+  const box = Mesh.CreateBox("box1", 2, scene);
 
   const ballMaterial = new StandardMaterial("ballMaterial", scene);
   ballMaterial.diffuseColor = new Color3(1, 0, 0);
-  sphere.material = ballMaterial;
-  sphere.actionManager = new ActionManager(scene);
-  // sphere.actionManager.registerAction(
+  box.material = ballMaterial;
+  box.actionManager = new ActionManager(scene);
+  // box.actionManager.registerAction(
   //   new ExecuteCodeAction(
-  //     // { trigger: ActionManager.OnPickTrigger, parameter: sphere },
+  //     // { trigger: ActionManager.OnPickTrigger, parameter: box },
   //     // { trigger: ActionManager.OnKeyUpTrigger, parameter: "r" },
   //     ActionManager.OnPickTrigger,
   //     function (event) {
@@ -54,28 +67,65 @@ export default ({ engine, canvas }) => {
   //     }
   //   )
   // );
-  sphere.actionManager.registerAction(
+  box.actionManager.registerAction(
     new ExecuteCodeAction(ActionManager.OnPickTrigger, (event) => {
-      // console.log(event);
       const state = store.getState(); // read redux store
       log(state.showUi);
       store.dispatch(gameActions.showUI(!state.showUi)); // fire redux action
     })
   );
 
-  // TODO: add on click and hook that up to redux to check if that works.
+  const SPEED = 0.1;
+  scene.actionManager = new ActionManager(scene);
+  scene.actionManager.registerAction(
+    new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "d" }, (event) => {
+      camera.position.x += SPEED * engine.getDeltaTime();
+      camera.position.z -= SPEED * engine.getDeltaTime();
+    })
+  );
+  scene.actionManager.registerAction(
+    new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "a" }, (event) => {
+      camera.position.x -= SPEED * engine.getDeltaTime();
+      camera.position.z += SPEED * engine.getDeltaTime();
+    })
+  );
+  scene.actionManager.registerAction(
+    new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "w" }, (event) => {
+      camera.position.x += SPEED * engine.getDeltaTime();
+      camera.position.z += SPEED * engine.getDeltaTime();
+    })
+  );
+  scene.actionManager.registerAction(
+    new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "s" }, (event) => {
+      camera.position.x -= SPEED * engine.getDeltaTime();
+      camera.position.z -= SPEED * engine.getDeltaTime();
+    })
+  );
+  // up / down the camera height
+  // scene.actionManager.registerAction(
+  //   new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "w" }, (event) => {
+  //     camera.position.y += SPEED * engine.getDeltaTime();
+  //   })
+  // );
+  // scene.actionManager.registerAction(
+  //   new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "s" }, (event) => {
+  //     camera.position.y -= SPEED * engine.getDeltaTime();
+  //   })
+  // );
+
+  // TODO:
 
   // Then can start building out rudimentary level with camera movement and left click
   // turn based movement using redux to manage game state.
 
-  // Once thats ready, start looking at socket server no server.js and how client is gonna
+  // Once thats ready, start looking at socket server on server.js and how client is gonna
   // communicate with it.
 
   // Finally look at storing game map on server, reading it, updateing based on client movement
   // and persisiting it in the file (later, in DB).
 
-  // Move the sphere upward 1/2 its height
-  sphere.position.y = 2;
+  // Move the box upward 1/2 its height
+  box.position.y = 2;
 
   // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
   const ground = Mesh.CreateGround("ground1", 6, 6, 2, scene);
