@@ -6,7 +6,8 @@ const fs = require("fs");
 const { notFound, render } = require("./server/response");
 const { debugLog, log } = require("./server/debug");
 
-const assets = process.env.NODE_ENV == "production" ? "build" : "public";
+// const assets = process.env.NODE_ENV == "production" ? "build" : "public";
+const assets = "dist";
 const publicPath = path.join(__dirname, assets);
 const port = process.env.PORT || 3001;
 
@@ -18,13 +19,13 @@ const server = (req, res) => {
   const query = url.parse(req.url, false);
 
   if (query.pathname === "/") query.pathname = "index.html";
-  debugLog(`[Pulse]: requesting ${query.pathname}`);
+  debugLog(`requesting ${query.pathname}`);
 
   const fileLoc = path.join(publicPath, query.pathname);
 
   // Check the cache first...
   if (cache[fileLoc] !== undefined) {
-    debugLog(`[Pulse]: returning cached ${fileLoc}`);
+    debugLog(`returning cached ${fileLoc}`);
     return render({ data: cache[fileLoc], res });
   }
 
@@ -32,7 +33,7 @@ const server = (req, res) => {
   fs.readFile(fileLoc, (err, data) => {
     if (err) return notFound(res);
 
-    debugLog(`[Pulse]: caching ${fileLoc}`);
+    debugLog(`caching ${fileLoc}`);
     cache[fileLoc] = data;
 
     return render({ data: cache[fileLoc], res });

@@ -7,8 +7,18 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 import { GridMaterial } from "@babylonjs/materials/grid";
 
+import { log, debugLog } from "./debug";
+
+log(`[Pulse Client]: Running in ${process.env.NODE_ENV !== "production" ? "dev" : "prod"} mode`);
+
 // Required side effects to populate the Create methods on the mesh class. Without this, the bundle would be smaller but the createXXX methods from mesh would not be accessible.
 import "@babylonjs/core/Meshes/meshBuilder";
+
+import testMap from "./areas/testy.json"; // json loader works out the box with webpack, other file types need explicit webpack set up
+
+const { name, tiles } = testMap;
+
+log(`[Pulse Client]: name ${name}, tiles ${tiles}`);
 
 // Get the canvas element from the DOM.
 const canvas = document.getElementById("renderCanvas");
