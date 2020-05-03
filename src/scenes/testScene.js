@@ -17,6 +17,7 @@ import * as gameActions from "../store/actions/game";
 
 import { log, debugLog } from "../debug";
 import testMap from "../areas/testy.json"; // json loader works out the box with webpack, other file types need explicit webpack set up
+import addRTSCamera from "../cameras/addRTSCamera";
 
 const { name, tiles } = testMap;
 
@@ -26,15 +27,7 @@ export default ({ engine, canvas }) => {
   // Create our first scene.
   const scene = new Scene(engine);
 
-  // This creates and positions a free camera (non-mesh)
-  const camera = new UniversalCamera("camera1", new Vector3(10, 10, 10), scene);
-  // This targets the camera to scene origin
-  camera.setTarget(Vector3.Zero());
-  // This attaches the camera to the canvas
-  camera.attachControl(canvas, true);
-
-  // set custom controls for rts style view and movement
-  camera.inputs.clear();
+  const camera = addRTSCamera({ name: "camera1", engine, scene });
 
   // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
   // Hemispheric light provides ambient lighting
@@ -76,82 +69,6 @@ export default ({ engine, canvas }) => {
       store.dispatch(gameActions.showUI(!state.showUi)); // fire redux action
     })
   );
-
-  const SPEED = 0.1;
-  scene.actionManager = new ActionManager(scene);
-  // scene.actionManager.registerAction(
-  //   new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "d" }, (event) => {
-  //     camera.position.x += SPEED * engine.getDeltaTime();
-  //     camera.position.z -= SPEED * engine.getDeltaTime();
-  //   })
-  // );
-
-  // attempt to tween the value...
-  // scene.actionManager
-  //   .registerAction(
-  //     new InterpolateValueAction(
-  //       { trigger: ActionManager.OnKeyDownTrigger, parameter: "d" },
-  //       camera,
-  //       "position",
-  //       new Vector3(camera.position.x + SPEED, camera.position.y, camera.position.z - SPEED),
-  //       1000
-  //     )
-  //   )
-  //   .then(
-  //     new SetValueAction(
-  //       { trigger: ActionManager.OnKeyDownTrigger, parameter: "d" },
-  //       camera,
-  //       "position",
-  //       new Vector3(camera.position.x + SPEED, camera.position.y, camera.position.z - SPEED)
-  //     )
-  //   );
-
-  // TODO: try custom animation https://www.tutorialspoint.com/babylonjs/babylonjs_animations.htm
-  // simple tweening didnt seem to work. So set up custom animation with keyframes set in a tween
-  // like pattern.
-
-  scene.actionManager.registerAction(
-    new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "a" }, (event) => {
-      camera.position.x -= SPEED * engine.getDeltaTime();
-      camera.position.z += SPEED * engine.getDeltaTime();
-    })
-  );
-  scene.actionManager.registerAction(
-    new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "w" }, (event) => {
-      camera.position.x += SPEED * engine.getDeltaTime();
-      camera.position.z += SPEED * engine.getDeltaTime();
-    })
-  );
-  scene.actionManager.registerAction(
-    new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "s" }, (event) => {
-      camera.position.x -= SPEED * engine.getDeltaTime();
-      camera.position.z -= SPEED * engine.getDeltaTime();
-    })
-  );
-  // up / down the camera height
-  // scene.actionManager.registerAction(
-  //   new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "w" }, (event) => {
-  //     camera.position.y += SPEED * engine.getDeltaTime();
-  //   })
-  // );
-  // scene.actionManager.registerAction(
-  //   new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "s" }, (event) => {
-  //     camera.position.y -= SPEED * engine.getDeltaTime();
-  //   })
-  // );
-  // rotate camera wip
-  // scene.actionManager.registerAction(
-  //   new InterpolateValueAction(
-  //     { trigger: ActionManager.OnKeyDownTrigger, parameter: "q" },
-  //     (event) => {}
-  //   )
-  // );
-  // scene.actionManager.registerAction(
-  //   new InterpolateValueAction(
-  //     { trigger: ActionManager.OnKeyDownTrigger, parameter: "e" },
-  //     (event) => {}
-  //   )
-  // );
 
   // TODO:
 
