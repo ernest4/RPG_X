@@ -1,4 +1,4 @@
-import {
+const {
   Scene,
   HemisphericLight,
   Vector3,
@@ -10,7 +10,7 @@ import {
   UniversalCamera,
   InterpolateValueAction,
   SetValueAction,
-} from "babylonjs";
+} = BABYLON;
 
 import store from "../store";
 import * as gameActions from "../store/actions/game";
@@ -79,12 +79,12 @@ export default ({ engine, canvas }) => {
 
   const SPEED = 0.1;
   scene.actionManager = new ActionManager(scene);
-  scene.actionManager.registerAction(
-    new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "d" }, (event) => {
-      camera.position.x += SPEED * engine.getDeltaTime();
-      camera.position.z -= SPEED * engine.getDeltaTime();
-    })
-  );
+  // scene.actionManager.registerAction(
+  //   new ExecuteCodeAction({ trigger: ActionManager.OnKeyDownTrigger, parameter: "d" }, (event) => {
+  //     camera.position.x += SPEED * engine.getDeltaTime();
+  //     camera.position.z -= SPEED * engine.getDeltaTime();
+  //   })
+  // );
 
   // attempt to tween the value...
   // scene.actionManager

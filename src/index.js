@@ -1,4 +1,4 @@
-import { Engine, PerformanceMonitor } from "babylonjs";
+const { Engine, PerformanceMonitor } = BABYLON;
 
 import { log, debugLog } from "./debug";
 import testScene from "./scenes/testScene";
