@@ -2,7 +2,7 @@ const {
   Scene,
   HemisphericLight,
   Vector3,
-  Mesh,
+  MeshBuilder,
   StandardMaterial,
   ActionManager,
   ExecuteCodeAction,
@@ -45,7 +45,7 @@ export default ({ engine, canvas }) => {
   light.groundColor = new Color3(0.3, 0.3, 0.3);
 
   // Our built-in 'box' shape. Params: name, subdivs, size, scene
-  const box = Mesh.CreateBox("box1", 2, scene);
+  const box = MeshBuilder.CreateBox("box1", { height: 5, width: 2, depth: 0.5 }, scene);
 
   const ballMaterial = new StandardMaterial("ballMaterial", scene);
   ballMaterial.diffuseColor = new Color3(1, 0, 0);
@@ -75,6 +75,8 @@ export default ({ engine, canvas }) => {
   // Then can start building out rudimentary level with camera movement and left click
   // turn based movement using redux to manage game state.
 
+  // MAP target size 50x50, 100x50 and 100 x 100 = 10,000 tiles. 4 leves of height (no height for now)?
+
   // Once thats ready, start looking at socket server on server.js and how client is gonna
   // communicate with it.
 
@@ -85,7 +87,11 @@ export default ({ engine, canvas }) => {
   box.position.y = 2;
 
   // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
-  const ground = Mesh.CreateGround("ground1", 6, 6, 2, scene);
+  const ground = MeshBuilder.CreateGround(
+    "ground1",
+    { height: 6, width: 6, subdivisions: 2 },
+    scene
+  );
   // Create a grid material
   const groundMaterial = new StandardMaterial("groundMaterial", scene);
   groundMaterial.diffuseColor = new Color3(0, 1, 0);
