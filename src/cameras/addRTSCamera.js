@@ -3,6 +3,9 @@ const { ActionManager, ExecuteCodeAction, Vector3, UniversalCamera } = BABYLON;
 export default ({ name, engine, scene, position }) => {
   const SPEED = 0.1;
 
+  // TODO: this can be done better. Set the camera to collide with ground using gravity and make the 
+  // camera.ellipsoid very tall to hover over the play area!
+
   // This creates and positions a free camera (non-mesh)
   const camera = new UniversalCamera(name, position || new Vector3(10, 10, 10), scene);
   // This targets the camera to scene origin

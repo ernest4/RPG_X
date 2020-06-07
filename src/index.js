@@ -8,6 +8,8 @@ log(`Running in ${process.env.NODE_ENV !== "production" ? "dev" : "prod"} mode`)
 // Get the canvas element from the DOM.
 const canvas = document.getElementById("renderCanvas");
 
+// TODO: add the banner to the top with social media links !!!
+
 // Associate a Babylon Engine to it.
 const engine = new Engine(canvas);
 

@@ -15,19 +15,33 @@ const {
 import store from "../store";
 import * as gameActions from "../store/actions/game";
 
-import { log, debugLog } from "../debug";
+import { log, debugLog, showFPS } from "../debug";
 import testMap from "../areas/testy.json"; // json loader works out the box with webpack, other file types need explicit webpack set up
-import addRTSCamera from "../cameras/addRTSCamera";
+// import addRTSCamera from "../cameras/addRTSCamera";
+import addFPSCamera from "../cameras/addFPSCamera";
 
 const { name, tiles } = testMap;
 
 log(`name ${name}, tiles ${tiles}`);
 
 export default ({ engine, canvas }) => {
+  // TODO: for in game UI on various things, make the UI inside the game world!! very cool https://www.babylonjs-playground.com/#Q81PBV#6
+
   // Create our first scene.
   const scene = new Scene(engine);
 
-  const camera = addRTSCamera({ name: "camera1", engine, scene });
+  //Set gravity for the scene (G force like, on Y-axis)
+  scene.gravity = new BABYLON.Vector3(0, -0.9, 0);
+
+  // const camera = addRTSCamera({ name: "camera1", engine, scene });
+  const camera = addFPSCamera({ name: "player", position: new Vector3(10, 10, 10), scene, canvas });
+
+  //Then apply collisions and gravity to the active camera
+  camera.checkCollisions = true;
+  camera.applyGravity = true;
+
+  // Enable Collisions
+  scene.collisionsEnabled = true;
 
   // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
   // Hemispheric light provides ambient lighting
@@ -63,7 +77,7 @@ export default ({ engine, canvas }) => {
   //   )
   // );
   box.actionManager.registerAction(
-    new ExecuteCodeAction(ActionManager.OnPickTrigger, (event) => {
+    new ExecuteCodeAction(ActionManager.OnPickTrigger, event => {
       const state = store.getState(); // read redux store
       log(state.showUi);
       store.dispatch(gameActions.showUI(!state.showUi)); // fire redux action
@@ -97,6 +111,17 @@ export default ({ engine, canvas }) => {
   groundMaterial.diffuseColor = new Color3(0, 1, 0);
   // Affect a material
   ground.material = groundMaterial;
+
+  // Create rendering pipeline for motion blur
+  // var pipeline = new BABYLON.StandardRenderingPipeline("standard", scene, 1.0, null, [camera]);
+  // pipeline.MotionBlurEnabled = true;
+  // pipeline.motionStrength = 0.1;
+  // pipeline.motionBlurSamples = 32;
+
+  // GUI
+  var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+  showFPS(scene, advancedTexture);
 
   return scene;
 };
