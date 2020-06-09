@@ -121,7 +121,19 @@ export default ({ engine, canvas }) => {
   // GUI
   var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
+  // TODO: set up the top bar with social info https://doc.babylonjs.com/snippets/openurl
+  // TODO: set up basic fps scene https://www.babylonjs-playground.com/#U8MEB0#0 , https://doc.babylonjs.com/babylon101/cameras
+  // TODO: set up netcode for players playing in real time in the secene 
+  // TODO: investigate ui customization https://www.html5gamedevs.com/topic/40142-can-we-customize-the-look-of-babylonjsgui/
+  // TODO: investigate procedural generation https://en.wikipedia.org/wiki/Procedural_texture , https://www.youtube.com/watch?v=uUfV41HE_Dg
   showFPS(scene, advancedTexture);
+  // TODO: art style for ammo in the fps low poly space game https://www.google.com/search?q=deus+ex+ammo&rlz=1C5CHFA_enIE838IE838&sxsrf=ALeKk02qKNLBZWJcgCGemAFdr69nyLPnCw:1591296438659&source=lnms&tbm=isch&sa=X&ved=2ahUKEwj8ndWX6ejpAhVhRBUIHbMOC0IQ_AUoAXoECAwQAw&biw=1440&bih=789#imgrc=9x-ZbNKIhsU7PM
+  // TODO: checkoout papercraft as examples for low poly 3d art https://www.google.com/search?q=papercraft+car&rlz=1C5CHFA_enIE838IE838&sxsrf=ALeKk00FmQeOMGmyxp0VkJiaLbbH0WtKow:1590947735783&source=lnms&tbm=isch&sa=X&ved=2ahUKEwia05aV1t7pAhVZShUIHbyoBOoQ_AUoAXoECA4QAw&biw=1440&bih=789
+  // TODO: check out tutorials for characters in low poly 3d https://www.youtube.com/watch?v=Ljl_QFs9xhE
+
+  // TODO: check put cool top fuel dragsters https://www.google.com/search?q=drag+racer+cars&rlz=1C5CHFA_enIE838IE838&sxsrf=ALeKk00QzyTwIA-o-pUFJQMVF36joAzwwg:1590854787477&tbm=isch&source=iu&ictx=1&fir=6IvmvjwVGWwqTM%253A%252CQHMJxPcyWnHl9M%252C%252Fm%252F02b9x&vet=1&usg=AI4_-kSwhg9d1FvS_-cCkT3MwTg1eYEUuQ&sa=X&ved=2ahUKEwiWqPzz-9vpAhV1RxUIHYUXDS8Q_B0wGnoECAYQAw
+
+  // TODO: check out scifi art https://www.pinterest.ie/etagonam/futuristic-design-and-scifi-art/
 
   return scene;
 };
