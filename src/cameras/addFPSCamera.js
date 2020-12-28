@@ -1,4 +1,4 @@
-const { ActionManager, ExecuteCodeAction, Vector3, UniversalCamera } = BABYLON;
+import { ActionManager, ExecuteCodeAction, Vector3, UniversalCamera } from "babylonjs";
 
 export default ({ name, scene, position, canvas }) => {
   const SPEED = 0.1;

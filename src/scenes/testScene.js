@@ -1,7 +1,21 @@
-const {
+// const {
+// Scene,
+// HemisphericLight,
+// Vector3,
+// MeshBuilder,
+// StandardMaterial,
+// ActionManager,
+// ExecuteCodeAction,
+// Color3,
+// UniversalCamera,
+// InterpolateValueAction,
+// SetValueAction,
+// } = BABYLON;
+
+import {
   Scene,
-  HemisphericLight,
   Vector3,
+  HemisphericLight,
   MeshBuilder,
   StandardMaterial,
   ActionManager,
@@ -10,7 +24,9 @@ const {
   UniversalCamera,
   InterpolateValueAction,
   SetValueAction,
-} = BABYLON;
+} from "babylonjs";
+
+import { AdvancedDynamicTexture } from "babylonjs-gui";
 
 import store from "../store";
 import * as gameActions from "../store/actions/game";
@@ -31,7 +47,7 @@ export default ({ engine, canvas }) => {
   const scene = new Scene(engine);
 
   //Set gravity for the scene (G force like, on Y-axis)
-  scene.gravity = new BABYLON.Vector3(0, -0.9, 0);
+  scene.gravity = new Vector3(0, -0.9, 0);
 
   // const camera = addRTSCamera({ name: "camera1", engine, scene });
   const camera = addFPSCamera({ name: "player", position: new Vector3(10, 10, 10), scene, canvas });
@@ -119,11 +135,12 @@ export default ({ engine, canvas }) => {
   // pipeline.motionBlurSamples = 32;
 
   // GUI
-  var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+  // var advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+  var advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
   // TODO: set up the top bar with social info https://doc.babylonjs.com/snippets/openurl
   // TODO: set up basic fps scene https://www.babylonjs-playground.com/#U8MEB0#0 , https://doc.babylonjs.com/babylon101/cameras
-  // TODO: set up netcode for players playing in real time in the secene 
+  // TODO: set up netcode for players playing in real time in the secene
   // TODO: investigate ui customization https://www.html5gamedevs.com/topic/40142-can-we-customize-the-look-of-babylonjsgui/
   // TODO: investigate procedural generation https://en.wikipedia.org/wiki/Procedural_texture , https://www.youtube.com/watch?v=uUfV41HE_Dg
   showFPS(scene, advancedTexture);
