@@ -1,3 +1,3 @@
-# Pulse
+# RPG_X (working title)
 
-This is the back end server for Massive Multiplayer Online Turn Based Strategy (mmotbs) game.
+Game work in progress
