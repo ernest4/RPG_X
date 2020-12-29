@@ -16,6 +16,7 @@
 // as regular arrays get downgraded to dictionaries by V8 once they becomes sparse. Otherwise make
 // sure to fill regular arrays with 0s or something to not appear 'sparse'
 
+// TODO: jest tests !!!!
 export const ECS = {};
 
 // wip...
@@ -39,25 +40,47 @@ export const ECS = {};
 //   weight: Pound;
 // };
 
+// TODO: need a finiteStateMachine as well. https://www.richardlord.net/blog/ecs/finite-state-machines-with-ash.html
+class EntityStateMachine {
+  // TODO: wip
+
+  createState = (name: string) => {
+    // TODO: ...
+  };
+
+  // TODO: this will probably live on some 'State' class as part of FSM stuff, instead of EntityStateMachine
+  add = (componentName: Symbol) => {
+    // TODO: add component to particular state (needs to be called on state)
+  };
+
+  // TODO: this will probably live on some 'State' class as part of FSM stuff, instead of EntityStateMachine
+  withInstance = (component: Component) => {
+    // TODO: add component instance to particular state (needs to be called on state)
+  };
+}
+
 type DeltaTime = number;
+type EntityId = number;
 class Engine {
-  deltaTime: DeltaTime;
+  _deltaTime: DeltaTime;
   updating: boolean;
   updateComplete: any; // TODO: better type?
   systemUpdateFunctions: ((engine: Engine, deltaTime: DeltaTime) => void)[];
   componentLists: { [key: string]: ComponentList };
+  // oldEntityIdsPool: EntityId[];
+  entityIdPool: EntityIdPool;
 
   constructor() {
     // TODO: ...
     this.systemUpdateFunctions = [];
-    this.deltaTime = 0;
+    this._deltaTime = 0;
     this.updating = false;
     this.componentLists = {};
     // this.updateComplete = new signals.Signal(); // TODO: signals?? https://github.com/millermedeiros/js-signals
   }
 
-  // TODO: priority integer sorting
-  addSystem = (system: System, priority: number) => {
+  addSystem = (system: System, priority?: number) => {
+    // TODO: priority integer sorting
     // simple priority based on insertion order for now...
     this.systemUpdateFunctions.push(system.update);
   };
@@ -80,8 +103,28 @@ class Engine {
     }
   };
 
+  removeComponent = (component: Component) => {
+    // NOTE: indexing using component class name
+    const componentClassName = component.constructor.name;
+    const componentList = this.componentLists[componentClassName];
+    if (!componentList) return;
+
+    const oldEntityId = componentList.remove(component);
+    // this.oldEntityIdsPool.push(oldEntityId);
+    this.entityIdPool.push(oldEntityId);
+  };
+
   // TODO: ...
-  generateEntityId = () => {};
+  // first check this.oldEntityIdsPool ...
+  // TODO: for the pool, you dont want to pop() or shrink the array. Use an array, keep custom
+  // index tracker that gets incremented with each new item.
+  // When removing, return the last item and count down the item counter.
+  // Don't actually delete or pop off anything. This array needs to as fast as anything else.
+  // Probably need a custom class for this as well?? FreeEntityIdPool ??
+  // otherwise if pool is empty ...
+  // keep track of this.lastEntityId and get the next integer after
+  // maybe package this and above pool into single class EntityIdPool ??
+  generateEntityId = () => this.entityIdPool.pop();
 
   // TODO: ... probably involves purging components too
   removeEntity = () => {};
@@ -98,16 +141,46 @@ class Engine {
     // this.updateComplete.dispatch(); // TODO: signals??
   };
 
+  queryForEntitiesWith = () => {
+    // TODO: ...
+  };
+
+  get deltaTime() {
+    return this._deltaTime;
+  }
+
+  set deltaTime(deltaTime: DeltaTime) {
+    this._deltaTime = deltaTime;
+  }
+
+  // private
+
   callSystemUpdateFunction(systemUpdateFunction: (engine: Engine, deltaTime: DeltaTime) => void) {
     systemUpdateFunction(this, this.deltaTime);
   }
 }
 
+class EntityIdPool {
+  constructor() {
+    // TODO:
+    this.lastEntityId = -1;
+    this.oldEntityIdPool = [];
+  }
+
+  push = () => {
+    // TODO: wip
+  };
+
+  pop = () => {
+    // TODO: ... wip
+  };
+}
+
 // custom components will extend this.
 class Component {
-  entityId: number;
+  entityId: EntityId;
 
-  constructor(entityId: number) {
+  constructor(entityId: EntityId) {
     this.entityId = entityId;
   }
 }
@@ -130,14 +203,43 @@ class ComponentList {
   }
 
   add = (component: Component) => {
+    // TODO: once entity (or component) is removed, there will be holes in the list. The entity will
+    // be there but will have -1 for entityId. Over time you might end up with large gaps of -1...
+    // Since we can't delete elements from array without downgrading it slower data type on V8,
+    // need to instead reuse those slots with new components (for new entityIds).
+    // For the to work, the global engine needs to be aware of what entityIds have been released out
+    // and reuse them when returning from engine.generateEntityId().
     const denseListIndex = this.denseList.push(component);
     this.denseListComponentCount++;
 
     this.sparseList[component.entityId] = denseListIndex;
   };
 
-  // TODO: wip...
-  remove = () => {};
+  has = (entityId: EntityId): boolean => !!this.get(entityId);
+
+  get = (entityId: EntityId): Component | null => {
+    const denseListIndex = this.sparseList[entityId];
+
+    if (denseListIndex < this.denseListComponentCount) return null;
+    if (this.denseList[denseListIndex].entityId !== entityId) return null;
+
+    return this.denseList[denseListIndex];
+  };
+
+  remove = (component: Component): EntityId | undefined => {
+    const denseListIndex = this.sparseList[component.entityId];
+
+    // const currentEntityId =
+    if (denseListIndex < this.denseListComponentCount) return;
+    // if (this.denseList[denseListIndex].entityId !== component.entityId) return;
+    if (this.denseList[denseListIndex] !== component) return; // NOTE: entity object ref should work as well...
+
+    const oldEntityId = component.entityId;
+    // this.denseList[denseListIndex].entityId = -1; // NOTE: -1 designates unused / invalid entityId
+    component.entityId = -1; // NOTE: -1 designates unused / invalid entityId // NOTE: entity object ref should work as well...
+
+    return oldEntityId;
+  };
 }
 
 // TODO: look at optimizing components by using ArrayBuffers where possible to store basic data
@@ -167,33 +269,99 @@ class System {
 }
 
 // e.g. desired usage example (sketch) =============================================================
+
+// interface PositionArguments {
+//   entityId: EntityId;
+//   x: number;
+//   y: number;
+//   rotation: number;
+// }
 class Position extends Component {
-  values: number[];
+  _values: number[];
   // TODO: ...
 
-  constructor(entityId: number, x: number, y: number, rotation: number) {
+  // nice interface example, but wanna keep things fast...
+  // constructor({ entityId, x, y, rotation }: PositionArguments) {
+  //   super(entityId);
+  //   this._values = [x, y, rotation];
+  // }
+
+  constructor(entityId: EntityId, x: number, y: number, rotation: number) {
     super(entityId);
-    this.values = [x, y, rotation];
+    this._values = [x, y, rotation];
+  }
+
+  // TODO: dynamically create these???
+  get x() {
+    return this._values[0];
+  }
+
+  set x(value: number) {
+    this._values[0] = value;
+  }
+
+  get y() {
+    return this._values[1];
+  }
+
+  set y(value: number) {
+    this._values[1] = value;
+  }
+
+  get rotation() {
+    return this._values[2];
+  }
+
+  set rotation(value: number) {
+    this._values[2] = value;
   }
 }
 
 class Velocity extends Component {
+  _values: number[];
   // TODO: ...
+  constructor(entityId: EntityId, x: number, y: number, angular: number) {
+    super(entityId);
+    this._values = [x, y, angular];
+  }
+
+  // TODO: dynamically create these???
+  get x() {
+    return this._values[0];
+  }
+
+  set x(value: number) {
+    this._values[0] = value;
+  }
+
+  get y() {
+    return this._values[1];
+  }
+
+  set y(value: number) {
+    this._values[1] = value;
+  }
+
+  get angular() {
+    return this._values[2];
+  }
+
+  set angular(value: number) {
+    this._values[2] = value;
+  }
 }
 
 // TODO: remove the class wrapper?? maybe like in ECSY, no need for standalone class for system...
 // just a function...
-class TestSystem extends System {
+class MovementSystem extends System {
   update(engine: Engine, deltaTime: DeltaTime) {
     this.deltaTime = deltaTime;
 
-    const nodes = engine.query(Position, Velocity);
-
-    nodes.forEach(this.updateNode); // wanna cache functions to prevent creating them from scratch
+    const nodes = engine.queryForEntitiesWith(Position, Velocity);
+    nodes.forEach(this.updateNode); // NOTE: wanna cache functions to prevent creating them from scratch
   }
 
   updateNode = (entityId, position, velocity) => {
-    // e.g. ...
     position.x = velocity.x * this.deltaTime;
     position.y = velocity.y * this.deltaTime;
     position.rotation = velocity.angularVelocity * this.deltaTime;
@@ -203,15 +371,14 @@ class TestSystem extends System {
 const main = () => {
   const engine = new Engine();
 
-  engine.addSystem(new TestSystem());
+  engine.addSystem(new MovementSystem());
   // other systems, order of addition matters!!
 
   for (let i = 0; i < 10; i++) {
-    const entity = engine.generateEntityId();
+    const entityId = engine.generateEntityId();
 
-    const pos = new Position(entity, i, i, 0);
-
-    engine.addComponent(pos);
+    engine.addComponent(new Position(entityId, i * i, i + i, 0));
+    engine.addComponent(new Velocity(entityId, i, i, i));
     // engine.addComponent(Velocity, [entity, i * 1, i * 1]);
   }
 
