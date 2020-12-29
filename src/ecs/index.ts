@@ -28,24 +28,57 @@ export const ECS = {};
 
 // needs to store an iterate over the update function references for systems
 // needs to be trigger by external ticker
+
+// NOTE: more custom type examples
+// type Foot = number;
+// type Pound = number;
+
+// type Patient = {
+//   name: string;
+//   height: Foot;
+//   weight: Pound;
+// };
+
+type DeltaTime = number;
 class Engine {
+  deltaTime: DeltaTime;
   updating: boolean;
   updateComplete: any; // TODO: better type?
+  systemUpdateFunctions: ((engine: Engine, deltaTime: DeltaTime) => void)[];
+  componentLists: { [key: string]: ComponentList };
 
   constructor() {
     // TODO: ...
+    this.systemUpdateFunctions = [];
+    this.deltaTime = 0;
     this.updating = false;
+    this.componentLists = {};
     // this.updateComplete = new signals.Signal(); // TODO: signals?? https://github.com/millermedeiros/js-signals
   }
 
-  // TODO: system & priority integer
-  addSystem = (system, priority) => {};
+  // TODO: priority integer sorting
+  addSystem = (system: System, priority: number) => {
+    // simple priority based on insertion order for now...
+    this.systemUpdateFunctions.push(system.update);
+  };
 
   // getSystem
 
   // removeSystem
 
   // removeAllSystems
+
+  addComponent = (component: Component) => {
+    // NOTE: indexing using component class name
+    const componentClassName = component.constructor.name;
+    const componentList = this.componentLists[componentClassName];
+    if (componentList) componentList.add(component);
+    else {
+      const newComponentList = new ComponentList();
+      newComponentList.add(component);
+      this.componentLists[componentClassName] = newComponentList;
+    }
+  };
 
   // TODO: ...
   generateEntityId = () => {};
@@ -56,37 +89,134 @@ class Engine {
   // TODO: ... probably involves purging components too
   removeAllEntities = () => {};
 
-  update = (deltaTime: number) => {
+  update = (deltaTime: DeltaTime) => {
+    this.deltaTime = deltaTime;
     // TODO: cycle through the systems, in priority
-
     this.updating = true;
-    // Ash snippet
-    // for (var system = this.systemList.head; system; system = system.next) {
-    //   system.update(time);
-    // }
+    this.systemUpdateFunctions.forEach(this.callSystemUpdateFunction);
     this.updating = false;
     // this.updateComplete.dispatch(); // TODO: signals??
   };
+
+  callSystemUpdateFunction(systemUpdateFunction: (engine: Engine, deltaTime: DeltaTime) => void) {
+    systemUpdateFunction(this, this.deltaTime);
+  }
 }
 
 // custom components will extend this.
 class Component {
-  // TODO: need to enforce passing in entity id as first and mandatory item, followed by any number
-  // of params
-  constructor(entityId: number, ...rest: any[]) {
-    // TODO: ...
+  entityId: number;
+
+  constructor(entityId: number) {
+    this.entityId = entityId;
   }
+}
+
+class ComponentList {
+  // TODO: based on https://programmingpraxis.com/2012/03/09/sparse-sets/
+  // has dense set (primary iteration) and sparse set (fast membership lookup)
+  denseList: Component[];
+  denseListComponentCount: number;
+  sparseList: number[];
+
+  constructor() {
+    // TODO: will want to optimize these lists to use ArrayBuffer for dense memory access where
+    // possible.
+    this.denseList = [];
+    this.denseListComponentCount = 0;
+    // TODO: Sparse lists will become hash maps in V8 optimizer. They are less efficient in speed
+    // compared too arrays. So maybe use fixed size ArrayBuffer as well? Dynamically grow it yourself?
+    this.sparseList = [];
+  }
+
+  add = (component: Component) => {
+    const denseListIndex = this.denseList.push(component);
+    this.denseListComponentCount++;
+
+    this.sparseList[component.entityId] = denseListIndex;
+  };
+
+  // TODO: wip...
+  remove = () => {};
 }
 
 // TODO: look at optimizing components by using ArrayBuffers where possible to store basic data
 // close together in memory and maybe even in the component array...
 
 class System {
+  deltaTime: DeltaTime;
+  // engine: Engine;
+
+  // constructor(engine: Engine) {
+  //   // TODO: ...
+  //   this.engine = engine;
+  // }
+
   constructor() {
     // TODO: ...
+    this.deltaTime = 0;
   }
 
-  update = (deltaTime: number) => {
+  // update = (deltaTime: DeltaTime) => {
+  //   throw new Error("unimplemented");
+  // };
+
+  update(engine: Engine, deltaTime: DeltaTime) {
     throw new Error("unimplemented");
+  }
+}
+
+// e.g. desired usage example (sketch) =============================================================
+class Position extends Component {
+  values: number[];
+  // TODO: ...
+
+  constructor(entityId: number, x: number, y: number, rotation: number) {
+    super(entityId);
+    this.values = [x, y, rotation];
+  }
+}
+
+class Velocity extends Component {
+  // TODO: ...
+}
+
+// TODO: remove the class wrapper?? maybe like in ECSY, no need for standalone class for system...
+// just a function...
+class TestSystem extends System {
+  update(engine: Engine, deltaTime: DeltaTime) {
+    this.deltaTime = deltaTime;
+
+    const nodes = engine.query(Position, Velocity);
+
+    nodes.forEach(this.updateNode); // wanna cache functions to prevent creating them from scratch
+  }
+
+  updateNode = (entityId, position, velocity) => {
+    // e.g. ...
+    position.x = velocity.x * this.deltaTime;
+    position.y = velocity.y * this.deltaTime;
+    position.rotation = velocity.angularVelocity * this.deltaTime;
   };
 }
+
+const main = () => {
+  const engine = new Engine();
+
+  engine.addSystem(new TestSystem());
+  // other systems, order of addition matters!!
+
+  for (let i = 0; i < 10; i++) {
+    const entity = engine.generateEntityId();
+
+    const pos = new Position(entity, i, i, 0);
+
+    engine.addComponent(pos);
+    // engine.addComponent(Velocity, [entity, i * 1, i * 1]);
+  }
+
+  // some third party update function, babylon.js or phaser3 etc
+  // update = deltaTime => {
+  //   engine.update(deltaTime);
+  // };
+};

@@ -15,6 +15,7 @@ const port = process.env.PORT || 3001;
 
 let cache = {};
 
+// TODO: might strip this out and just use express.js ??
 const server = (req, res) => {
   const query = url.parse(req.url, false);
 

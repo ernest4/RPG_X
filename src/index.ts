@@ -26,6 +26,7 @@ const scene = testScene({ engine, canvas });
 // const performanceMonitor = new PerformanceMonitor();
 
 // Render every frame
+// TODO: use a cached function here instead of anonymous !!!
 engine.runRenderLoop(() => {
   scene.render();
 
