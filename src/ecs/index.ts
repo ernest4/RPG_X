@@ -61,6 +61,7 @@ class EntityStateMachine {
 
 type DeltaTime = number;
 type EntityId = number;
+type QuerySet = Component[];
 class Engine {
   _deltaTime: DeltaTime;
   updating: boolean;
@@ -133,7 +134,7 @@ class Engine {
   };
 
   // TODO: fix the typescript...
-  queryForEntitiesWith = <T extends Component>(...componentClasses: T[]) => {
+  *getQuerySetIteratorFor<T extends Component>(...componentClasses: T[]) {
     // TODO: ...
     // Query function will take shortest componentlist and loop throught the dense list of it.
     // For each denselist component with valid entityid, will check that components entityid against the rest of desired component lists and get those components (if present).
@@ -169,10 +170,12 @@ class Engine {
       const entityId = component.entityId;
 
       // TODO: optimize by caching querySet array ??
-      const querySet = [entityId]; // NOTE: setting first value as number will hint to V8 it's array of numbers...
+      // const querySet: (number | Component)[] = [entityId]; // NOTE: setting first value as number will hint to V8 it's array of numbers...
+      const querySet: QuerySet = []; // NOTE: setting first value as number will hint to V8 it's array of numbers...
 
       // TODO: cache componentClasses.length !!!
-      for (let i = 0; i < componentClasses.length; i++) {
+      const componentClassesLength = componentClasses.length;
+      for (let i = 0; i < componentClassesLength; i++) {
         if (i === shortestComponentListIndex) continue; // NOTE: skip checking the shortest list !
 
         const componentClassName = componentClasses[i].constructor.name;
@@ -181,11 +184,12 @@ class Engine {
         // ...
         if (anotherComponent) querySet.push(anotherComponent);
         else break; // NOTE: soon as we discover a missing component, abandon further pointless search for that entityId !
-      }
 
-      // TODO: yield querySet if all components found for entityId
+        // NOTE: yield querySet if all components found for entityId
+        if (i + 1 === componentClassesLength) yield querySet;
+      }
     }
-  };
+  }
 
   get deltaTime() {
     return this._deltaTime;
@@ -443,11 +447,16 @@ class MovementSystem extends System {
     this.deltaTime = deltaTime;
 
     // TODO: stream the entities one by one instead of creating new node lists...
-    const nodes = engine.queryForEntitiesWith(Position, Velocity);
-    nodes.forEach(this.updateNode); // NOTE: wanna cache functions to prevent creating them from scratch
+    // const nodes = engine.queryForEntitiesWith(Position, Velocity);
+    // nodes.forEach(this.updateNode); // NOTE: wanna cache functions to prevent creating them from scratch
+
+    const querySetIterator = engine.getQuerySetIteratorFor(Position, Velocity);
+    for (const querySet of querySetIterator) this.updateEntity(querySet);
   }
 
-  updateNode = (entityId, position, velocity) => {
+  updateEntity = (querySet: QuerySet) => {
+    const [position, velocity] = querySet;
+
     position.x = velocity.x * this.deltaTime;
     position.y = velocity.y * this.deltaTime;
     position.rotation = velocity.angularVelocity * this.deltaTime;

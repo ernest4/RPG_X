@@ -7,10 +7,10 @@
     "noImplicitAny": true,
     "module": "es6",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es2015",
     "allowJs": true,
     "jsx": "react",
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["./src/**/*", "tests"],
   "types": ["babylonjs", "babylonjs-gui"]
