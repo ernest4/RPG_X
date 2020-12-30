@@ -114,16 +114,6 @@ class Engine {
     this.entityIdPool.push(oldEntityId);
   };
 
-  // TODO: ...
-  // first check this.oldEntityIdsPool ...
-  // TODO: for the pool, you dont want to pop() or shrink the array. Use an array, keep custom
-  // index tracker that gets incremented with each new item.
-  // When removing, return the last item and count down the item counter.
-  // Don't actually delete or pop off anything. This array needs to as fast as anything else.
-  // Probably need a custom class for this as well?? FreeEntityIdPool ??
-  // otherwise if pool is empty ...
-  // keep track of this.lastEntityId and get the next integer after
-  // maybe package this and above pool into single class EntityIdPool ??
   generateEntityId = () => this.entityIdPool.pop();
 
   // TODO: ... probably involves purging components too
@@ -161,10 +151,22 @@ class Engine {
 }
 
 class EntityIdPool {
+  // TODO: ...
+  // first check this.oldEntityIdsPool ...
+  // TODO: for the pool, you dont want to pop() or shrink the array. Use an array, keep custom
+  // index tracker that gets incremented with each new item.
+  // When removing, return the last item and count down the item counter.
+  // Don't actually delete or pop off anything. This array needs to as fast as anything else.
+  // Probably need a custom class for this as well?? FreeEntityIdPool ??
+  // otherwise if pool is empty ...
+  // keep track of this.lastEntityId and get the next integer after
+  // maybe package this and above pool into single class EntityIdPool ??
+
   constructor() {
     // TODO:
     this.lastEntityId = -1;
     this.oldEntityIdPool = [];
+    this.oldEntityIdPoolSize = 0;
   }
 
   push = () => {
@@ -205,14 +207,25 @@ class ComponentList {
   add = (component: Component) => {
     // TODO: once entity (or component) is removed, there will be holes in the list. The entity will
     // be there but will have -1 for entityId. Over time you might end up with large gaps of -1...
-    // Since we can't delete elements from array without downgrading it slower data type on V8,
+    // Since we can't delete elements from array without downgrading it to slower data type on V8,
     // need to instead reuse those slots with new components (for new entityIds).
-    // For the to work, the global engine needs to be aware of what entityIds have been released out
-    // and reuse them when returning from engine.generateEntityId().
-    const denseListIndex = this.denseList.push(component);
-    this.denseListComponentCount++;
+    // For this to work, the global engine needs to be aware of what entityIds have been released
+    // out and reuse them when returning from engine.generateEntityId().
 
-    this.sparseList[component.entityId] = denseListIndex;
+    const currentComponentEntityId = component.entityId;
+
+    const existingComponent = this.get(currentComponentEntityId);
+
+    if (!existingComponent?.entityId || existingComponent.entityId === -1) {
+      // NOTE: plug the existing free entity component slot in dense list
+      this.denseList[this.sparseList[currentComponentEntityId]] = component;
+    } else {
+      // NOTE: create new entity component slot
+      const denseListIndex = this.denseList.push(component);
+      this.sparseList[currentComponentEntityId] = denseListIndex;
+    }
+
+    this.denseListComponentCount++;
   };
 
   has = (entityId: EntityId): boolean => !!this.get(entityId);
@@ -220,7 +233,7 @@ class ComponentList {
   get = (entityId: EntityId): Component | null => {
     const denseListIndex = this.sparseList[entityId];
 
-    if (denseListIndex < this.denseListComponentCount) return null;
+    if (this.denseListComponentCount < denseListIndex) return null;
     if (this.denseList[denseListIndex].entityId !== entityId) return null;
 
     return this.denseList[denseListIndex];
@@ -229,8 +242,8 @@ class ComponentList {
   remove = (component: Component): EntityId | undefined => {
     const denseListIndex = this.sparseList[component.entityId];
 
-    // const currentEntityId =
-    if (denseListIndex < this.denseListComponentCount) return;
+    // const currentEntityId = ...
+    if (this.denseListComponentCount < denseListIndex) return;
     // if (this.denseList[denseListIndex].entityId !== component.entityId) return;
     if (this.denseList[denseListIndex] !== component) return; // NOTE: entity object ref should work as well...
 
@@ -357,6 +370,7 @@ class MovementSystem extends System {
   update(engine: Engine, deltaTime: DeltaTime) {
     this.deltaTime = deltaTime;
 
+    // TODO: stream the entities one by one instead of creating new node lists...
     const nodes = engine.queryForEntitiesWith(Position, Velocity);
     nodes.forEach(this.updateNode); // NOTE: wanna cache functions to prevent creating them from scratch
   }
