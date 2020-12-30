@@ -94,13 +94,14 @@ class Engine {
   addComponent = (component: Component) => {
     // NOTE: indexing using component class name
     const componentClassName = component.constructor.name;
-    const componentList = this.componentLists[componentClassName];
-    if (componentList) componentList.add(component);
-    else {
-      const newComponentList = new ComponentList();
-      newComponentList.add(component);
-      this.componentLists[componentClassName] = newComponentList;
+    let componentList = this.componentLists[componentClassName];
+
+    if (!componentList) {
+      componentList = new ComponentList();
+      this.componentLists[componentClassName] = componentList;
     }
+
+    componentList.add(component);
   };
 
   removeComponent = (component: Component) => {
@@ -131,8 +132,59 @@ class Engine {
     // this.updateComplete.dispatch(); // TODO: signals??
   };
 
-  queryForEntitiesWith = () => {
+  // TODO: fix the typescript...
+  queryForEntitiesWith = <T extends Component>(...componentClasses: T[]) => {
     // TODO: ...
+    // Query function will take shortest componentlist and loop throught the dense list of it.
+    // For each denselist component with valid entityid, will check that components entityid against the rest of desired component lists and get those components (if present).
+    // If no early bailouts (so all query conditions met) yield the queryset.
+    // Query should be streamed via the query set, letting you operate on each component, instead of constructing an array of all results (dont waste time creating intermediary array...)
+
+    // NOTE: finding shortest component list
+    let shortestComponentListIndex = 0;
+
+    let shortestComponentList = this.componentLists[
+      componentClasses[shortestComponentListIndex].constructor.name
+    ];
+    componentClasses.forEach((componentClass, index) => {
+      const nextShortestComponentList = this.componentLists[componentClass.constructor.name];
+
+      if (nextShortestComponentList.size < shortestComponentList.size) {
+        shortestComponentList = nextShortestComponentList;
+        shortestComponentListIndex = index;
+      }
+    });
+
+    // NOTE: cycling through the shortest component list
+    // const componentsIterator = shortestComponentList.denseListStream();
+    const componentsIterator = shortestComponentList.denseListStreamClean();
+
+    for (const component of componentsIterator) {
+      // TODO: if the entity of this component, has all the other componentClasses, yield it and it's components
+      // otherwise, continue
+      // componentClasses.forEach((componentClass, index) => {
+
+      // });
+
+      const entityId = component.entityId;
+
+      // TODO: optimize by caching querySet array ??
+      const querySet = [entityId]; // NOTE: setting first value as number will hint to V8 it's array of numbers...
+
+      // TODO: cache componentClasses.length !!!
+      for (let i = 0; i < componentClasses.length; i++) {
+        if (i === shortestComponentListIndex) continue; // NOTE: skip checking the shortest list !
+
+        const componentClassName = componentClasses[i].constructor.name;
+        const anotherComponent = this.componentLists[componentClassName].get(entityId);
+
+        // ...
+        if (anotherComponent) querySet.push(anotherComponent);
+        else break; // NOTE: soon as we discover a missing component, abandon further pointless search for that entityId !
+      }
+
+      // TODO: yield querySet if all components found for entityId
+    }
   };
 
   get deltaTime() {
@@ -253,6 +305,26 @@ class ComponentList {
 
     return oldEntityId;
   };
+
+  get size() {
+    return this.denseListComponentCount;
+  }
+
+  *denseListStream() {
+    for (let i = 0; i < this.denseListComponentCount; i++) {
+      yield this.denseList[i];
+    }
+  }
+
+  *denseListStreamClean() {
+    for (let i = 0; i < this.denseListComponentCount; i++) {
+      const component = this.denseList[i];
+
+      if (!component?.entityId || component.entityId === -1) continue;
+
+      yield component;
+    }
+  }
 }
 
 // TODO: look at optimizing components by using ArrayBuffers where possible to store basic data
