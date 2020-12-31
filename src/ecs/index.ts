@@ -118,8 +118,10 @@ class Engine {
 
   generateEntityId = () => this.entityIdPool.pop();
 
-  // TODO: ... probably involves purging components too
-  removeEntity = () => {};
+  // TODO: ... involves purging all related components too
+  removeEntity = () => {
+    // NOTE: In EnTT this happens by iterating every single sparse set in the registry, checking if it contains the entity, and deleting it if it does.
+  };
 
   // TODO: ... probably involves purging components too
   removeAllEntities = () => {};
@@ -133,7 +135,7 @@ class Engine {
     // this.updateComplete.dispatch(); // TODO: signals??
   };
 
-  // TODO: fix the typescript...
+  // TODO: fix the types and interface !!!
   *getQuerySetIteratorFor<T extends Component>(...componentClasses: T[]) {
     // TODO: ...
     // Query function will take shortest componentlist and loop throught the dense list of it.
@@ -170,10 +172,8 @@ class Engine {
       const entityId = component.entityId;
 
       // TODO: optimize by caching querySet array ??
-      // const querySet: (number | Component)[] = [entityId]; // NOTE: setting first value as number will hint to V8 it's array of numbers...
-      const querySet: QuerySet = []; // NOTE: setting first value as number will hint to V8 it's array of numbers...
+      const querySet: QuerySet = [];
 
-      // TODO: cache componentClasses.length !!!
       const componentClassesLength = componentClasses.length;
       for (let i = 0; i < componentClassesLength; i++) {
         if (i === shortestComponentListIndex) continue; // NOTE: skip checking the shortest list !
@@ -181,7 +181,6 @@ class Engine {
         const componentClassName = componentClasses[i].constructor.name;
         const anotherComponent = this.componentLists[componentClassName].get(entityId);
 
-        // ...
         if (anotherComponent) querySet.push(anotherComponent);
         else break; // NOTE: soon as we discover a missing component, abandon further pointless search for that entityId !
 
@@ -446,10 +445,9 @@ class MovementSystem extends System {
   update(engine: Engine, deltaTime: DeltaTime) {
     this.deltaTime = deltaTime;
 
-    // TODO: stream the entities one by one instead of creating new node lists...
-    // const nodes = engine.queryForEntitiesWith(Position, Velocity);
-    // nodes.forEach(this.updateNode); // NOTE: wanna cache functions to prevent creating them from scratch
+    // NOTE: streaming the entities one by one instead of creating new node lists...
 
+    // TODO: fix the types and interface !!!
     const querySetIterator = engine.getQuerySetIteratorFor(Position, Velocity);
     for (const querySet of querySetIterator) this.updateEntity(querySet);
   }
@@ -457,6 +455,7 @@ class MovementSystem extends System {
   updateEntity = (querySet: QuerySet) => {
     const [position, velocity] = querySet;
 
+    // TODO: fix the types and interface !!!
     position.x = velocity.x * this.deltaTime;
     position.y = velocity.y * this.deltaTime;
     position.rotation = velocity.angularVelocity * this.deltaTime;
