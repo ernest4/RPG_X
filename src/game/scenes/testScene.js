@@ -69,7 +69,7 @@ export default ({ engine, canvas }) => {
   // blue lighting for sad, dark, scary.
   // Orange lighting for light, bright, energetic.
   // Red light if you're in a building on fire or in a spaceship with hight alert.
-  // Simple black and white if you're in outer space (pich black shadows, i.e. no back light).
+  // Simple black and white if you're in outer space (pitch black shadows, i.e. no back light).
   light.diffuse = new Color3(0.95, 0.95, 0.95);
   light.specular = new Color3(0.95, 0.95, 0.95);
   light.groundColor = new Color3(0.3, 0.3, 0.3);

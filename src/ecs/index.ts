@@ -362,7 +362,8 @@ class ComponentList {
 // close together in memory and maybe even in the component array...
 
 class System {
-  deltaTime: DeltaTime;
+  // deltaTime: DeltaTime;
+  private _engine: Engine;
   // engine: Engine;
 
   // constructor(engine: Engine) {
@@ -370,17 +371,36 @@ class System {
   //   this.engine = engine;
   // }
 
-  constructor() {
+  constructor(engine: Engine) {
     // TODO: ...
-    this.deltaTime = 0;
+    // this.deltaTime = 0;
+    this._engine = engine;
+  }
+
+  start() {
+    // TODO: init stuff, engine should run this when system right after system is added
+    throw new Error("unimplemented");
   }
 
   // update = (deltaTime: DeltaTime) => {
   //   throw new Error("unimplemented");
   // };
 
-  update(engine: Engine, deltaTime: DeltaTime) {
+  update() {
     throw new Error("unimplemented");
+  }
+
+  destroy() {
+    // TODO: clean up stuff, engine should run this when system right before system is removed
+    throw new Error("unimplemented");
+  }
+
+  get engine() {
+    return this._engine;
+  }
+
+  get deltaTime() {
+    return this._engine.deltaTime;
   }
 }
 
@@ -416,7 +436,7 @@ class System {
 // That said, can finish the generic implementation of ECS first, but then make an optimized version
 // that uses ArrayBuffers after (either dynamically resolve which components can fit in ArrayBuffers
 // or just specifically optimize the key components like Position and Velocity etc.).
-class Position extends Component {
+class PositionComponent extends Component {
   _values: number[];
   // TODO: ...
 
@@ -487,7 +507,7 @@ class Position extends Component {
 // everything collides with everything, but that's not performant nor desired. Player will collide
 // with most things but NPCs might not...
 // }
-class Velocity extends Component {
+class VelocityComponent extends Component {
   _values: number[];
   // TODO: ...
   constructor(entityId: EntityId, x: number, y: number, angular: number) {
@@ -524,13 +544,16 @@ class Velocity extends Component {
 // TODO: remove the class wrapper?? maybe like in ECSY, no need for standalone class for system...
 // just a function...
 class MovementSystem extends System {
-  update(engine: Engine, deltaTime: DeltaTime) {
-    this.deltaTime = deltaTime;
+  start() {}
 
+  update() {
     // NOTE: streaming the entities one by one instead of creating new node lists...
 
     // TODO: fix the types and interface !!!
-    const querySetIterator = engine.getQuerySetIteratorFor(Position, Velocity);
+    const querySetIterator = this.engine.getQuerySetIteratorFor(
+      PositionComponent,
+      VelocityComponent
+    );
     for (const querySet of querySetIterator) this.updateEntity(querySet);
   }
 
@@ -542,19 +565,34 @@ class MovementSystem extends System {
     position.y = velocity.y * this.deltaTime;
     position.rotation = velocity.angularVelocity * this.deltaTime;
   };
+
+  destroy() {}
+}
+
+class RenderSystem extends System {
+  start() {
+    // TODO: add to display item to scene
+  }
+
+  update() {
+    // for every entity with display object and position:
+    // add position info to display object https://github.com/abiyasa/ashteroids-js/blob/master/src/systems/ThreeRenderSystem.js#L78
+  }
 }
 
 const main = () => {
   const engine = new Engine();
 
-  engine.addSystem(new MovementSystem());
+  // input system
+  engine.addSystem(new MovementSystem(engine));
+  // render system
   // other systems, order of addition matters!!
 
   for (let i = 0; i < 10; i++) {
     const entityId = engine.generateEntityId();
 
-    engine.addComponent(new Position(entityId, i * i, i + i, 0));
-    engine.addComponent(new Velocity(entityId, i, i, i));
+    engine.addComponent(new PositionComponent(entityId, i * i, i + i, 0));
+    engine.addComponent(new VelocityComponent(entityId, i, i, i));
     // engine.addComponent(Velocity, [entity, i * 1, i * 1]);
   }
 

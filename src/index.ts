@@ -25,14 +25,15 @@ const scene = testScene({ engine, canvas });
 
 // const performanceMonitor = new PerformanceMonitor();
 
-// Render every frame
-// TODO: use a cached function here instead of anonymous !!!
-engine.runRenderLoop(() => {
+// NOTE: use a cached function here instead of anonymous !!!
+const renderLoop = () => {
   scene.render();
 
   // log(1000 / engine.getDeltaTime());
   // log(performanceMonitor.averageFPS());
-});
+};
+
+engine.runRenderLoop(renderLoop);
 
 // the canvas/window resize event handler
 window.addEventListener("resize", function () {
