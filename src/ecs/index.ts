@@ -58,7 +58,7 @@ class Entity {
   //   return this._engine.getComponent(componentClass);
   // };
 
-  // addComponent = (component: Comment) => {
+  // addComponent = (component: Comment): Component => {
   //   // TODO: ...
   // };
 
@@ -191,10 +191,10 @@ class Engine {
     let shortestComponentListIndex = 0;
 
     let shortestComponentList = this.componentLists[
-      componentClasses[shortestComponentListIndex].constructor.name
+      componentClasses[shortestComponentListIndex].name
     ];
     componentClasses.forEach((componentClass, index) => {
-      const nextShortestComponentList = this.componentLists[componentClass.constructor.name];
+      const nextShortestComponentList = this.componentLists[componentClass.name];
 
       if (nextShortestComponentList.size < shortestComponentList.size) {
         shortestComponentList = nextShortestComponentList;
@@ -222,7 +222,7 @@ class Engine {
       for (let i = 0; i < componentClassesLength; i++) {
         if (i === shortestComponentListIndex) continue; // NOTE: skip checking the shortest list !
 
-        const componentClassName = componentClasses[i].constructor.name;
+        const componentClassName = componentClasses[i].name;
         const anotherComponent = this.componentLists[componentClassName].get(entityId);
 
         if (anotherComponent) querySet.push(anotherComponent);
