@@ -41,23 +41,25 @@ export const ECS = {};
 // };
 
 // TODO: entity wrapper ??
-// class Entity {
-//   private _entityId: number;
+class Entity {
+  private _entityId: number;
+  private _engine: Engine;
 
-//   constructor(entityId: EntityId) {
-//     this._entityId = entityId;
-//   }
+  constructor(entityId: EntityId, engine: Engine) {
+    this._entityId = entityId;
+    this._engine = engine;
+  }
 
-//   get entityId() {
-//     return this._entityId;
-//   }
+  get entityId() {
+    return this._entityId;
+  }
 
-//   // other util methods... ??
+  // other util methods... ??
 
-//   // getComponent = (componentClass: Component) => {
-//   //   return this._engine.getComponent(componentClass);
-//   // };
-// }
+  // getComponent = (componentClass: Component) => {
+  //   return this._engine.getComponent(componentClass);
+  // };
+}
 
 // TODO: need a finiteStateMachine as well. https://www.richardlord.net/blog/ecs/finite-state-machines-with-ash.html
 class EntityStateMachine {
@@ -97,6 +99,7 @@ class Engine {
     this.updating = false;
     this.componentLists = {};
     // this.updateComplete = new signals.Signal(); // TODO: signals?? https://github.com/millermedeiros/js-signals
+    this.entityIdPool = new EntityIdPool({});
   }
 
   addSystem = (system: System, priority?: number) => {
@@ -132,20 +135,30 @@ class Engine {
     const componentList = this.componentLists[componentClassName];
     if (!componentList) return;
 
-    const oldEntityId = componentList.remove(component);
-    // this.oldEntityIdsPool.push(oldEntityId);
-    this.entityIdPool.push(oldEntityId);
+    // const oldEntityId = componentList.remove(component);
+    componentList.remove(component);
   };
 
   // removeComponent = (componentClass, entityId) => {};
 
   // getComponent = (componentClass, entityId) => {};
 
-  generateEntityId = () => this.entityIdPool.pop();
+  createEntity = () => new Entity(this.generateEntityId(), this);
+
+  generateEntityId = () => this.entityIdPool.getId();
 
   // TODO: ... involves purging all related components too
-  removeEntity = () => {
+  removeEntity = (entityId: EntityId) => {
     // NOTE: In EnTT this happens by iterating every single sparse set in the registry, checking if it contains the entity, and deleting it if it does.
+    Object.values(this.componentLists).forEach(componentList => {
+      // TODO: add remove(entityId: EntityId) to ComponentList to remove component by entityId
+      // more efficiently than this...
+      const component = componentList.get(entityId);
+      if (component) componentList.remove(component);
+    });
+
+    // TODO: reclaim entityId to be reused only when deleting Entity (for now) i.e. when all components gone...
+    this.entityIdPool.reclaimId(entityId);
   };
 
   // TODO: ... probably involves purging components too
@@ -232,7 +245,16 @@ class Engine {
   }
 }
 
+type EntityIdPoolParams = {
+  lastUsedEntityId?: EntityId;
+  reclaimedEntityIdPool?: EntityId[];
+  reclaimedEntityIdPoolSize?: number;
+};
+
 class EntityIdPool {
+  private _lastUsedEntityId: EntityId;
+  private _reclaimedEntityIdPoolSize: number;
+  private _reclaimedEntityIdPool: EntityId[];
   // TODO: ...
   // first check this.oldEntityIdsPool ...
   // TODO: for the pool, you dont want to pop() or shrink the array. Use an array, keep custom
@@ -244,19 +266,30 @@ class EntityIdPool {
   // keep track of this.lastEntityId and get the next integer after
   // maybe package this and above pool into single class EntityIdPool ??
 
-  constructor() {
-    // TODO:
-    this.lastEntityId = -1;
-    this.oldEntityIdPool = [];
-    this.oldEntityIdPoolSize = 0;
+  // TODO: need to think about when and how this entityId pool will be saved and reinitialized
+  // along with the rest of the games entities...
+  constructor({
+    lastUsedEntityId,
+    reclaimedEntityIdPool,
+    reclaimedEntityIdPoolSize,
+  }: EntityIdPoolParams) {
+    this._lastUsedEntityId = lastUsedEntityId || -1;
+    this._reclaimedEntityIdPool = reclaimedEntityIdPool || [];
+    this._reclaimedEntityIdPoolSize = reclaimedEntityIdPoolSize || 0;
   }
 
-  push = () => {
-    // TODO: wip
+  reclaimId = (entityId: EntityId) => {
+    this._reclaimedEntityIdPool[++this._reclaimedEntityIdPoolSize] = entityId;
   };
 
-  pop = () => {
-    // TODO: ... wip
+  getId = (): EntityId => {
+    this._reclaimedEntityIdPoolSize--;
+
+    if (0 < this._reclaimedEntityIdPoolSize) {
+      return this._reclaimedEntityIdPool[this._reclaimedEntityIdPoolSize];
+    }
+
+    return ++this._lastUsedEntityId;
   };
 }
 
@@ -507,6 +540,10 @@ class PositionComponent extends Component {
 // everything collides with everything, but that's not performant nor desired. Player will collide
 // with most things but NPCs might not...
 // }
+
+// actually not everything that checks for collision, will have velocity (like static objects)
+// so might keep velocity separate from physics body
+// 3 components => velocity, collider & physicsBody
 class VelocityComponent extends Component {
   _values: number[];
   // TODO: ...
@@ -539,6 +576,30 @@ class VelocityComponent extends Component {
   set angular(value: number) {
     this._values[2] = value;
   }
+}
+
+class SpriteComponent extends Component {
+  constructor(entityId: EntityId) {
+    super(entityId);
+  }
+
+  // TODO: ...
+  // sprite
+  // sprite manager
+  // color
+  // flip
+  // material ??
+  // sorting order (draw order) ??
+}
+
+class AnimationComponent extends Component {
+  constructor(entityId: EntityId) {
+    super(entityId);
+  }
+
+  // TODO: ...
+  // loop: boolean
+  // animations: {'name': {startCell: number, endCell: number, frameInterval: number (time between frames)}, ...} (frame information for different animations)
 }
 
 // TODO: remove the class wrapper?? maybe like in ECSY, no need for standalone class for system...
@@ -576,10 +637,11 @@ class RenderSystem extends System {
 
   update() {
     // for every entity with display object and position:
-    // add position info to display object https://github.com/abiyasa/ashteroids-js/blob/master/src/systems/ThreeRenderSystem.js#L78
+    // add position & rotation info to display object https://github.com/abiyasa/ashteroids-js/blob/master/src/systems/ThreeRenderSystem.js#L78
   }
 }
 
+// TODO: probably want arcFollowCamera for my game...https://doc.babylonjs.com/divingDeeper/cameras
 const main = () => {
   const engine = new Engine();
 
@@ -589,11 +651,16 @@ const main = () => {
   // other systems, order of addition matters!!
 
   for (let i = 0; i < 10; i++) {
-    const entityId = engine.generateEntityId();
+    // const entityId = engine.generateEntityId();
 
-    engine.addComponent(new PositionComponent(entityId, i * i, i + i, 0));
-    engine.addComponent(new VelocityComponent(entityId, i, i, i));
+    // engine.addComponent(new PositionComponent(entityId, i * i, i + i, 0));
+    // engine.addComponent(new VelocityComponent(entityId, i, i, i));
     // engine.addComponent(Velocity, [entity, i * 1, i * 1]);
+
+    const entity = engine.createEntity();
+
+    entity.addComponent<PositionComponent>(i * i, i + i, 0);
+    entity.addComponent<VelocityComponent>(i, i, i);
   }
 
   // some third party update function, babylon.js or phaser3 etc
