@@ -103,6 +103,8 @@ class Engine {
     }
 
     componentList.add(component);
+
+    return component;
   };
 
   removeComponent = (component: Component) => {
@@ -115,6 +117,10 @@ class Engine {
     // this.oldEntityIdsPool.push(oldEntityId);
     this.entityIdPool.push(oldEntityId);
   };
+
+  // removeComponent = (componentClass, entityId) => {};
+
+  // getComponent = (componentClass, entityId) => {};
 
   generateEntityId = () => this.entityIdPool.pop();
 
@@ -287,11 +293,12 @@ class ComponentList {
 
   get = (entityId: EntityId): Component | null => {
     const denseListIndex = this.sparseList[entityId];
+    const component = this.denseList[denseListIndex];
 
     if (this.denseListComponentCount < denseListIndex) return null;
-    if (this.denseList[denseListIndex].entityId !== entityId) return null;
+    if (component.entityId !== entityId) return null;
 
-    return this.denseList[denseListIndex];
+    return component;
   };
 
   remove = (component: Component): EntityId | undefined => {
@@ -364,6 +371,30 @@ class System {
 //   y: number;
 //   rotation: number;
 // }
+
+// TODO: maybe go Unity way? https://docs.unity3d.com/Manual/Components.html
+// Idea is that you have presets for components that are heavily optimized (as they are used all the
+// time) like position and sprite components. These could be stored in pure ArrayBuffers, even in
+// special ComponentList to maximize iteration speed.
+// 
+// Then you have the catch all "Script" components that actually let you script game logic in a way
+// that basically makes them equivalent to systems on their own (Systems as components idea). Of
+// course there will be a default set of systems (maybe more optimized even) that handle default
+// component types, including the Script components.
+// Scripts system (and scripts storage) would need to be sophisticated enough to allow single
+// entity to hold multiple scrip components (encapsulating logic into small nuggets).
+// 
+// You'd have Entity class that mimic this basically https://docs.unity3d.com/Manual/class-GameObject.html
+// 
+// NOTE: ironically it seems game developers and Unity itself are "rediscovering" ECS and going
+// BACKWARDS to pure ECS approach over stray scripts https://levelup.gitconnected.com/a-simple-guide-to-get-started-with-unity-ecs-b0e6a036e707
+// Citing better more modular architecture and improved performance as reasons hahahaha!
+// 
+// BEST SOLUTION: keep everything as is basically... bets solution. That's what the new Unity DOTS
+// does already. It works with system scripts and basic data component scripts.
+// That said, can finish the generic implementation of ECS first, but then make an optimized version
+// that uses ArrayBuffers after (either dynamically resolve which components can fit in ArrayBuffers
+// or just specifically optimize the key components like Position and Velocity etc.).
 class Position extends Component {
   _values: number[];
   // TODO: ...
@@ -405,6 +436,28 @@ class Position extends Component {
   }
 }
 
+// TODO: maybe instead of velocity standalone, have it part of PhysicsBody component like in Unity
+// and heavily optimize that??
+// PhysicsBody {
+// mass: number
+// linearDamping: number
+// angularDamping: number
+// linearVelocity: [x,y,z]
+// angularVelocity: [x,y,z]
+// gravityFactor: number
+// }
+// TODO: also PhysicsShape (with 2 options, circle (sphere) and box (cube)) that will be involved in
+// collision detection.
+// PhysicsShape {
+// shapeType: number (SPHERE = 0 | BOX = 1)
+// radius: number (SPHERE)
+// size: [x,y,z] (BOX)
+// center: [x,y,z]
+// orientation: [x,y,z] ??? whats this
+// collisionFilter: {belongsTo, collidesWith} // ... need to think about this. Naive collision,
+// everything collides with everything, but that's not performant nor desired. Player will collide
+// with most things but NPCs might not...
+// }
 class Velocity extends Component {
   _values: number[];
   // TODO: ...

@@ -1,9 +1,9 @@
 import { Engine, Nullable, PerformanceMonitor } from "babylonjs";
 
-import { log, debugLog } from "./debug";
-import testScene from "./scenes/testScene";
+import { log, debugLog } from "./game/debug";
+import testScene from "./game/scenes/testScene";
 
-import { testAdder } from "./testy2";
+import { testAdder } from "./game/testy2";
 
 testAdder(1, 3);
 // testAdder("abc", 3);
