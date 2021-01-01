@@ -54,11 +54,15 @@ class Entity {
     return this._entityId;
   }
 
-  // other util methods... ??
-
-  // getComponent = (componentClass: Component) => {
+  // getComponent = <T extends Component>(componentClass: T) => {
   //   return this._engine.getComponent(componentClass);
   // };
+
+  // addComponent = (component: Comment) => {
+  //   // TODO: ...
+  // };
+
+  // other util methods... ??
 }
 
 // TODO: need a finiteStateMachine as well. https://www.richardlord.net/blog/ecs/finite-state-machines-with-ash.html
@@ -139,8 +143,10 @@ class Engine {
     componentList.remove(component);
   };
 
+  // TODO: ...
   // removeComponent = (componentClass, entityId) => {};
 
+  // TODO: ...
   // getComponent = (componentClass, entityId) => {};
 
   createEntity = () => new Entity(this.generateEntityId(), this);
@@ -174,7 +180,7 @@ class Engine {
   };
 
   // TODO: fix the types and interface !!!
-  *getQuerySetIteratorFor<T extends Component>(...componentClasses: T[]) {
+  *getQuerySetIteratorFor<T extends Array<Component>>(...componentClasses: T) {
     // TODO: ...
     // Query function will take shortest componentlist and loop throught the dense list of it.
     // For each denselist component with valid entityid, will check that components entityid against the rest of desired component lists and get those components (if present).
