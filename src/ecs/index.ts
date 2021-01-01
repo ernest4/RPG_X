@@ -40,6 +40,25 @@ export const ECS = {};
 //   weight: Pound;
 // };
 
+// TODO: entity wrapper ??
+// class Entity {
+//   private _entityId: number;
+
+//   constructor(entityId: EntityId) {
+//     this._entityId = entityId;
+//   }
+
+//   get entityId() {
+//     return this._entityId;
+//   }
+
+//   // other util methods... ??
+
+//   // getComponent = (componentClass: Component) => {
+//   //   return this._engine.getComponent(componentClass);
+//   // };
+// }
+
 // TODO: need a finiteStateMachine as well. https://www.richardlord.net/blog/ecs/finite-state-machines-with-ash.html
 class EntityStateMachine {
   // TODO: wip
@@ -206,7 +225,9 @@ class Engine {
 
   // private
 
-  callSystemUpdateFunction(systemUpdateFunction: (engine: Engine, deltaTime: DeltaTime) => void) {
+  private callSystemUpdateFunction(
+    systemUpdateFunction: (engine: Engine, deltaTime: DeltaTime) => void
+  ) {
     systemUpdateFunction(this, this.deltaTime);
   }
 }
@@ -376,20 +397,20 @@ class System {
 // Idea is that you have presets for components that are heavily optimized (as they are used all the
 // time) like position and sprite components. These could be stored in pure ArrayBuffers, even in
 // special ComponentList to maximize iteration speed.
-// 
+//
 // Then you have the catch all "Script" components that actually let you script game logic in a way
 // that basically makes them equivalent to systems on their own (Systems as components idea). Of
 // course there will be a default set of systems (maybe more optimized even) that handle default
 // component types, including the Script components.
 // Scripts system (and scripts storage) would need to be sophisticated enough to allow single
 // entity to hold multiple scrip components (encapsulating logic into small nuggets).
-// 
+//
 // You'd have Entity class that mimic this basically https://docs.unity3d.com/Manual/class-GameObject.html
-// 
+//
 // NOTE: ironically it seems game developers and Unity itself are "rediscovering" ECS and going
 // BACKWARDS to pure ECS approach over stray scripts https://levelup.gitconnected.com/a-simple-guide-to-get-started-with-unity-ecs-b0e6a036e707
 // Citing better more modular architecture and improved performance as reasons hahahaha!
-// 
+//
 // BEST SOLUTION: keep everything as is basically... bets solution. That's what the new Unity DOTS
 // does already. It works with system scripts and basic data component scripts.
 // That said, can finish the generic implementation of ECS first, but then make an optimized version
@@ -411,6 +432,8 @@ class Position extends Component {
   }
 
   // TODO: dynamically create these???
+  // Heres JS snippet as guide https://github.com/playcanvas/engine/blob/master/src/framework/components/component.js#L35
+  // maybe...couldn't seem to get it working properly in console.
   get x() {
     return this._values[0];
   }
@@ -435,6 +458,12 @@ class Position extends Component {
     this._values[2] = value;
   }
 }
+
+// TODO: support for special Tag components? This will let you tag entities for queries.
+// Tags will dynamically add new ComponentLists and systems at run time for each unique tag for
+// efficient storage and query. This will be implemented using the ArrayBuffer optimization.
+// So maybe not version 1...
+// Otherwise tagging will be simply supported by creating empty components as tags
 
 // TODO: maybe instead of velocity standalone, have it part of PhysicsBody component like in Unity
 // and heavily optimize that??
