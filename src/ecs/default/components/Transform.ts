@@ -1,45 +1,106 @@
+// TODO: optimize this to act as basic view into ComponentList pure ArrayBuffer for Transform
+// components
 class Transform extends Component {
-  _values: [number, number, number, number, number, number, number, number, number];
-  // TODO: ...
+  private _values: Uint32Array;
+  private _position: Vector3DataView;
+  private _rotation: Vector3DataView;
+  private _scale: Vector3DataView;
 
-  // nice interface example, but wanna keep things fast...
-  // constructor({ entityId, x, y, rotation }: PositionArguments) {
-  //   super(entityId);
-  //   this._values = [x, y, rotation];
-  // }
-
+  // TODO: more constructors...
   constructor(entityId: EntityId) {
     super(entityId);
     // TODO: [positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ]
-    this._values = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    // this._values = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    this._values = new Uint32Array(9);
+    // this._position = new Position(this._values);
+    this._position = new Vector3DataView(this._values);
+    this._rotation = new Vector3DataView(this._values, 3);
+    this._scale = new Vector3DataView(this._values, 6);
   }
 
-  // TODO: dynamically create these???
-  // Heres JS snippet as guide https://github.com/playcanvas/engine/blob/master/src/framework/components/component.js#L35
-  // maybe...couldn't seem to get it working properly in console.
-  get x() {
-    return this._values[0];
-  }
-
-  set x(value: number) {
-    this._values[0] = value;
-  }
-
-  get y() {
-    return this._values[1];
-  }
-
-  set y(value: number) {
-    this._values[1] = value;
+  get position() {
+    return this._position;
   }
 
   get rotation() {
-    return this._values[2];
+    return this._rotation;
   }
 
-  set rotation(value: number) {
-    this._values[2] = value;
+  get scale() {
+    return this._scale;
   }
+
+  // get positionX() {
+  //   return this._values[TransformValueIndexes.POSITION_X];
+  // }
+
+  // set positionX(value: number) {
+  //   this._values[TransformValueIndexes.POSITION_X] = value;
+  // }
+
+  // get positionY() {
+  //   return this._values[TransformValueIndexes.POSITION_Y];
+  // }
+
+  // set positionY(value: number) {
+  //   this._values[TransformValueIndexes.POSITION_Y] = value;
+  // }
+
+  // get positionZ() {
+  //   return this._values[TransformValueIndexes.POSITION_Z];
+  // }
+
+  // set positionZ(value: number) {
+  //   this._values[TransformValueIndexes.POSITION_Z] = value;
+  // }
+
+  // get rotationX() {
+  //   return this._values[TransformValueIndexes.ROTATION_X];
+  // }
+
+  // set rotationX(value: number) {
+  //   this._values[TransformValueIndexes.ROTATION_X] = value;
+  // }
+
+  // get rotationY() {
+  //   return this._values[TransformValueIndexes.ROTATION_Y];
+  // }
+
+  // set rotationY(value: number) {
+  //   this._values[TransformValueIndexes.ROTATION_Y] = value;
+  // }
+
+  // get rotationZ() {
+  //   return this._values[TransformValueIndexes.ROTATION_Z];
+  // }
+
+  // set rotationZ(value: number) {
+  //   this._values[TransformValueIndexes.ROTATION_Z] = value;
+  // }
+
+  // get scaleX() {
+  //   return this._values[TransformValueIndexes.SCALE_X];
+  // }
+
+  // set scaleX(value: number) {
+  //   this._values[TransformValueIndexes.SCALE_X] = value;
+  // }
+
+  // get scaleY() {
+  //   return this._values[TransformValueIndexes.SCALE_Y];
+  // }
+
+  // set scaleY(value: number) {
+  //   this._values[TransformValueIndexes.SCALE_Y] = value;
+  // }
+
+  // get scaleZ() {
+  //   return this._values[TransformValueIndexes.SCALE_Z];
+  // }
+
+  // set scaleZ(value: number) {
+  //   this._values[TransformValueIndexes.SCALE_Z] = value;
+  // }
 
   // distanceTo = (position: Position): number => {
   //   // TODO: wip...

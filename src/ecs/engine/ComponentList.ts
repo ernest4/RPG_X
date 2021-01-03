@@ -1,3 +1,5 @@
+// TODO: rework to optimize the list to keep default components like Transform in a pure
+// large ArrayBuffer...
 class ComponentList {
   // TODO: based on https://programmingpraxis.com/2012/03/09/sparse-sets/
   // has dense set (primary iteration) and sparse set (fast membership lookup)

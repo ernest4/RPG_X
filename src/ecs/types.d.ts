@@ -26,19 +26,10 @@ declare const enum ShapeType {
   SPHERE = "1",
 }
 
-declare const enum TransformValueIndexes {
-  // position
-  POSITION_X = 0,
-  POSITION_Y = 1,
-  POSITION_Z = 2,
-  // rotation
-  ROTATION_X = 3,
-  ROTATION_Y = 4,
-  ROTATION_Z = 5,
-  // scale
-  SCALE_X = 6,
-  SCALE_Y = 7,
-  SCALE_Z = 8,
+declare const enum Vector3ViewIndexes {
+  X = 0,
+  Y = 1,
+  Z = 2,
 }
 
 declare const enum ColliderValueIndexes {
