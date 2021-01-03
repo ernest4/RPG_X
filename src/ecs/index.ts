@@ -87,6 +87,7 @@ class EntityStateMachine {
 type DeltaTime = number;
 type EntityId = number;
 type QuerySet = Component[];
+type ComponentClass = { name: string; prototype: Component };
 class Engine {
   _deltaTime: DeltaTime;
   updating: boolean;
@@ -149,9 +150,16 @@ class Engine {
   // TODO: ...
   // getComponent = (componentClass, entityId) => {};
 
-  createEntity = () => new Entity(this.generateEntityId(), this);
+  createEntity = (): Entity => {
+    return new Entity(this.generateEntityId(), this);
 
-  generateEntityId = () => this.entityIdPool.getId();
+    // TODO: every single entity have PositionComponent and TagComponent by default ????
+    // entity.addComponent(new PositionComponent(...))
+    // entity.addComponent(new TagComponent(...))
+    // return entity;
+  };
+
+  generateEntityId = (): EntityId => this.entityIdPool.getId();
 
   // TODO: ... involves purging all related components too
   removeEntity = (entityId: EntityId) => {
@@ -179,8 +187,7 @@ class Engine {
     // this.updateComplete.dispatch(); // TODO: signals??
   };
 
-  // TODO: fix the types and interface !!!
-  *getQuerySetIteratorFor<T extends Array<Component>>(...componentClasses: T) {
+  *getQuerySetIteratorFor(...componentClasses: ComponentClass[]) {
     // TODO: ...
     // Query function will take shortest componentlist and loop throught the dense list of it.
     // For each denselist component with valid entityid, will check that components entityid against the rest of desired component lists and get those components (if present).
@@ -236,10 +243,6 @@ class Engine {
 
   get deltaTime() {
     return this._deltaTime;
-  }
-
-  set deltaTime(deltaTime: DeltaTime) {
-    this._deltaTime = deltaTime;
   }
 
   // private
@@ -475,7 +478,7 @@ class System {
 // That said, can finish the generic implementation of ECS first, but then make an optimized version
 // that uses ArrayBuffers after (either dynamically resolve which components can fit in ArrayBuffers
 // or just specifically optimize the key components like Position and Velocity etc.).
-class PositionComponent extends Component {
+class Position extends Component {
   _values: number[];
   // TODO: ...
 
@@ -550,7 +553,7 @@ class PositionComponent extends Component {
 // actually not everything that checks for collision, will have velocity (like static objects)
 // so might keep velocity separate from physics body
 // 3 components => velocity, collider & physicsBody
-class VelocityComponent extends Component {
+class Velocity extends Component {
   _values: number[];
   // TODO: ...
   constructor(entityId: EntityId, x: number, y: number, angular: number) {
@@ -615,12 +618,7 @@ class MovementSystem extends System {
 
   update() {
     // NOTE: streaming the entities one by one instead of creating new node lists...
-
-    // TODO: fix the types and interface !!!
-    const querySetIterator = this.engine.getQuerySetIteratorFor(
-      PositionComponent,
-      VelocityComponent
-    );
+    const querySetIterator = this.engine.getQuerySetIteratorFor(Position, Velocity);
     for (const querySet of querySetIterator) this.updateEntity(querySet);
   }
 
@@ -665,8 +663,8 @@ const main = () => {
 
     const entity = engine.createEntity();
 
-    entity.addComponent<PositionComponent>(i * i, i + i, 0);
-    entity.addComponent<VelocityComponent>(i, i, i);
+    entity.addComponent<Position>(i * i, i + i, 0);
+    entity.addComponent<Velocity>(i, i, i);
   }
 
   // some third party update function, babylon.js or phaser3 etc
