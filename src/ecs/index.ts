@@ -90,7 +90,8 @@ class EntityStateMachine {
 
 type DeltaTime = number;
 type EntityId = number;
-type QuerySet = Array<typeof Component>[];
+type QuerySet = Component[];
+type QueryCallback = (querySet: QuerySet) => void;
 type ComponentClass = { name: string; prototype: Component };
 class Engine {
   _deltaTime: DeltaTime;
@@ -195,7 +196,61 @@ class Engine {
     // this.updateComplete.dispatch(); // TODO: signals??
   };
 
-  *getQuerySetIteratorFor(...componentClasses: ComponentClass[]) {
+  // *query(...componentClasses: ComponentClass[]) {
+  //   // TODO: ...
+  //   // Query function will take shortest componentlist and loop throught the dense list of it.
+  //   // For each denselist component with valid entityid, will check that components entityid against the rest of desired component lists and get those components (if present).
+  //   // If no early bailouts (so all query conditions met) yield the queryset.
+  //   // Query should be streamed via the query set, letting you operate on each component, instead of constructing an array of all results (dont waste time creating intermediary array...)
+
+  //   // NOTE: finding shortest component list
+  //   let shortestComponentListIndex = 0;
+
+  //   let shortestComponentList = this._componentLists[
+  //     componentClasses[shortestComponentListIndex].name
+  //   ];
+  //   componentClasses.forEach((componentClass, index) => {
+  //     const nextShortestComponentList = this._componentLists[componentClass.name];
+
+  //     if (nextShortestComponentList.size < shortestComponentList.size) {
+  //       shortestComponentList = nextShortestComponentList;
+  //       shortestComponentListIndex = index;
+  //     }
+  //   });
+
+  //   // NOTE: cycling through the shortest component list
+  //   // const componentsIterator = shortestComponentList.denseListStream();
+  //   const componentsIterator = shortestComponentList.denseListStreamClean();
+
+  //   for (const component of componentsIterator) {
+  //     // TODO: if the entity of this component, has all the other componentClasses, yield it and it's components
+  //     // otherwise, continue
+  //     // componentClasses.forEach((componentClass, index) => {
+
+  //     // });
+
+  //     const entityId = component.entityId;
+
+  //     // TODO: optimize by caching querySet array ??
+  //     const querySet: QuerySet = [];
+
+  //     const componentClassesLength = componentClasses.length;
+  //     for (let i = 0; i < componentClassesLength; i++) {
+  //       if (i === shortestComponentListIndex) continue; // NOTE: skip checking the shortest list !
+
+  //       const componentClassName = componentClasses[i].name;
+  //       const anotherComponent = this._componentLists[componentClassName].get(entityId);
+
+  //       if (anotherComponent) querySet.push(anotherComponent);
+  //       else break; // NOTE: soon as we discover a missing component, abandon further pointless search for that entityId !
+
+  //       // NOTE: yield querySet if all components found for entityId
+  //       if (i + 1 === componentClassesLength) yield querySet;
+  //     }
+  //   }
+  // }
+
+  query(callback: QueryCallback, ...componentClasses: ComponentClass[]) {
     // TODO: ...
     // Query function will take shortest componentlist and loop throught the dense list of it.
     // For each denselist component with valid entityid, will check that components entityid against the rest of desired component lists and get those components (if present).
@@ -244,7 +299,8 @@ class Engine {
         else break; // NOTE: soon as we discover a missing component, abandon further pointless search for that entityId !
 
         // NOTE: yield querySet if all components found for entityId
-        if (i + 1 === componentClassesLength) yield querySet;
+        // if (i + 1 === componentClassesLength) yield querySet;
+        if (i + 1 === componentClassesLength) callback(querySet);
       }
     }
   }
@@ -642,17 +698,18 @@ class MovementSystem extends System {
 
   update() {
     // NOTE: streaming the entities one by one instead of creating new node lists...
-    const querySetIterator = this.engine.getQuerySetIteratorFor(Position, Velocity);
-    for (const querySet of querySetIterator) this.updateEntity(querySet);
+    // const query = this.engine.query(Position, Velocity);
+    // for (const querySet of query) this.updateEntity(querySet);
+
+    this.engine.query(this.updateEntity, Position, Velocity);
   }
 
   updateEntity = (querySet: QuerySet) => {
-    const [position, velocity] = querySet;
+    const [position, velocity] = querySet as [Position, Velocity];
 
-    // TODO: fix the types and interface !!!
     position.x = velocity.x * this.deltaTime;
     position.y = velocity.y * this.deltaTime;
-    position.rotation = velocity.angularVelocity * this.deltaTime;
+    position.rotation = velocity.angular * this.deltaTime;
   };
 
   destroy() {}
