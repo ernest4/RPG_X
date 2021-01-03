@@ -1,4 +1,8 @@
 // TODO: optimize this to act as basic view into ComponentList pure ArrayBuffer for Transform
+
+import Component from "../../Component";
+import { EntityId } from "../../types";
+
 // components
 class Transform extends Component {
   private _values: Uint32Array;
@@ -102,7 +106,29 @@ class Transform extends Component {
   //   this._values[TransformValueIndexes.SCALE_Z] = value;
   // }
 
+  serialize(): void {
+    // throw new Error("Method not implemented.");
+  }
+
+  load(componentObject): void {
+    // throw new Error("Method not implemented.");
+    // return this.constructor(5);
+    const { position, rotation, scale } = componentObject;
+
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.position.z = position.z;
+    this.rotation.x = rotation.x;
+    this.rotation.y = rotation.y;
+    this.rotation.z = rotation.z;
+    this.scale.x = scale.x;
+    this.scale.y = scale.y;
+    this.scale.z = scale.z;
+  }
+
   // distanceTo = (position: Position): number => {
   //   // TODO: wip...
   // };
 }
+
+export default Transform;

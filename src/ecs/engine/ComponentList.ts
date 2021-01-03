@@ -1,4 +1,7 @@
 // TODO: rework to optimize the list to keep default components like Transform in a pure
+
+import Component from "../Component";
+
 // large ArrayBuffer...
 class ComponentList {
   // TODO: based on https://programmingpraxis.com/2012/03/09/sparse-sets/
@@ -103,4 +106,16 @@ class ComponentList {
   //     callback(component);
   //   }
   // }
+
+  serialize = () => {};
+
+  load = ({ componentClassName, componentsData }) => {
+    componentsData.forEach(componentData => {
+      const component = eval(`new ${componentClassName}(${componentData.entityId})`) as Component;
+      component.load(componentData);
+      this.add(component);
+    });
+  };
 }
+
+export default ComponentList;

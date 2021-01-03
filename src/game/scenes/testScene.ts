@@ -31,14 +31,9 @@ import { AdvancedDynamicTexture } from "babylonjs-gui";
 import store from "../store";
 import * as gameActions from "../store/actions/game";
 
-import { log, debugLog, showFPS } from "../debug";
-import testMap from "../areas/testy.json"; // json loader works out the box with webpack, other file types need explicit webpack set up
 // import addRTSCamera from "../cameras/addRTSCamera";
 import addFPSCamera from "../cameras/addFPSCamera";
-
-const { name, tiles } = testMap;
-
-log(`name ${name}, tiles ${tiles}`);
+import { showFPS } from "../debug";
 
 export default ({ engine, canvas }) => {
   // TODO: for in game UI on various things, make the UI inside the game world!! very cool https://www.babylonjs-playground.com/#Q81PBV#6
@@ -95,7 +90,7 @@ export default ({ engine, canvas }) => {
   box.actionManager.registerAction(
     new ExecuteCodeAction(ActionManager.OnPickTrigger, event => {
       const state = store.getState(); // read redux store
-      log(state.showUi);
+      // log(state.showUi);
       store.dispatch(gameActions.showUI(!state.showUi)); // fire redux action
     })
   );
@@ -143,7 +138,7 @@ export default ({ engine, canvas }) => {
   // TODO: set up netcode for players playing in real time in the secene
   // TODO: investigate ui customization https://www.html5gamedevs.com/topic/40142-can-we-customize-the-look-of-babylonjsgui/
   // TODO: investigate procedural generation https://en.wikipedia.org/wiki/Procedural_texture , https://www.youtube.com/watch?v=uUfV41HE_Dg
-  showFPS(scene, advancedTexture);
+  showFPS(advancedTexture, scene);
   // TODO: art style for ammo in the fps low poly space game https://www.google.com/search?q=deus+ex+ammo&rlz=1C5CHFA_enIE838IE838&sxsrf=ALeKk02qKNLBZWJcgCGemAFdr69nyLPnCw:1591296438659&source=lnms&tbm=isch&sa=X&ved=2ahUKEwj8ndWX6ejpAhVhRBUIHbMOC0IQ_AUoAXoECAwQAw&biw=1440&bih=789#imgrc=9x-ZbNKIhsU7PM
   // TODO: checkoout papercraft as examples for low poly 3d art https://www.google.com/search?q=papercraft+car&rlz=1C5CHFA_enIE838IE838&sxsrf=ALeKk00FmQeOMGmyxp0VkJiaLbbH0WtKow:1590947735783&source=lnms&tbm=isch&sa=X&ved=2ahUKEwia05aV1t7pAhVZShUIHbyoBOoQ_AUoAXoECA4QAw&biw=1440&bih=789
   // TODO: check out tutorials for characters in low poly 3d https://www.youtube.com/watch?v=Ljl_QFs9xhE

@@ -16,8 +16,9 @@
 // as regular arrays get downgraded to dictionaries by V8 once they becomes sparse. Otherwise make
 // sure to fill regular arrays with 0s or something to not appear 'sparse'
 
+import Engine from "./Engine";
 // TODO: jest tests !!!!
-export const ECS = {};
+export { Engine };
 
 // wip...
 
@@ -72,44 +73,46 @@ export const ECS = {};
 // So maybe not version 1...
 // Otherwise tagging will be simply supported by creating empty components as tags
 
-class AnimationComponent extends Component {
-  constructor(entityId: EntityId) {
-    super(entityId);
-  }
+// class AnimationComponent extends Component {
+//   constructor(entityId: EntityId) {
+//     super(entityId);
+//   }
 
-  // TODO: ...
-  // loop: boolean
-  // animations: {'name': {startCell: number, endCell: number, frameInterval: number (time between frames)}, ...} (frame information for different animations)
-}
+//   // TODO: ...
+//   // loop: boolean
+//   // animations: {'name': {startCell: number, endCell: number, frameInterval: number (time between frames)}, ...} (frame information for different animations)
+// }
 
-// TODO: probably want arcFollowCamera for my game...https://doc.babylonjs.com/divingDeeper/cameras
-const main = () => {
-  const engine = new Engine();
+// // TODO: probably want arcFollowCamera for my game...https://doc.babylonjs.com/divingDeeper/cameras
+// const main = () => {
+//   const engine = new Engine();
 
-  // input system
-  engine.addSystem(new MovementSystem(engine));
-  // render system
-  // other systems, order of addition matters!!
+//   // input system
+//   engine.addSystem(new MovementSystem(engine));
+//   // render system
+//   // other systems, order of addition matters!!
 
-  for (let i = 0; i < 10; i++) {
-    // const entityId = engine.generateEntityId();
+//   for (let i = 0; i < 10; i++) {
+//     // const entityId = engine.generateEntityId();
 
-    // engine.addComponent(new PositionComponent(entityId, i * i, i + i, 0));
-    // engine.addComponent(new VelocityComponent(entityId, i, i, i));
-    // engine.addComponent(Velocity, [entity, i * 1, i * 1]);
+//     // engine.addComponent(new PositionComponent(entityId, i * i, i + i, 0));
+//     // engine.addComponent(new VelocityComponent(entityId, i, i, i));
+//     // engine.addComponent(Velocity, [entity, i * 1, i * 1]);
 
-    const entity = engine.createEntity();
+//     const entity = engine.createEntity();
 
-    entity.addComponent(new Transform(entity.entityId, i * i, i + i, 0));
-    entity.addComponent(new PhysicsBody(entity.entityId, i, i, i));
-    // entity.addComponent(Position, i * i, i + i, 0);
-    // entity.addComponent(Velocity, i, i, i);
-    // entity.addComponent(Velocity,);
-    // entity.addComponent(Engine, i, i, i);
-  }
+//     // entity.addComponent(new Transform(entity.entityId, i * i, i + i, 0));
+//     // entity.addComponent(new PhysicsBody(entity.entityId, i, i, i));
 
-  // some third party update function, babylon.js or phaser3 etc
-  // update = deltaTime => {
-  //   engine.update(deltaTime);
-  // };
-};
+//     // entity.addComponent(Position, i * i, i + i, 0);
+//     // entity.addComponent(Velocity, i, i, i);
+
+//     // entity.addComponent(Velocity,);
+//     // entity.addComponent(Engine, i, i, i);
+//   }
+
+//   // some third party update function, babylon.js or phaser3 etc
+//   // update = deltaTime => {
+//   //   engine.update(deltaTime);
+//   // };
+// };

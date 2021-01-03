@@ -1,12 +1,9 @@
+import { Scene } from "babylonjs";
+import { AdvancedDynamicTexture } from "babylonjs-gui";
+
 const DEBUG = process.env.DEBUG_LOG === "true" || process.env.NODE_ENV !== "production";
 
-export const log = msg => console.log(`[Pulse Client]: ${msg}`);
-
-export const debugLog = msg => {
-  if (DEBUG) console.log(`[Pulse Client]: ${msg}`);
-};
-
-export const showFPS = (scene, advancedTexture) => {
+export const showFPS = (advancedTexture: AdvancedDynamicTexture, scene: Scene) => {
   var fpsContainer = new BABYLON.GUI.Rectangle();
   // fpsContainer.width = 0.2;
   fpsContainer.width = "90px";
@@ -29,6 +26,6 @@ export const showFPS = (scene, advancedTexture) => {
   fpsContainer.addControl(fpsText);
 
   scene.onBeforeRenderObservable.add(() => {
-    fpsText.text = scene.getEngine().getFps().toFixed() + " fps";
+    fpsText.text = `${scene.getEngine().getFps().toFixed()} fps`;
   });
 };

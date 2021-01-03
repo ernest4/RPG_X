@@ -1,3 +1,8 @@
+import { ComponentClass, DeltaTime, EntityId, QueryCallback, QuerySet } from "./types";
+import EntityIdPool from "./engine/EntityIdPool";
+import Component from "./Component";
+import ComponentList from "./engine/ComponentList";
+
 class Engine {
   _deltaTime: DeltaTime;
   _updating: boolean;
@@ -13,7 +18,7 @@ class Engine {
     this._updating = false;
     this._componentLists = {};
     // this.updateComplete = new signals.Signal(); // TODO: signals?? https://github.com/millermedeiros/js-signals
-    this._entityIdPool = new EntityIdPool({});
+    this._entityIdPool = new EntityIdPool();
   }
 
   addSystem = (system: System, priority?: number) => {
@@ -92,14 +97,14 @@ class Engine {
     this._entityIdPool.reset();
   };
 
-  update = (deltaTime: DeltaTime) => {
+  update(deltaTime: DeltaTime) {
     this._deltaTime = deltaTime;
     // TODO: cycle through the systems, in priority
     this._updating = true;
     this._systemUpdateFunctions.forEach(this.callSystemUpdateFunction);
     this._updating = false;
     // this.updateComplete.dispatch(); // TODO: signals??
-  };
+  }
 
   // *query(...componentClasses: ComponentClass[]) {
   //   // TODO: ...
@@ -214,9 +219,56 @@ class Engine {
     return this._deltaTime;
   }
 
+  serialize = () => {
+    // TODO: export all component state to object
+  };
+
+  load = (ecsObject): void => {
+    // TODO: import all component state to Engine
+
+    const { entityIdPool, componentLists } = ecsObject;
+
+    this._componentLists = this.loadComponentLists(componentLists);
+    this._entityIdPool.load(entityIdPool);
+  };
+
+  // // TODO: filepath?? probably caller of this method will need to do that
+  // toJSON = () => {
+  //   // TODO: ...
+  //   JSON.stringify(this.serialize());
+  // };
+
+  // // TODO: filepath?? probably caller of this method will need to do that
+  // fromJSON = (jsonString: string) => {
+  //   // TODO: ...
+  //   this.deserialize(JSON.parse(jsonString));
+  // };
+
   // private
 
   private callSystemUpdateFunction = (
     systemUpdateFunction: (engine: Engine, deltaTime: DeltaTime) => void
   ) => systemUpdateFunction(this, this.deltaTime);
+
+  private loadComponentLists = (componentListsObject): { [key: string]: ComponentList } => {
+    const componentLists = {};
+
+    Object.entries(componentLists).forEach(([componentClassName, componentsData]) => {
+      const componentList = new ComponentList();
+      componentList.load({ componentClassName, componentsData });
+      this._componentLists[componentClassName] = componentList;
+
+      // // componentsData.forEach(componentData => componentList.add(...));
+
+      // componentsData.forEach(componentData =>
+      //   componentList.add(eval(`new ${componentClassName}(${componentData})`))
+      // );
+
+      // // eval(`console.log(new Testy(78).wow)`)
+    });
+
+    return componentLists;
+  };
 }
+
+export default Engine;

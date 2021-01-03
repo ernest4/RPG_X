@@ -2,6 +2,8 @@
 // type Foot = number;
 // type Pound = number;
 
+import Scene from "../game/Scene";
+
 // type Patient = {
 //   name: string;
 //   height: Foot;
@@ -13,11 +15,6 @@ type EntityId = number;
 type QuerySet = Component[];
 type QueryCallback = (querySet: QuerySet) => void;
 type ComponentClass = { name: string; prototype: Component };
-type EntityIdPoolParams = {
-  lastUsedEntityId?: EntityId;
-  reclaimedEntityIdPool?: EntityId[];
-  reclaimedEntityIdPoolSize?: number;
-};
 
 // NOTE: using string enums over number enums as number enums are not enforceable in the type check!
 // https://stackoverflow.com/questions/57334349/typescript-why-is-exact-enum-type-not-enforced
@@ -41,3 +38,5 @@ declare const enum ColliderValueIndexes {
 }
 
 type BoxColliderSize = { x: number; y: number; z: number };
+
+type URL = string;
