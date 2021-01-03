@@ -30,7 +30,26 @@ class ScenesManager {
           active: true,
           name: "menu",
           babylonScene: { gravity: [0, 0, 0], collisionsEnabled: false },
-          ecs: { entityIdPool: { lastUsedEntityId: -1, reclaimedEntityIdPool: [] } },
+          ecs: {
+            entityIdPool: { lastUsedEntityId: -1, reclaimedEntityIdPool: [] },
+            // componentLists: { Transform: [{ entityId: 0, position: [0, 0, 0] }] },
+            componentLists: {
+              Transform: [
+                {
+                  entityId: 0,
+                  position: { x: 0, y: 0, z: 0 },
+                  rotation: { x: 0, y: 0, z: 0 },
+                  scale: { x: 0, y: 0, z: 0 },
+                },
+                {
+                  entityId: 1,
+                  position: { x: 0, y: 0, z: 0 },
+                  rotation: { x: 0, y: 0, z: 0 },
+                  scale: { x: 0, y: 0, z: 0 },
+                },
+              ],
+            },
+          },
         },
         {
           active: false,
