@@ -478,6 +478,16 @@ class ComponentList {
       yield component;
     }
   }
+
+  // denseListCleanForEach(callback: (activeComponent: Component) => void) {
+  //   for (let i = 0; i < this._denseListComponentCount; i++) {
+  //     const component = this._denseList[i];
+
+  //     if (!component?.entityId || component.entityId === -1) continue;
+
+  //     callback(component);
+  //   }
+  // }
 }
 
 // TODO: look at optimizing components by using ArrayBuffers where possible to store basic data
