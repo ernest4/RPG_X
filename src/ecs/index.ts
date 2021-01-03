@@ -58,11 +58,15 @@ class Entity {
   //   return this._engine.getComponent(componentClass);
   // };
 
-  // addComponent = (component: Comment): Component => {
-  //   // TODO: ...
-  // };
+  addComponent = (component: Component): Component => {
+    return this._engine.addComponent(component);
+  };
 
   // other util methods... ??
+
+  // removeComponent
+
+  // removeAllComponents
 }
 
 // TODO: need a finiteStateMachine as well. https://www.richardlord.net/blog/ecs/finite-state-machines-with-ash.html
@@ -160,7 +164,6 @@ class Engine {
 
   generateEntityId = (): EntityId => this._entityIdPool.getId();
 
-  // TODO: ... involves purging all related components too
   removeEntity = (entityId: EntityId) => {
     // NOTE: In EnTT this happens by iterating every single sparse set in the registry, checking if it contains the entity, and deleting it if it does.
     Object.values(this._componentLists).forEach(componentList => {
@@ -184,7 +187,7 @@ class Engine {
   };
 
   update = (deltaTime: DeltaTime) => {
-    this.deltaTime = deltaTime;
+    this._deltaTime = deltaTime;
     // TODO: cycle through the systems, in priority
     this._updating = true;
     this._systemUpdateFunctions.forEach(this.callSystemUpdateFunction);
@@ -248,10 +251,6 @@ class Engine {
 
   get deltaTime() {
     return this._deltaTime;
-  }
-
-  set deltaTime(deltaTime: DeltaTime) {
-    this._deltaTime = deltaTime;
   }
 
   // private
@@ -688,8 +687,12 @@ const main = () => {
 
     const entity = engine.createEntity();
 
-    entity.addComponent<Position>(i * i, i + i, 0);
-    entity.addComponent<Velocity>(i, i, i);
+    entity.addComponent(new Position(entity.entityId, i * i, i + i, 0));
+    entity.addComponent(new Velocity(entity.entityId, i, i, i));
+    // entity.addComponent(Position, i * i, i + i, 0);
+    // entity.addComponent(Velocity, i, i, i);
+    // entity.addComponent(Velocity,);
+    // entity.addComponent(Engine, i, i, i);
   }
 
   // some third party update function, babylon.js or phaser3 etc
