@@ -86,31 +86,30 @@ class EntityStateMachine {
 
 type DeltaTime = number;
 type EntityId = number;
-type QuerySet = Component[];
+type QuerySet = Array<typeof Component>[];
 type ComponentClass = { name: string; prototype: Component };
 class Engine {
   _deltaTime: DeltaTime;
-  updating: boolean;
-  updateComplete: any; // TODO: better type?
-  systemUpdateFunctions: ((engine: Engine, deltaTime: DeltaTime) => void)[];
-  componentLists: { [key: string]: ComponentList };
-  // oldEntityIdsPool: EntityId[];
-  entityIdPool: EntityIdPool;
+  _updating: boolean;
+  // updateComplete: any; // TODO: better type?
+  _systemUpdateFunctions: ((engine: Engine, deltaTime: DeltaTime) => void)[];
+  _componentLists: { [key: string]: ComponentList };
+  _entityIdPool: EntityIdPool;
 
   constructor() {
     // TODO: ...
-    this.systemUpdateFunctions = [];
+    this._systemUpdateFunctions = [];
     this._deltaTime = 0;
-    this.updating = false;
-    this.componentLists = {};
+    this._updating = false;
+    this._componentLists = {};
     // this.updateComplete = new signals.Signal(); // TODO: signals?? https://github.com/millermedeiros/js-signals
-    this.entityIdPool = new EntityIdPool({});
+    this._entityIdPool = new EntityIdPool({});
   }
 
   addSystem = (system: System, priority?: number) => {
     // TODO: priority integer sorting
     // simple priority based on insertion order for now...
-    this.systemUpdateFunctions.push(system.update);
+    this._systemUpdateFunctions.push(system.update);
   };
 
   // getSystem
@@ -122,11 +121,11 @@ class Engine {
   addComponent = (component: Component) => {
     // NOTE: indexing using component class name
     const componentClassName = component.constructor.name;
-    let componentList = this.componentLists[componentClassName];
+    let componentList = this._componentLists[componentClassName];
 
     if (!componentList) {
       componentList = new ComponentList();
-      this.componentLists[componentClassName] = componentList;
+      this._componentLists[componentClassName] = componentList;
     }
 
     componentList.add(component);
@@ -137,7 +136,7 @@ class Engine {
   removeComponent = (component: Component) => {
     // NOTE: indexing using component class name
     const componentClassName = component.constructor.name;
-    const componentList = this.componentLists[componentClassName];
+    const componentList = this._componentLists[componentClassName];
     if (!componentList) return;
 
     // const oldEntityId = componentList.remove(component);
@@ -159,12 +158,12 @@ class Engine {
     // return entity;
   };
 
-  generateEntityId = (): EntityId => this.entityIdPool.getId();
+  generateEntityId = (): EntityId => this._entityIdPool.getId();
 
   // TODO: ... involves purging all related components too
   removeEntity = (entityId: EntityId) => {
     // NOTE: In EnTT this happens by iterating every single sparse set in the registry, checking if it contains the entity, and deleting it if it does.
-    Object.values(this.componentLists).forEach(componentList => {
+    Object.values(this._componentLists).forEach(componentList => {
       // TODO: add remove(entityId: EntityId) to ComponentList to remove component by entityId
       // more efficiently than this...
       const component = componentList.get(entityId);
@@ -172,18 +171,24 @@ class Engine {
     });
 
     // TODO: reclaim entityId to be reused only when deleting Entity (for now) i.e. when all components gone...
-    this.entityIdPool.reclaimId(entityId);
+    this._entityIdPool.reclaimId(entityId);
   };
 
-  // TODO: ... probably involves purging components too
-  removeAllEntities = () => {};
+  // NOTE: fast O(1) bulk operations
+  removeAllEntities = () => {
+    Object.values(this._componentLists).forEach(componentList => {
+      componentList.removeAll();
+    });
+
+    this._entityIdPool.reset();
+  };
 
   update = (deltaTime: DeltaTime) => {
     this.deltaTime = deltaTime;
     // TODO: cycle through the systems, in priority
-    this.updating = true;
-    this.systemUpdateFunctions.forEach(this.callSystemUpdateFunction);
-    this.updating = false;
+    this._updating = true;
+    this._systemUpdateFunctions.forEach(this.callSystemUpdateFunction);
+    this._updating = false;
     // this.updateComplete.dispatch(); // TODO: signals??
   };
 
@@ -197,11 +202,11 @@ class Engine {
     // NOTE: finding shortest component list
     let shortestComponentListIndex = 0;
 
-    let shortestComponentList = this.componentLists[
+    let shortestComponentList = this._componentLists[
       componentClasses[shortestComponentListIndex].name
     ];
     componentClasses.forEach((componentClass, index) => {
-      const nextShortestComponentList = this.componentLists[componentClass.name];
+      const nextShortestComponentList = this._componentLists[componentClass.name];
 
       if (nextShortestComponentList.size < shortestComponentList.size) {
         shortestComponentList = nextShortestComponentList;
@@ -230,7 +235,7 @@ class Engine {
         if (i === shortestComponentListIndex) continue; // NOTE: skip checking the shortest list !
 
         const componentClassName = componentClasses[i].name;
-        const anotherComponent = this.componentLists[componentClassName].get(entityId);
+        const anotherComponent = this._componentLists[componentClassName].get(entityId);
 
         if (anotherComponent) querySet.push(anotherComponent);
         else break; // NOTE: soon as we discover a missing component, abandon further pointless search for that entityId !
@@ -245,13 +250,15 @@ class Engine {
     return this._deltaTime;
   }
 
+  set deltaTime(deltaTime: DeltaTime) {
+    this._deltaTime = deltaTime;
+  }
+
   // private
 
-  private callSystemUpdateFunction(
+  private callSystemUpdateFunction = (
     systemUpdateFunction: (engine: Engine, deltaTime: DeltaTime) => void
-  ) {
-    systemUpdateFunction(this, this.deltaTime);
-  }
+  ) => systemUpdateFunction(this, this.deltaTime);
 }
 
 type EntityIdPoolParams = {
@@ -300,6 +307,18 @@ class EntityIdPool {
 
     return ++this._lastUsedEntityId;
   };
+
+  reset = (): number => {
+    const oldReclaimedEntityIdPoolSize = this._reclaimedEntityIdPoolSize;
+    this._reclaimedEntityIdPoolSize = 0;
+    return oldReclaimedEntityIdPoolSize;
+  };
+
+  // resetClean = () => {
+  //   this._lastUsedEntityId = -1;
+  //   this._reclaimedEntityIdPool = [];
+  //   this._reclaimedEntityIdPoolSize = 0;
+  // };
 }
 
 // custom components will extend this.
@@ -314,18 +333,18 @@ class Component {
 class ComponentList {
   // TODO: based on https://programmingpraxis.com/2012/03/09/sparse-sets/
   // has dense set (primary iteration) and sparse set (fast membership lookup)
-  denseList: Component[];
-  denseListComponentCount: number;
-  sparseList: number[];
+  _denseList: Component[];
+  _denseListComponentCount: number;
+  _sparseList: number[];
 
   constructor() {
     // TODO: will want to optimize these lists to use ArrayBuffer for dense memory access where
     // possible.
-    this.denseList = [];
-    this.denseListComponentCount = 0;
+    this._denseList = [];
+    this._denseListComponentCount = 0;
     // TODO: Sparse lists will become hash maps in V8 optimizer. They are less efficient in speed
     // compared too arrays. So maybe use fixed size ArrayBuffer as well? Dynamically grow it yourself?
-    this.sparseList = [];
+    this._sparseList = [];
   }
 
   add = (component: Component) => {
@@ -342,35 +361,35 @@ class ComponentList {
 
     if (!existingComponent?.entityId || existingComponent.entityId === -1) {
       // NOTE: plug the existing free entity component slot in dense list
-      this.denseList[this.sparseList[currentComponentEntityId]] = component;
+      this._denseList[this._sparseList[currentComponentEntityId]] = component;
     } else {
       // NOTE: create new entity component slot
-      const denseListIndex = this.denseList.push(component);
-      this.sparseList[currentComponentEntityId] = denseListIndex;
+      const denseListIndex = this._denseList.push(component);
+      this._sparseList[currentComponentEntityId] = denseListIndex;
     }
 
-    this.denseListComponentCount++;
+    this._denseListComponentCount++;
   };
 
   has = (entityId: EntityId): boolean => !!this.get(entityId);
 
   get = (entityId: EntityId): Component | null => {
-    const denseListIndex = this.sparseList[entityId];
-    const component = this.denseList[denseListIndex];
+    const denseListIndex = this._sparseList[entityId];
+    const component = this._denseList[denseListIndex];
 
-    if (this.denseListComponentCount < denseListIndex) return null;
+    if (this._denseListComponentCount < denseListIndex) return null;
     if (component.entityId !== entityId) return null;
 
     return component;
   };
 
   remove = (component: Component): EntityId | undefined => {
-    const denseListIndex = this.sparseList[component.entityId];
+    const denseListIndex = this._sparseList[component.entityId];
 
     // const currentEntityId = ...
-    if (this.denseListComponentCount < denseListIndex) return;
+    if (this._denseListComponentCount < denseListIndex) return;
     // if (this.denseList[denseListIndex].entityId !== component.entityId) return;
-    if (this.denseList[denseListIndex] !== component) return; // NOTE: entity object ref should work as well...
+    if (this._denseList[denseListIndex] !== component) return; // NOTE: entity object ref should work as well...
 
     const oldEntityId = component.entityId;
     // this.denseList[denseListIndex].entityId = -1; // NOTE: -1 designates unused / invalid entityId
@@ -379,19 +398,25 @@ class ComponentList {
     return oldEntityId;
   };
 
+  removeAll = (): number => {
+    const oldDenseListComponentCount = this._denseListComponentCount;
+    this._denseListComponentCount = 0;
+    return oldDenseListComponentCount;
+  };
+
   get size() {
-    return this.denseListComponentCount;
+    return this._denseListComponentCount;
   }
 
   *denseListStream() {
-    for (let i = 0; i < this.denseListComponentCount; i++) {
-      yield this.denseList[i];
+    for (let i = 0; i < this._denseListComponentCount; i++) {
+      yield this._denseList[i];
     }
   }
 
   *denseListStreamClean() {
-    for (let i = 0; i < this.denseListComponentCount; i++) {
-      const component = this.denseList[i];
+    for (let i = 0; i < this._denseListComponentCount; i++) {
+      const component = this._denseList[i];
 
       if (!component?.entityId || component.entityId === -1) continue;
 
