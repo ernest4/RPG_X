@@ -18,14 +18,7 @@ class Engine {
   constructor(componentClasses: { [key: string]: ComponentClass }) {
     // TODO: ...
     this._componentClasses = { ...componentClasses, ...defaultComponentClasses };
-
-
-    // TODO: preload the default set of update functions
     this._systemUpdateFunctions = [];
-
-
-
-    
     this._deltaTime = 0;
     this._updating = false;
     this._componentLists = {};

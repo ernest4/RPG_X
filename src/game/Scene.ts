@@ -2,6 +2,9 @@ import { Scene as BabylonScene, Vector3 } from "babylonjs";
 import { Engine } from "../ecs";
 import ScenesManager from "./ScenesManager";
 import componentClasses from "./components";
+import Movement from "../ecs/default/systems/Movement";
+import Render from "../ecs/default/systems/Render";
+import Input from "../ecs/default/systems/Input";
 
 class Scene {
   private _active: boolean;
@@ -23,7 +26,7 @@ class Scene {
 
   constructor(scenesManager: ScenesManager) {
     this._scenesManager = scenesManager;
-    this._entityComponentSystem = new Engine(componentClasses);
+    this._entityComponentSystem = this.initializeEntityComponentSystem();
 
     // TODO: asset manager
     // TODO: input manager
@@ -71,6 +74,28 @@ class Scene {
 
   deactivate = () => {
     this._active = false;
+  };
+
+  private initializeEntityComponentSystem = () => {
+    const ecs = new Engine(componentClasses);
+
+    // TODO: preload the default set of update functions !!!
+    // TODO: handle priority lists...
+    // [
+    //   [sys, sys, ...], // INPUT: 0
+    //   [sys, sys,...], // AI: 1
+    //   ...
+    // ]
+    ecs.addSystem(new Input(ecs), PRIORITY.INPUT); // NOTE: process inputs from player
+    // ecs.addSystem(new AI(ecs), PRIORITY.AI); // TODO: essentially second set of inputs, but from computer. This is NOT a default system, but users will slot any AI system in this order of priority !!!
+    // ecs.addSystem(new Physics(ecs), PRIORITY.PHYSICS);
+    ecs.addSystem(new Movement(ecs), PRIORITY.MOVEMENT);
+    // ecs.addSystem(new Collision(ecs), PRIORITY.COLLISION);
+    // TODO: ... (more game specific systems, PRIORITY.GAMEPLAY) need to dynamically load after default ones are set...
+    // ecs.addSystem(new Render(ecs), PRIORITY.RENDER, (optional_inner_priority)); // NOTE: render the result
+    ecs.addSystem(new Render(ecs), PRIORITY.RENDER); // NOTE: render the result
+
+    return ecs;
   };
 
   private serializeBabylonScene = () => {

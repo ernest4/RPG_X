@@ -1,6 +1,6 @@
 import System from "../../System";
 
-class Render extends System {
+class Input extends System {
   start(): void {
     // TODO: add to display item to scene
   }
@@ -13,4 +13,4 @@ class Render extends System {
   destroy(): void {}
 }
 
-export default Render;
+export default Input;

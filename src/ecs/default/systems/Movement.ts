@@ -3,7 +3,7 @@ import System from "../../System";
 import PhysicsBody from "../components/PhysicsBody";
 import Transform from "../components/Transform";
 
-class MovementSystem extends System {
+class Movement extends System {
   start(): void {}
 
   update(): void {
@@ -29,4 +29,4 @@ class MovementSystem extends System {
   destroy(): void {}
 }
 
-export default MovementSystem;
+export default Movement;
