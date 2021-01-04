@@ -9,6 +9,9 @@
 // gravityFactor: number
 // }
 
+import { EntityId } from "../../types";
+import Component from "../../Component";
+
 // TODO: optimize with ArrayBuffers
 class PhysicsBody extends Component {
   _values: number[];
@@ -42,4 +45,14 @@ class PhysicsBody extends Component {
   set angular(value: number) {
     this._values[2] = value;
   }
+
+  serialize(): void {
+    throw new Error("Method not implemented.");
+  }
+
+  load(componentObject: any): void {
+    throw new Error("Method not implemented.");
+  }
 }
+
+export default PhysicsBody;

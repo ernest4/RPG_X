@@ -32,7 +32,7 @@ class Scene {
     const sceneObject = {
       active: this._active,
       name: this._sceneName,
-      babylonScene: this.serializeBabylonScene(this._scene),
+      babylonScene: this.serializeBabylonScene(),
       ecs: this._entityComponentSystem.serialize(),
     };
 

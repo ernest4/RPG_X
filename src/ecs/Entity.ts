@@ -1,3 +1,7 @@
+import { EntityId } from "./types";
+import Component from "./Component";
+import Engine from "./Engine";
+
 // TODO: entity wrapper ??
 class Entity {
   private _entityId: number;
@@ -26,3 +30,5 @@ class Entity {
 
   // removeAllComponents
 }
+
+export default Entity;

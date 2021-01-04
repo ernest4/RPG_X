@@ -13,6 +13,7 @@ class Engine {
 
   constructor() {
     // TODO: ...
+    // TODO: preload the default set of update functions
     this._systemUpdateFunctions = [];
     this._deltaTime = 0;
     this._updating = false;
@@ -227,6 +228,9 @@ class Engine {
     // TODO: import all component state to Engine
 
     const { entityIdPool, componentLists } = ecsObject;
+
+    // TODO: preload the default set of update functions + any active update systems from the serialization?
+    // Look them up using string system name from the key of import object
 
     this._componentLists = this.loadComponentLists(componentLists);
     this._entityIdPool.load(entityIdPool);

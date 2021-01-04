@@ -1,3 +1,5 @@
+import { Vector3ViewIndexes } from "../types";
+
 class Vector3DataView {
   // private _values: TransformValues;
   private _values: Uint32Array;
@@ -32,3 +34,5 @@ class Vector3DataView {
     this._values[Vector3ViewIndexes.Z + this._startOffset] = value;
   }
 }
+
+export default Vector3DataView;

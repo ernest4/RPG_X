@@ -1,7 +1,8 @@
 // TODO: optimize this to act as basic view into ComponentList pure ArrayBuffer for Transform
 
-import Component from "../../Component";
 import { EntityId } from "../../types";
+import Component from "../../Component";
+import Vector3DataView from "../../utils/Vector3DataView";
 
 // components
 class Transform extends Component {

@@ -111,6 +111,13 @@ class ComponentList {
 
   load = ({ componentClassName, componentsData }) => {
     componentsData.forEach(componentData => {
+      // TODO: instead of dirty eval(), look up component class using string class name from the key
+      // of import object (which will be combo of default and custom components)
+      // export {
+      //   Transform: Transform,
+      //   ...
+      // }
+
       const component = eval(`new ${componentClassName}(${componentData.entityId})`) as Component;
       component.load(componentData);
       this.add(component);

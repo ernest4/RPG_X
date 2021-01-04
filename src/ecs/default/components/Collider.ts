@@ -12,6 +12,9 @@
 // with most things but NPCs might not...
 // }
 
+import { ColliderValueIndexes, EntityId, ShapeType } from "../../types";
+import Component from "../../Component";
+
 // TODO: optimize with ArrayBuffers
 class Collider extends Component {
   _values: [number, number, number, number, number]; // TODO: wip...
@@ -63,6 +66,14 @@ class Collider extends Component {
     this._values[ColliderValueIndexes.BOX_SIZE_Z] = value;
   }
 
+  serialize(): void {
+    throw new Error("Method not implemented.");
+  }
+
+  load(componentObject: any): void {
+    throw new Error("Method not implemented.");
+  }
+
   // NOTE: wrappers less efficient...maybe not use them ??
   // get boxSize(): BoxColliderSize {
   //   return { x: this.boxSizeX, y: this.boxSizeX, z: this.boxSizeX };
@@ -73,3 +84,5 @@ class Collider extends Component {
   //   return false;
   // };
 }
+
+export default Collider;

@@ -1,6 +1,9 @@
 import { Engine, Nullable } from "babylonjs";
 import Scene from "./Scene";
 
+// Testing...
+import SAMPLE_GAME_STATE from "./tests/gameState";
+
 class ScenesManager {
   private _scenes: Scene[];
   private _renderEngine: Engine;
@@ -24,41 +27,7 @@ class ScenesManager {
     // const gameStateJson = JSON.parse(gameStateJsonString);
 
     // TESTING: ...
-    const gameStateJson = {
-      scenes: [
-        {
-          active: true,
-          name: "menu",
-          babylonScene: { gravity: [0, 0, 0], collisionsEnabled: false },
-          ecs: {
-            entityIdPool: { lastUsedEntityId: -1, reclaimedEntityIdPool: [] },
-            // componentLists: { Transform: [{ entityId: 0, position: [0, 0, 0] }] },
-            componentLists: {
-              Transform: [
-                {
-                  entityId: 0,
-                  position: { x: 0, y: 0, z: 0 },
-                  rotation: { x: 0, y: 0, z: 0 },
-                  scale: { x: 0, y: 0, z: 0 },
-                },
-                {
-                  entityId: 1,
-                  position: { x: 0, y: 0, z: 0 },
-                  rotation: { x: 0, y: 0, z: 0 },
-                  scale: { x: 0, y: 0, z: 0 },
-                },
-              ],
-            },
-          },
-        },
-        {
-          active: false,
-          name: "world",
-          babylonScene: { gravity: [0, 0, 0], collisionsEnabled: false },
-          ecs: { entityIdPool: { lastUsedEntityId: -1, reclaimedEntityIdPool: [] } },
-        },
-      ],
-    };
+    const gameStateJson = SAMPLE_GAME_STATE;
 
     this._scenes = gameStateJson.scenes.map(this.loadScene);
   };
