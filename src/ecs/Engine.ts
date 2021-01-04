@@ -2,7 +2,7 @@ import { ComponentClass, DeltaTime, EntityId, QueryCallback, QuerySet } from "./
 import EntityIdPool from "./engine/EntityIdPool";
 import Component from "./Component";
 import ComponentList from "./engine/ComponentList";
-import defaultComponentClasses from "./default/components";
+import defaultComponentClasses from "../game/components";
 import System from "./System";
 import Entity from "./Entity";
 
@@ -231,10 +231,13 @@ class Engine {
   load = (ecsObject): void => {
     // TODO: import all component state to Engine
 
-    const { entityIdPool, componentLists } = ecsObject;
+    const { entityIdPool, componentLists, systemLists } = ecsObject;
 
     // TODO: preload the default set of update functions + any active update systems from the serialization?
     // Look them up using string system name from the key of import object
+
+    // WIP...
+    // systemLists.forEach(system => this.addSystem(system, priority))
 
     this._componentLists = this.loadComponentLists(componentLists);
     this._entityIdPool.load(entityIdPool);

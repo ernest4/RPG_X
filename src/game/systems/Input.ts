@@ -1,4 +1,4 @@
-import System from "../../System";
+import System from "../../ecs/System";
 
 class Input extends System {
   start(): void {

@@ -1,5 +1,7 @@
-import Component from "../../Component";
-import { EntityId } from "../../types";
+import Component from "../../ecs/Component";
+import { EntityId } from "../../ecs/types";
+
+// TODO: Sprite a separate (and only) render component ? (A Mesh for 3d one ?)
 
 // TODO: optimize with ArrayBuffers ??
 class Render extends Component {
@@ -13,7 +15,7 @@ class Render extends Component {
   // color
   // flip
   // material ??
-  // sorting order (draw order) ??
+  // sorting order (draw order) ?? need that...
 
   serialize(): void {
     throw new Error("Method not implemented.");

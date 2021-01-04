@@ -1,4 +1,4 @@
-import System from "../../System";
+import System from "../../ecs/System";
 
 class Render extends System {
   start(): void {

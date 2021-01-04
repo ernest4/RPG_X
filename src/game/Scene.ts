@@ -2,9 +2,9 @@ import { Scene as BabylonScene, Vector3 } from "babylonjs";
 import { Engine } from "../ecs";
 import ScenesManager from "./ScenesManager";
 import componentClasses from "./components";
-import Movement from "../ecs/default/systems/Movement";
-import Render from "../ecs/default/systems/Render";
-import Input from "../ecs/default/systems/Input";
+import Movement from "./systems/Movement";
+import Render from "./systems/Render";
+import Input from "./systems/Input";
 
 class Scene {
   private _active: boolean;
@@ -112,7 +112,7 @@ class Scene {
     // collisionsEnabled: boolean
     const { gravity, collisionsEnabled } = babylonSceneObject;
 
-    const scene = new BabylonScene();
+    const scene = new BabylonScene(this._scenesManager.renderEngine);
     if (gravity.length === 3) scene.gravity = new Vector3(...gravity);
     scene.collisionsEnabled = collisionsEnabled;
 

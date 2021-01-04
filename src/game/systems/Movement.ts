@@ -1,5 +1,5 @@
-import { QuerySet } from "../../types";
-import System from "../../System";
+import { QuerySet } from "../../ecs/types";
+import System from "../../ecs/System";
 import PhysicsBody from "../components/PhysicsBody";
 import Transform from "../components/Transform";
 

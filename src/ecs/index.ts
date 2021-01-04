@@ -73,6 +73,7 @@ export { Engine };
 // So maybe not version 1...
 // Otherwise tagging will be simply supported by creating empty components as tags
 
+// TODO: some kinda state machine for animation...???
 // class AnimationComponent extends Component {
 //   constructor(entityId: EntityId) {
 //     super(entityId);
