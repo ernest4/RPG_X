@@ -1,6 +1,7 @@
 import { Scene as BabylonScene, Vector3 } from "babylonjs";
 import { Engine } from "../ecs";
 import ScenesManager from "./ScenesManager";
+import componentClasses from "./components";
 
 class Scene {
   private _active: boolean;
@@ -22,7 +23,7 @@ class Scene {
 
   constructor(scenesManager: ScenesManager) {
     this._scenesManager = scenesManager;
-    this._entityComponentSystem = new Engine();
+    this._entityComponentSystem = new Engine(componentClasses);
 
     // TODO: asset manager
     // TODO: input manager

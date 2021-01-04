@@ -1,4 +1,4 @@
-import { EntityId, EntityIdPoolParams } from "../types";
+import { EntityId } from "../types";
 
 class EntityIdPool {
   private _lastUsedEntityId: EntityId;

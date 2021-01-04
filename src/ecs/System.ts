@@ -1,3 +1,5 @@
+import Engine from "./Engine";
+
 abstract class System {
   private _engine: Engine;
 
@@ -22,3 +24,5 @@ abstract class System {
     return this._engine.deltaTime;
   }
 }
+
+export default System;

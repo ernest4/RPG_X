@@ -1,6 +1,7 @@
 // TODO: rework to optimize the list to keep default components like Transform in a pure
 
 import Component from "../Component";
+import { ComponentClass, EntityId } from "../types";
 
 // large ArrayBuffer...
 class ComponentList {
@@ -9,10 +10,12 @@ class ComponentList {
   _denseList: Component[];
   _denseListComponentCount: number;
   _sparseList: number[];
+  private _componentClasses: { [key: string]: ComponentClass };
 
-  constructor() {
+  constructor(componentClasses: { [key: string]: ComponentClass }) {
     // TODO: will want to optimize these lists to use ArrayBuffer for dense memory access where
     // possible.
+    this._componentClasses = componentClasses;
     this._denseList = [];
     this._denseListComponentCount = 0;
     // TODO: Sparse lists will become hash maps in V8 optimizer. They are less efficient in speed
@@ -111,14 +114,9 @@ class ComponentList {
 
   load = ({ componentClassName, componentsData }) => {
     componentsData.forEach(componentData => {
-      // TODO: instead of dirty eval(), look up component class using string class name from the key
-      // of import object (which will be combo of default and custom components)
-      // export {
-      //   Transform: Transform,
-      //   ...
-      // }
-
-      const component = eval(`new ${componentClassName}(${componentData.entityId})`) as Component;
+      // const component = eval(`new ${componentClassName}(${componentData.entityId})`) as Component;
+      const componentClass = this._componentClasses[componentClassName];
+      const component = new componentClass(componentData.entityId);
       component.load(componentData);
       this.add(component);
     });

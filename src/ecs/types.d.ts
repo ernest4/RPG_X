@@ -15,7 +15,11 @@ type DeltaTime = number;
 type EntityId = number;
 type QuerySet = Component[];
 type QueryCallback = (querySet: QuerySet) => void;
-type ComponentClass = { name: string; prototype: Component };
+type ComponentClass = {
+  name: string;
+  prototype: Component;
+  new (entityId: EntityId): Component;
+};
 
 // NOTE: using string enums over number enums as number enums are not enforceable in the type check!
 // https://stackoverflow.com/questions/57334349/typescript-why-is-exact-enum-type-not-enforced

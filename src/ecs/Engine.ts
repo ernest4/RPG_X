@@ -2,6 +2,9 @@ import { ComponentClass, DeltaTime, EntityId, QueryCallback, QuerySet } from "./
 import EntityIdPool from "./engine/EntityIdPool";
 import Component from "./Component";
 import ComponentList from "./engine/ComponentList";
+import defaultComponentClasses from "./default/components";
+import System from "./System";
+import Entity from "./Entity";
 
 class Engine {
   _deltaTime: DeltaTime;
@@ -10,11 +13,19 @@ class Engine {
   _systemUpdateFunctions: ((engine: Engine, deltaTime: DeltaTime) => void)[];
   _componentLists: { [key: string]: ComponentList };
   _entityIdPool: EntityIdPool;
+  private _componentClasses: { [key: string]: ComponentClass };
 
-  constructor() {
+  constructor(componentClasses: { [key: string]: ComponentClass }) {
     // TODO: ...
+    this._componentClasses = { ...componentClasses, ...defaultComponentClasses };
+
+
     // TODO: preload the default set of update functions
     this._systemUpdateFunctions = [];
+
+
+
+    
     this._deltaTime = 0;
     this._updating = false;
     this._componentLists = {};
@@ -40,7 +51,7 @@ class Engine {
     let componentList = this._componentLists[componentClassName];
 
     if (!componentList) {
-      componentList = new ComponentList();
+      componentList = new ComponentList(this._componentClasses);
       this._componentLists[componentClassName] = componentList;
     }
 
@@ -258,17 +269,9 @@ class Engine {
     const componentLists = {};
 
     Object.entries(componentLists).forEach(([componentClassName, componentsData]) => {
-      const componentList = new ComponentList();
+      const componentList = new ComponentList(this._componentClasses);
       componentList.load({ componentClassName, componentsData });
       this._componentLists[componentClassName] = componentList;
-
-      // // componentsData.forEach(componentData => componentList.add(...));
-
-      // componentsData.forEach(componentData =>
-      //   componentList.add(eval(`new ${componentClassName}(${componentData})`))
-      // );
-
-      // // eval(`console.log(new Testy(78).wow)`)
     });
 
     return componentLists;

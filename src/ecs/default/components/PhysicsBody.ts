@@ -16,9 +16,9 @@ import Component from "../../Component";
 class PhysicsBody extends Component {
   _values: number[];
   // TODO: ...
-  constructor(entityId: EntityId, x: number, y: number, angular: number) {
+  constructor(entityId: EntityId) {
     super(entityId);
-    this._values = [x, y, angular];
+    this._values = [];
   }
 
   // TODO: dynamically create these???

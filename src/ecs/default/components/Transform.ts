@@ -107,8 +107,25 @@ class Transform extends Component {
   //   this._values[TransformValueIndexes.SCALE_Z] = value;
   // }
 
-  serialize(): void {
-    // throw new Error("Method not implemented.");
+  serialize() {
+    return {
+      entityId: this.entityId,
+      position: {
+        x: this.position.x,
+        y: this.position.y,
+        z: this.position.z,
+      },
+      rotation: {
+        x: this.rotation.x,
+        y: this.rotation.y,
+        z: this.rotation.z,
+      },
+      scale: {
+        x: this.scale.x,
+        y: this.scale.y,
+        z: this.scale.z,
+      },
+    };
   }
 
   load(componentObject): void {
@@ -119,9 +136,11 @@ class Transform extends Component {
     this.position.x = position.x;
     this.position.y = position.y;
     this.position.z = position.z;
+
     this.rotation.x = rotation.x;
     this.rotation.y = rotation.y;
     this.rotation.z = rotation.z;
+
     this.scale.x = scale.x;
     this.scale.y = scale.y;
     this.scale.z = scale.z;
