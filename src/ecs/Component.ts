@@ -21,6 +21,7 @@ export default Component;
 // 1. Will hold a scenes graph from the renderer.
 // 2. Initialize and Add items to scene graph from info of Render component.
 // 3. Dispose and Swap scenes based on signals from GameManger etc.
+// Some sprite specific stuff, animation, instancing and events (picking) https://playground.babylonjs.com/#9RUHH#5
 
 // [GameManager] this first system will orchestrate everything. Signal game serialization and
 // deserialization, switch scenes signals etc.
