@@ -1,5 +1,8 @@
 import { ActionManager, ExecuteCodeAction, Vector3, UniversalCamera } from "babylonjs";
 
+// TODO: this will go out to Entity / component / Render (system)
+// TODO: probably want arcFollowCamera for my game...https://doc.babylonjs.com/divingDeeper/cameras
+
 export default ({ name, engine, scene, position }) => {
   const SPEED = 0.1;
 

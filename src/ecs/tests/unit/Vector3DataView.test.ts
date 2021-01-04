@@ -7,3 +7,7 @@
 // test("adds numbers", () => {
 //   expect(testAdder(1, 2)).toBe(3);
 // });
+
+
+// TODO: tests, start doing them !!
+

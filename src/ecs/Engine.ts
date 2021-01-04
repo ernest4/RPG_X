@@ -2,10 +2,10 @@ import { ComponentClass, DeltaTime, EntityId, QueryCallback, QuerySet } from "./
 import EntityIdPool from "./engine/EntityIdPool";
 import Component from "./Component";
 import ComponentList from "./engine/ComponentList";
-import defaultComponentClasses from "../game/components";
 import System from "./System";
 import Entity from "./Entity";
 
+// TODO: jest tests !!!!
 class Engine {
   _deltaTime: DeltaTime;
   _updating: boolean;
@@ -13,11 +13,8 @@ class Engine {
   _systemUpdateFunctions: ((engine: Engine, deltaTime: DeltaTime) => void)[];
   _componentLists: { [key: string]: ComponentList };
   _entityIdPool: EntityIdPool;
-  private _componentClasses: { [key: string]: ComponentClass };
 
-  constructor(componentClasses: { [key: string]: ComponentClass }) {
-    // TODO: ...
-    this._componentClasses = { ...componentClasses, ...defaultComponentClasses };
+  constructor() {
     this._systemUpdateFunctions = [];
     this._deltaTime = 0;
     this._updating = false;
@@ -44,7 +41,7 @@ class Engine {
     let componentList = this._componentLists[componentClassName];
 
     if (!componentList) {
-      componentList = new ComponentList(this._componentClasses);
+      componentList = new ComponentList();
       this._componentLists[componentClassName] = componentList;
     }
 
@@ -224,54 +221,43 @@ class Engine {
     return this._deltaTime;
   }
 
-  serialize = () => {
-    // TODO: export all component state to object
-  };
-
-  load = (ecsObject): void => {
-    // TODO: import all component state to Engine
-
-    const { entityIdPool, componentLists, systemLists } = ecsObject;
-
-    // TODO: preload the default set of update functions + any active update systems from the serialization?
-    // Look them up using string system name from the key of import object
-
-    // WIP...
-    // systemLists.forEach(system => this.addSystem(system, priority))
-
-    this._componentLists = this.loadComponentLists(componentLists);
-    this._entityIdPool.load(entityIdPool);
-  };
-
-  // // TODO: filepath?? probably caller of this method will need to do that
-  // toJSON = () => {
-  //   // TODO: ...
-  //   JSON.stringify(this.serialize());
-  // };
-
-  // // TODO: filepath?? probably caller of this method will need to do that
-  // fromJSON = (jsonString: string) => {
-  //   // TODO: ...
-  //   this.deserialize(JSON.parse(jsonString));
-  // };
-
   // private
 
   private callSystemUpdateFunction = (
     systemUpdateFunction: (engine: Engine, deltaTime: DeltaTime) => void
   ) => systemUpdateFunction(this, this.deltaTime);
-
-  private loadComponentLists = (componentListsObject): { [key: string]: ComponentList } => {
-    const componentLists = {};
-
-    Object.entries(componentLists).forEach(([componentClassName, componentsData]) => {
-      const componentList = new ComponentList(this._componentClasses);
-      componentList.load({ componentClassName, componentsData });
-      this._componentLists[componentClassName] = componentList;
-    });
-
-    return componentLists;
-  };
 }
 
 export default Engine;
+
+// TODO: not responsibility of this class !!
+// serialize = () => {
+//   // TODO: export all component state to object
+// };
+
+// load = (ecsObject): void => {
+//   // TODO: import all component state to Engine
+
+//   const { entityIdPool, componentLists, systemLists } = ecsObject;
+
+//   // TODO: preload the default set of update functions + any active update systems from the serialization?
+//   // Look them up using string system name from the key of import object
+
+//   // WIP...
+//   // systemLists.forEach(system => this.addSystem(system, priority))
+
+//   this._componentLists = this.loadComponentLists(componentLists);
+//   this._entityIdPool.load(entityIdPool);
+// };
+
+// private loadComponentLists = (componentListsObject): { [key: string]: ComponentList } => {
+//   const componentLists = {};
+
+//   Object.entries(componentLists).forEach(([componentClassName, componentsData]) => {
+//     const componentList = new ComponentList(this._componentClasses);
+//     componentList.load({ componentClassName, componentsData });
+//     this._componentLists[componentClassName] = componentList;
+//   });
+
+//   return componentLists;
+// };

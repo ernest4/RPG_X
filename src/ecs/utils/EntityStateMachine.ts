@@ -1,4 +1,8 @@
+import Component from "../Component";
+
 // TODO: need a finiteStateMachine as well. https://www.richardlord.net/blog/ecs/finite-state-machines-with-ash.html
+
+// TODO: jest tests !!!!
 class EntityStateMachine {
   // TODO: wip
 
@@ -16,3 +20,5 @@ class EntityStateMachine {
     // TODO: add component instance to particular state (needs to be called on state)
   };
 }
+
+export default EntityStateMachine;

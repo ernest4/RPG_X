@@ -1,21 +1,26 @@
-// TODO: rework to optimize the list to keep default components like Transform in a pure
+// NOTE: when using sparse arrays, make sure to use array buffers to force localization of data,
+// as regular arrays get downgraded to dictionaries by V8 once they becomes sparse. Otherwise make
+// sure to fill regular arrays with 0s or something to not appear 'sparse'
+
+// TODO: look at optimizing components by using ArrayBuffers where possible to store basic data
+// close together in memory and maybe even in the component array...
 
 import Component from "../Component";
-import { ComponentClass, EntityId } from "../types";
+import { EntityId } from "../types";
 
 // large ArrayBuffer...
+
+// TODO: jest tests !!!!
 class ComponentList {
   // TODO: based on https://programmingpraxis.com/2012/03/09/sparse-sets/
   // has dense set (primary iteration) and sparse set (fast membership lookup)
   _denseList: Component[];
   _denseListComponentCount: number;
   _sparseList: number[];
-  private _componentClasses: { [key: string]: ComponentClass };
 
-  constructor(componentClasses: { [key: string]: ComponentClass }) {
+  constructor() {
     // TODO: will want to optimize these lists to use ArrayBuffer for dense memory access where
     // possible.
-    this._componentClasses = componentClasses;
     this._denseList = [];
     this._denseListComponentCount = 0;
     // TODO: Sparse lists will become hash maps in V8 optimizer. They are less efficient in speed
@@ -109,18 +114,19 @@ class ComponentList {
   //     callback(component);
   //   }
   // }
-
-  serialize = () => {};
-
-  load = ({ componentClassName, componentsData }) => {
-    componentsData.forEach(componentData => {
-      // const component = eval(`new ${componentClassName}(${componentData.entityId})`) as Component;
-      const componentClass = this._componentClasses[componentClassName];
-      const component = new componentClass(componentData.entityId);
-      component.load(componentData);
-      this.add(component);
-    });
-  };
 }
 
 export default ComponentList;
+
+// TODO: this is not responsibility of ECS... external Class or system should do this...
+// serialize = () => {};
+
+// load = ({ componentClassName, componentsData }) => {
+//   componentsData.forEach(componentData => {
+//     // const component = eval(`new ${componentClassName}(${componentData.entityId})`) as Component;
+//     const componentClass = this._componentClasses[componentClassName];
+//     const component = new componentClass(componentData.entityId);
+//     component.load(componentData);
+//     this.add(component);
+//   });
+// };

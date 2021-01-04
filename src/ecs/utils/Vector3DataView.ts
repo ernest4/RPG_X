@@ -1,5 +1,6 @@
 import { Vector3ViewIndexes } from "../types";
 
+// TODO: jest tests !!!!
 class Vector3DataView {
   // private _values: TransformValues;
   private _values: Uint32Array;

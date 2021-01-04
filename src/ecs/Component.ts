@@ -1,6 +1,8 @@
 import { EntityId } from "./types";
 
 // custom components will extend this.
+
+// TODO: jest tests !!!!
 abstract class Component {
   // NO METHODS ON COMPONENTS !!!
   entityId: EntityId;

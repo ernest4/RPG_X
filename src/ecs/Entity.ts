@@ -3,6 +3,8 @@ import Component from "./Component";
 import Engine from "./Engine";
 
 // TODO: entity wrapper ??
+
+// TODO: jest tests !!!!
 class Entity {
   private _entityId: number;
   private _engine: Engine;
