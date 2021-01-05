@@ -34,19 +34,46 @@ describe(ComponentList, () => {
   describe("#get", () => {
     let getComponentForEntity: Component | null;
 
-    beforeEach(() => {
-      getComponentForEntity = subject.get(entityId1);
-    });
+    beforeEach(() => (getComponentForEntity = subject.get(entityId1)));
 
     context("when entity has the component", () => {
       it("returns the component", () => {
-        expect(getComponentForEntity).toBeInstanceOf(NumberComponent);
+        expect(getComponentForEntity).toBe(numberComponent1);
         expect(getComponentForEntity?.entityId).toEqual(entityId1);
       });
     });
 
     context("when entity does not have the component", () => {
-      // TODO: ...
+      beforeEach(() => (subject = new ComponentList()));
+
+      context("when component never existed", () => {
+        it("return null", () => {
+          expect(subject.get(entityId1)).toEqual(null);
+        });
+      });
+
+      context("when component was added", () => {
+        beforeEach(() => subject.add(numberComponent1));
+
+        context("when component was removed", () => {
+          beforeEach(() => subject.remove(numberComponent1));
+
+          it("return null", () => {
+            expect(subject.get(entityId1)).toEqual(null);
+          });
+        });
+
+        context("when all components were cleared", () => {
+          beforeEach(() => subject.removeAll());
+
+          // TODO: this is not hitting the if branch in get() like expected...
+          // tough seems to work anyway ???
+
+          it("return null", () => {
+            expect(subject.get(entityId1)).toEqual(null);
+          });
+        });
+      });
     });
   });
 

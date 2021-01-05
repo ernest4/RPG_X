@@ -59,9 +59,9 @@ class ComponentList {
     const denseListIndex = this._sparseList[entityId];
     if (!isNumber(denseListIndex)) return null;
 
-    const component = this._denseList[denseListIndex];
+    if (this._denseListComponentCount < denseListIndex + 1) return null;
 
-    if (this._denseListComponentCount < denseListIndex) return null;
+    const component = this._denseList[denseListIndex];
     if (component.entityId !== entityId) return null;
 
     return component;
@@ -71,7 +71,7 @@ class ComponentList {
     const denseListIndex = this._sparseList[component.entityId];
 
     // const currentEntityId = ...
-    if (this._denseListComponentCount < denseListIndex) return;
+    if (this._denseListComponentCount < denseListIndex + 1) return;
     // if (this.denseList[denseListIndex].entityId !== component.entityId) return;
     if (this._denseList[denseListIndex] !== component) return; // NOTE: entity object ref should work as well...
 
