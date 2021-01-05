@@ -16,14 +16,6 @@ class Render extends Component {
   // flip
   // material ??
   // sorting order (draw order) ?? need that...
-
-  serialize(): void {
-    throw new Error("Method not implemented.");
-  }
-
-  load(componentObject: any): void {
-    throw new Error("Method not implemented.");
-  }
 }
 
 export default Render;

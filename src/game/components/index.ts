@@ -1,8 +1,8 @@
 import Collider from "./Collider";
 import PhysicsBody from "./PhysicsBody";
-import Render from "../../ecs/default/components/Render";
-import Tag from "../../ecs/default/components/Tag";
-import Transform from "../../ecs/default/components/Transform";
+import Render from "./Render";
+import Tag from "./Tag";
+import Transform from "./Transform";
 
 export default {
   Collider,

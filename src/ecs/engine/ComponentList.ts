@@ -7,6 +7,7 @@
 
 import Component from "../Component";
 import { EntityId } from "../types";
+import { isNumber } from "../utils/Number";
 
 // large ArrayBuffer...
 
@@ -40,12 +41,12 @@ class ComponentList {
 
     const existingComponent = this.get(currentComponentEntityId);
 
-    if (!existingComponent?.entityId || existingComponent.entityId === -1) {
+    if (existingComponent?.entityId === -1) {
       // NOTE: plug the existing free entity component slot in dense list
       this._denseList[this._sparseList[currentComponentEntityId]] = component;
     } else {
       // NOTE: create new entity component slot
-      const denseListIndex = this._denseList.push(component);
+      const denseListIndex = this._denseList.push(component) - 1;
       this._sparseList[currentComponentEntityId] = denseListIndex;
     }
 
@@ -56,6 +57,8 @@ class ComponentList {
 
   get = (entityId: EntityId): Component | null => {
     const denseListIndex = this._sparseList[entityId];
+    if (!isNumber(denseListIndex)) return null;
+
     const component = this._denseList[denseListIndex];
 
     if (this._denseListComponentCount < denseListIndex) return null;
