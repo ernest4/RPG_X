@@ -2,14 +2,14 @@
 
 import { EntityId } from "../../ecs/types";
 import Component from "../../ecs/Component";
-import Vector3DataView from "../../ecs/utils/Vector3DataView";
+import Vector3BufferView from "../../ecs/utils/Vector3BufferView";
 
 // components
 class Transform extends Component {
   private _values: Uint32Array;
-  position: Vector3DataView;
-  rotation: Vector3DataView;
-  scale: Vector3DataView;
+  position: Vector3BufferView;
+  rotation: Vector3BufferView;
+  scale: Vector3BufferView;
 
   // TODO: more constructors...
   constructor(entityId: EntityId) {
@@ -18,9 +18,9 @@ class Transform extends Component {
     // this._values = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     this._values = new Uint32Array(9);
     // this._position = new Position(this._values);
-    this.position = new Vector3DataView(this._values);
-    this.rotation = new Vector3DataView(this._values, 3);
-    this.scale = new Vector3DataView(this._values, 6);
+    this.position = new Vector3BufferView(this._values);
+    this.rotation = new Vector3BufferView(this._values, 3);
+    this.scale = new Vector3BufferView(this._values, 6);
 
     // TODO: hold the parent here ???
     // this._sparent = entityId;
