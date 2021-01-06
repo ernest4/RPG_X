@@ -43,9 +43,8 @@ class ComponentList {
     let existingComponent;
 
     const denseListIndex = this._sparseList[currentComponentEntityId];
-    if (isNumber(denseListIndex) && !(this._denseListComponentCount < denseListIndex + 1)) {
-      existingComponent = this._denseList[denseListIndex];
-    }
+
+    if (isNumber(denseListIndex)) existingComponent = this._denseList[denseListIndex];
 
     if (existingComponent?.entityId === -1) {
       // NOTE: plug the existing free entity component slot in dense list
@@ -73,17 +72,19 @@ class ComponentList {
     return component;
   };
 
-  remove = (component: Component): EntityId | undefined => {
+  remove = (component: Component): EntityId | null => {
     const denseListIndex = this._sparseList[component.entityId];
 
     // const currentEntityId = ...
-    if (this._denseListComponentCount < denseListIndex + 1) return;
+    if (this._denseListComponentCount < denseListIndex + 1) return null;
     // if (this.denseList[denseListIndex].entityId !== component.entityId) return;
-    if (this._denseList[denseListIndex] !== component) return; // NOTE: entity object ref should work as well...
+    if (this._denseList[denseListIndex] !== component) return null; // NOTE: entity object ref should work as well...
 
     const oldEntityId = component.entityId;
     // this.denseList[denseListIndex].entityId = -1; // NOTE: -1 designates unused / invalid entityId
     component.entityId = -1; // NOTE: -1 designates unused / invalid entityId // NOTE: entity object ref should work as well...
+
+    this._denseListComponentCount--;
 
     return oldEntityId;
   };
