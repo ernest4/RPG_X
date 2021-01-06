@@ -15,9 +15,10 @@ import { isNumber } from "../utils/Number";
 class ComponentList {
   // TODO: based on https://programmingpraxis.com/2012/03/09/sparse-sets/
   // has dense set (primary iteration) and sparse set (fast membership lookup)
-  _denseList: Component[];
-  _denseListComponentCount: number;
-  _sparseList: number[];
+  // private _denseList: Component[];
+  private _denseList: Component[];
+  private _denseListComponentCount: number;
+  private _sparseList: number[];
 
   constructor() {
     // TODO: will want to optimize these lists to use ArrayBuffer for dense memory access where

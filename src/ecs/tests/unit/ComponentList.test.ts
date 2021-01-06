@@ -9,9 +9,9 @@ describe(ComponentList, () => {
   const entityId2 = 456;
   const entityId3 = 789;
 
-  const numberComponent1 = new NumberComponent(entityId1);
-  const numberComponent2 = new NumberComponent(entityId2);
-  const numberComponent3 = new NumberComponent(entityId3);
+  let numberComponent1 = new NumberComponent(entityId1);
+  let numberComponent2 = new NumberComponent(entityId2);
+  let numberComponent3 = new NumberComponent(entityId3);
 
   let subject: ComponentList;
 
@@ -53,7 +53,10 @@ describe(ComponentList, () => {
       });
 
       context("when component was added", () => {
-        beforeEach(() => subject.add(numberComponent1));
+        beforeEach(() => {
+          numberComponent1 = new NumberComponent(entityId1);
+          subject.add(numberComponent1);
+        });
 
         context("when component was removed", () => {
           beforeEach(() => subject.remove(numberComponent1));
@@ -65,9 +68,6 @@ describe(ComponentList, () => {
 
         context("when all components were cleared", () => {
           beforeEach(() => subject.removeAll());
-
-          // TODO: this is not hitting the if branch in get() like expected...
-          // tough seems to work anyway ???
 
           it("return null", () => {
             expect(subject.get(entityId1)).toEqual(null);
