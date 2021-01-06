@@ -203,6 +203,20 @@ describe(SparseSet, () => {
   });
 
   describe("#stream", () => {
-    // TODO: ...
+    beforeEach(() => {
+      subject.add(numberComponent3);
+    });
+    it("streams all the items", () => {
+      let items: any[] = [];
+
+      subject.stream((item: any) => items.push(item));
+      expect(items).toEqual([numberComponent1, numberComponent2, numberComponent3]);
+
+      subject.remove(numberComponent2);
+
+      items = [];
+      subject.stream((item: any) => items.push(item));
+      expect(items).toEqual([numberComponent1, numberComponent3]);
+    });
   });
 });
