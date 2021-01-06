@@ -33,13 +33,13 @@ describe(ComponentList, () => {
       let previousSize: number;
 
       beforeEach(() => {
-        subject = new ComponentList(); // 0
-        subject.add(originalComponent); // 1
-        subject.remove(originalComponent); // 0
+        subject = new ComponentList();
+        subject.add(originalComponent);
+        subject.remove(originalComponent);
 
         previousSize = subject.size;
 
-        subject.add(anotherComponent); // 0 -> 1
+        subject.add(anotherComponent);
       });
 
       it("plugs that component slow gap with new component of same entityId", () => {
@@ -175,23 +175,24 @@ describe(ComponentList, () => {
     // TODO: ...
   });
 
-  // describe("#size", () => {
-  //   it("returns the number of components in the list", () => {
-  //     expect(subject.size).toEqual(2);
+  describe("#size", () => {
+    it("returns the number of components in the list", () => {
+      expect(subject.size).toEqual(2);
 
-  //     subject.add(numberComponent3);
-  //     expect(subject.size).toEqual(3);
+      subject.add(numberComponent3);
+      expect(subject.size).toEqual(3);
 
-  //     subject.remove(numberComponent1);
-  //     expect(subject.size).toEqual(2);
+      subject.remove(numberComponent1);
+      expect(subject.size).toEqual(2);
 
-  //     subject.remove(numberComponent2);
-  //     expect(subject.size).toEqual(1);
+      subject.remove(numberComponent2);
+      expect(subject.size).toEqual(1);
 
-  //     subject.remove(numberComponent3);
-  //     expect(subject.size).toEqual(0);
-  //   });
-  // });
+      console.log(numberComponent3);
+      subject.remove(numberComponent3);
+      expect(subject.size).toEqual(0);
+    });
+  });
 
   describe("#denseListStream", () => {
     // TODO: ...

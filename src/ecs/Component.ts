@@ -1,14 +1,12 @@
 import { EntityId } from "./types";
+import { SparseSetItem } from "./utils/SparseSet";
 
 // custom components will extend this.
-
-// TODO: jest tests !!!!
-abstract class Component {
+abstract class Component extends SparseSetItem {
   // NO METHODS ON COMPONENTS !!!
-  entityId: EntityId;
 
   constructor(entityId: EntityId) {
-    this.entityId = entityId;
+    super(entityId);
   }
 }
 
@@ -34,7 +32,6 @@ export default Component;
 
 // Renderer doesn't care about ecs, only manages it's scene graph. Scene graph will be updated from
 // components found in ECS.
-
 
 // NOTE: for serializing text to binary
 // var t = new TextEncoder()

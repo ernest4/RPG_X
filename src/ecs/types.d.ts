@@ -2,7 +2,6 @@
 // type Foot = number;
 // type Pound = number;
 
-import Scene from "../game/Scene";
 import Component from "./Component";
 
 // type Patient = {

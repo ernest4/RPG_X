@@ -6,7 +6,7 @@ import Engine from "./Engine";
 
 // TODO: jest tests !!!!
 class Entity {
-  private _entityId: number;
+  private _entityId: EntityId;
   private _engine: Engine;
 
   constructor(entityId: EntityId, engine: Engine) {
@@ -14,7 +14,7 @@ class Entity {
     this._engine = engine;
   }
 
-  get entityId() {
+  get entityId(): EntityId {
     return this._entityId;
   }
 

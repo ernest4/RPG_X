@@ -12,6 +12,8 @@ import { isNumber } from "../utils/Number";
 // large ArrayBuffer...
 
 // TODO: jest tests !!!!
+
+// TODO: much better sparse-set implementation example https://www.geeksforgeeks.org/sparse-set/
 class ComponentList {
   // TODO: based on https://programmingpraxis.com/2012/03/09/sparse-sets/
   // has dense set (primary iteration) and sparse set (fast membership lookup)
@@ -75,11 +77,15 @@ class ComponentList {
 
   remove = (component: Component): EntityId | null => {
     if (component.entityId < 0) return null; // NOTE: guard against negative ids
+    if (this._denseListComponentCount === 0) return null;
 
     const denseListIndex = this._sparseList[component.entityId];
     if (!isNumber(denseListIndex)) return null;
 
-    if (this._denseListComponentCount < denseListIndex + 1) return null;
+    if (component.entityId === 789) console.log(this._denseListComponentCount);
+    if (component.entityId === 789) console.log(denseListIndex);
+
+    // if (this._denseListComponentCount < denseListIndex + 1) return null;
     if (this._denseList[denseListIndex].entityId !== component.entityId) return null;
 
     const oldEntityId = component.entityId;
