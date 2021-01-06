@@ -45,7 +45,7 @@ class SparseSet {
     const denseListIndex = this._sparseList[id];
 
     if (this._elementCount <= denseListIndex) return null;
-    if (this._denseList[denseListIndex].id !== id) return null;
+    if (this._denseList[denseListIndex]?.id !== id) return null;
 
     return this._denseList[denseListIndex];
   };
@@ -78,7 +78,7 @@ class SparseSet {
     const itemId = item.id;
 
     // If x is not present
-    if (this.get(itemId) !== null) return null;
+    if (this.get(itemId) === null) return null;
 
     const denseListIndex = this._sparseList[itemId];
 
