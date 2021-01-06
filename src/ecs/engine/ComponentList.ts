@@ -15,7 +15,6 @@ import { isNumber } from "../utils/Number";
 class ComponentList {
   // TODO: based on https://programmingpraxis.com/2012/03/09/sparse-sets/
   // has dense set (primary iteration) and sparse set (fast membership lookup)
-  // private _denseList: Component[];
   private _denseList: Component[];
   private _denseListComponentCount: number;
   private _sparseList: number[];
@@ -31,6 +30,8 @@ class ComponentList {
   }
 
   add = (component: Component) => {
+    if (component.entityId < 0) return; // NOTE: guard against negative ids
+
     // TODO: once entity (or component) is removed, there will be holes in the list. The entity will
     // be there but will have -1 for entityId. Over time you might end up with large gaps of -1...
     // Since we can't delete elements from array without downgrading it to slower data type on V8,
@@ -73,16 +74,16 @@ class ComponentList {
   };
 
   remove = (component: Component): EntityId | null => {
-    const denseListIndex = this._sparseList[component.entityId];
+    if (component.entityId < 0) return null; // NOTE: guard against negative ids
 
-    // const currentEntityId = ...
+    const denseListIndex = this._sparseList[component.entityId];
+    if (!isNumber(denseListIndex)) return null;
+
     if (this._denseListComponentCount < denseListIndex + 1) return null;
-    // if (this.denseList[denseListIndex].entityId !== component.entityId) return;
-    if (this._denseList[denseListIndex] !== component) return null; // NOTE: entity object ref should work as well...
+    if (this._denseList[denseListIndex].entityId !== component.entityId) return null;
 
     const oldEntityId = component.entityId;
-    // this.denseList[denseListIndex].entityId = -1; // NOTE: -1 designates unused / invalid entityId
-    component.entityId = -1; // NOTE: -1 designates unused / invalid entityId // NOTE: entity object ref should work as well...
+    component.entityId = -1; // NOTE: -1 designates unused / invalid entityId
 
     this._denseListComponentCount--;
 
