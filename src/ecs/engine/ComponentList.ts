@@ -40,7 +40,12 @@ class ComponentList {
 
     const currentComponentEntityId = component.entityId;
 
-    const existingComponent = this.get(currentComponentEntityId);
+    let existingComponent;
+
+    const denseListIndex = this._sparseList[currentComponentEntityId];
+    if (isNumber(denseListIndex) && !(this._denseListComponentCount < denseListIndex + 1)) {
+      existingComponent = this._denseList[denseListIndex];
+    }
 
     if (existingComponent?.entityId === -1) {
       // NOTE: plug the existing free entity component slot in dense list
@@ -54,7 +59,7 @@ class ComponentList {
     this._denseListComponentCount++;
   };
 
-  has = (entityId: EntityId): boolean => !!this.get(entityId);
+  // has = (entityId: EntityId): boolean => !!this.get(entityId);
 
   get = (entityId: EntityId): Component | null => {
     const denseListIndex = this._sparseList[entityId];

@@ -24,12 +24,28 @@ describe(ComponentList, () => {
   });
 
   describe("#add", () => {
-    // TODO: ...
+    context("when component slot was reclaimed", () => {
+      const component = new NumberComponent(entityId1);
+      const anotherComponent = new NumberComponent(entityId1);
+
+      beforeEach(() => {
+        subject = new ComponentList();
+        subject.add(component);
+        subject.remove(component);
+        subject.add(anotherComponent);
+      });
+
+      it("plugs that component slow gap with new component of same entityId", () => {
+        expect(subject.get(entityId1)).toBe(anotherComponent);
+      });
+    });
   });
 
-  describe("#has", () => {
-    // TODO: ...
-  });
+  // describe("#has", () => {
+  //   context("when entity has component", () => {
+  //     expect(subject.has(numberComponent1)).toEqual(true);
+  //   });
+  // });
 
   describe("#get", () => {
     let getComponentForEntity: Component | null;
