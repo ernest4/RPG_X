@@ -94,6 +94,14 @@ class SparseSet {
   };
 
   clear = () => (this._elementCount = 0);
+
+  get size() {
+    return this._elementCount;
+  }
+
+  stream = (callback: Function) => {
+    for (let i = 0; i < this._elementCount; i++) callback(this._denseList[i]);
+  };
 }
 
 export default SparseSet;
