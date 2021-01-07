@@ -26,6 +26,11 @@ const setUpTestScene = (system: System) => {
   const transform1 = new Transform(sprite1);
   system.engine.addComponent(transform1);
 
-  const render1 = new Display(sprite1);
-  system.engine.addComponent(render1);
+  const display1 = new Display(sprite1);
+  const display1SpriteManager = display1.spriteManager;
+  display1SpriteManager.url = "assets/turtle.jpg";
+  display1SpriteManager.capacity = 1;
+  display1SpriteManager.cellSize = 64;
+
+  system.engine.addComponent(display1);
 };

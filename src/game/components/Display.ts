@@ -14,7 +14,7 @@ class Display extends Component {
     url: string;
     capacity: number;
     cellSize: number;
-    isPickable: false;
+    isPickable: boolean;
     ref?: SpriteManager; // This is just for render engine, wont be useful when serialized...
   };
   private _sprite: {
@@ -42,8 +42,8 @@ class Display extends Component {
     return this._shouldDispose;
   }
 
-  get is2d(){
-    return this._is2d
+  get is2d() {
+    return this._is2d;
   }
 
   get spriteManager() {
