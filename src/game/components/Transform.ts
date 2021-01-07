@@ -1,4 +1,4 @@
-// TODO: optimize this to act as basic view into ComponentList pure ArrayBuffer for Transform
+// TODO: optimize this to act as basic view into SparseSet pure ArrayBuffer for Transform
 
 import { EntityId } from "../../ecs/types";
 import Component from "../../ecs/Component";

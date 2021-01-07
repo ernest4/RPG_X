@@ -1,7 +1,7 @@
 import { ComponentClass, DeltaTime, EntityId, QueryCallback, QuerySet } from "./types";
 import EntityIdPool from "./engine/EntityIdPool";
 import Component from "./Component";
-import ComponentList from "./engine/ComponentList";
+import SparseSet from "./utils/SparseSet";
 import System from "./System";
 import Entity from "./Entity";
 
@@ -11,7 +11,7 @@ class Engine {
   _updating: boolean;
   // updateComplete: any; // TODO: better type?
   _systemUpdateFunctions: ((engine: Engine, deltaTime: DeltaTime) => void)[];
-  _componentLists: { [key: string]: ComponentList };
+  _componentLists: { [key: string]: SparseSet };
   _entityIdPool: EntityIdPool;
 
   constructor() {
@@ -41,7 +41,7 @@ class Engine {
     let componentList = this._componentLists[componentClassName];
 
     if (!componentList) {
-      componentList = new ComponentList();
+      componentList = new SparseSet();
       this._componentLists[componentClassName] = componentList;
     }
 
@@ -79,12 +79,7 @@ class Engine {
 
   removeEntity = (entityId: EntityId) => {
     // NOTE: In EnTT this happens by iterating every single sparse set in the registry, checking if it contains the entity, and deleting it if it does.
-    Object.values(this._componentLists).forEach(componentList => {
-      // TODO: add remove(entityId: EntityId) to ComponentList to remove component by entityId
-      // more efficiently than this...
-      const component = componentList.get(entityId);
-      if (component) componentList.remove(component);
-    });
+    Object.values(this._componentLists).forEach(componentList => componentList.remove(entityId));
 
     // TODO: reclaim entityId to be reused only when deleting Entity (for now) i.e. when all components gone...
     this._entityIdPool.reclaimId(entityId);
@@ -92,9 +87,7 @@ class Engine {
 
   // NOTE: fast O(1) bulk operations
   removeAllEntities = () => {
-    Object.values(this._componentLists).forEach(componentList => {
-      componentList.removeAll();
-    });
+    Object.values(this._componentLists).forEach(componentList => componentList.clear());
 
     this._entityIdPool.reset();
   };
@@ -132,7 +125,7 @@ class Engine {
 
   //   // NOTE: cycling through the shortest component list
   //   // const componentsIterator = shortestComponentList.denseListStream();
-  //   const componentsIterator = shortestComponentList.denseListStreamClean();
+  //   const componentsIterator = shortestComponentList.stream();
 
   //   for (const component of componentsIterator) {
   //     // TODO: if the entity of this component, has all the other componentClasses, yield it and it's components
@@ -141,7 +134,7 @@ class Engine {
 
   //     // });
 
-  //     const entityId = component.entityId;
+  //     const entityId = component.id;
 
   //     // TODO: optimize by caching querySet array ??
   //     const querySet: QuerySet = [];
@@ -186,7 +179,7 @@ class Engine {
 
     // NOTE: cycling through the shortest component list
     // const componentsIterator = shortestComponentList.denseListStream();
-    const componentsIterator = shortestComponentList.denseListStreamClean();
+    const componentsIterator = shortestComponentList.streamIterator();
 
     for (const component of componentsIterator) {
       // TODO: if the entity of this component, has all the other componentClasses, yield it and it's components
@@ -195,7 +188,7 @@ class Engine {
 
       // });
 
-      const entityId = component.entityId;
+      const entityId = component.id;
 
       // TODO: optimize by caching querySet array ??
       const querySet: QuerySet = [];
@@ -250,11 +243,11 @@ export default Engine;
 //   this._entityIdPool.load(entityIdPool);
 // };
 
-// private loadComponentLists = (componentListsObject): { [key: string]: ComponentList } => {
+// private loadComponentLists = (componentListsObject): { [key: string]: SparseSet } => {
 //   const componentLists = {};
 
 //   Object.entries(componentLists).forEach(([componentClassName, componentsData]) => {
-//     const componentList = new ComponentList(this._componentClasses);
+//     const componentList = new SparseSet(this._componentClasses);
 //     componentList.load({ componentClassName, componentsData });
 //     this._componentLists[componentClassName] = componentList;
 //   });

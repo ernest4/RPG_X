@@ -117,6 +117,10 @@ describe(SparseSet, () => {
         expect(subject.remove(numberComponent1)).toEqual(entityId1);
       });
 
+      it("allows you to remove component by id", () => {
+        expect(subject.remove(entityId1)).toEqual(entityId1);
+      });
+
       it("reduces list size", () => {
         subject.remove(numberComponent1);
         expect(subject.size).toEqual(previousSize - 1);
@@ -203,9 +207,8 @@ describe(SparseSet, () => {
   });
 
   describe("#stream", () => {
-    beforeEach(() => {
-      subject.add(numberComponent3);
-    });
+    beforeEach(() => subject.add(numberComponent3));
+
     it("streams all the items", () => {
       let items: any[] = [];
 
@@ -216,6 +219,26 @@ describe(SparseSet, () => {
 
       items = [];
       subject.stream((item: any) => items.push(item));
+      expect(items).toEqual([numberComponent1, numberComponent3]);
+    });
+  });
+
+  describe("#streamIterator", () => {
+    beforeEach(() => subject.add(numberComponent3));
+
+    it("streams all the items one by one", () => {
+      let items: any[] = [];
+      let iterator;
+
+      iterator = subject.streamIterator();
+      for (const item of iterator) items.push(item);
+      expect(items).toEqual([numberComponent1, numberComponent2, numberComponent3]);
+
+      subject.remove(numberComponent2);
+
+      items = [];
+      iterator = subject.streamIterator();
+      for (const item of iterator) items.push(item);
       expect(items).toEqual([numberComponent1, numberComponent3]);
     });
   });

@@ -1,3 +1,5 @@
+import { isNumber } from "./Number";
+
 export class SparseSetItem {
   private _id: number;
 
@@ -15,7 +17,11 @@ export class SparseSetItem {
 }
 
 class SparseSet {
+  // TODO: will want to optimize these lists to use ArrayBuffer for dense memory access where
+  // possible?
   private _denseList: SparseSetItem[];
+  // TODO: Sparse lists will become hash maps in V8 optimizer. They are less efficient in speed
+  // compared to arrays. So maybe use fixed size ArrayBuffer as well? Dynamically grow it yourself?
   private _sparseList: number[];
   private _elementCount: number;
 
@@ -74,8 +80,8 @@ class SparseSet {
   // A function that deletes 'x' if present in this data
   // structure, else it does nothing (just returns).
   // By deleting 'x', we unset 'x' from this set.
-  remove = (item: SparseSetItem): number | null => {
-    const itemId = item.id;
+  remove = (item: SparseSetItem | number): number | null => {
+    const itemId = isNumber(item) ? (item as number) : (item as SparseSetItem).id;
 
     // If x is not present
     if (this.get(itemId) === null) return null;
@@ -102,6 +108,10 @@ class SparseSet {
   stream = (callback: Function) => {
     for (let i = 0; i < this._elementCount; i++) callback(this._denseList[i]);
   };
+
+  *streamIterator() {
+    for (let i = 0; i < this._elementCount; i++) yield this._denseList[i];
+  }
 }
 
 export default SparseSet;
