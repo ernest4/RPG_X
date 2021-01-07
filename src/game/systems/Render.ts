@@ -10,6 +10,9 @@ import {
   Sprite,
   ArcRotateCamera,
   Vector3,
+  HemisphericLight,
+  Color3,
+  PointLight,
 } from "babylonjs";
 
 class Render extends System {
@@ -28,9 +31,25 @@ class Render extends System {
     this._scene = new Scene(this._renderEngine);
 
     // TODO: move some of this set up out ?!?!
-    // var light = new PointLight("Point", new Vector3(5, 10, 5), scene);
     const camera = new ArcRotateCamera("Camera", 1, 0.8, 8, new Vector3(0, 0, 0), this._scene);
     camera.attachControl(canvas, true);
+
+    const light = new PointLight("Point", new Vector3(5, 10, 5), this._scene);
+
+    // // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
+    // // Hemispheric light provides ambient lighting
+    // const light = new HemisphericLight("light1", new Vector3(0, 1, 0), this._scene);
+    // // Default intensity is 1. Let's dim the light a small amount
+    // light.intensity = 0.7;
+
+    // // Set default ambient lighting. Tweaking this is good way to create moods with
+    // // blue lighting for sad, dark, scary.
+    // // Orange lighting for light, bright, energetic.
+    // // Red light if you're in a building on fire or in a spaceship with hight alert.
+    // // Simple black and white if you're in outer space (pitch black shadows, i.e. no back light).
+    // light.diffuse = new Color3(0.95, 0.95, 0.95);
+    // light.specular = new Color3(0.95, 0.95, 0.95);
+    // light.groundColor = new Color3(0.3, 0.3, 0.3);
 
     // TODO: set up action manager to send input events... (code in testScene.ts)
   }
