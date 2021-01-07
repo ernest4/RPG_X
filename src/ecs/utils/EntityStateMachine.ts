@@ -11,9 +11,9 @@ class EntityStateMachine {
   };
 
   // TODO: this will probably live on some 'State' class as part of FSM stuff, instead of EntityStateMachine
-  add = componentName => {
-    // TODO: add component to particular state (needs to be called on state)
-  };
+  // add = componentName => {
+  //   // TODO: add component to particular state (needs to be called on state)
+  // };
 
   // TODO: this will probably live on some 'State' class as part of FSM stuff, instead of EntityStateMachine
   withInstance = (component: Component) => {

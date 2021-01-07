@@ -31,6 +31,8 @@ class Render extends System {
     // var light = new PointLight("Point", new Vector3(5, 10, 5), scene);
     const camera = new ArcRotateCamera("Camera", 1, 0.8, 8, new Vector3(0, 0, 0), this._scene);
     camera.attachControl(canvas, true);
+
+    // TODO: set up action manager to send input events... (code in testScene.ts)
   }
 
   update(): void {

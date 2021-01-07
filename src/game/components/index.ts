@@ -7,7 +7,7 @@ import Transform from "./Transform";
 export default {
   Collider,
   PhysicsBody,
-  Display: Render,
+  Display,
   Tag,
   Transform,
 };

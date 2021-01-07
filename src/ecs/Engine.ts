@@ -100,7 +100,7 @@ class Engine {
     this._entityIdPool.clearPool();
   };
 
-  update(deltaTime: DeltaTime) {
+  update = (deltaTime: DeltaTime) => {
     this._deltaTime = deltaTime;
     // TODO: cycle through the systems, in priority
     this._updating = true;
@@ -108,7 +108,7 @@ class Engine {
     this._systems.forEach(this.updateSystem);
     this._updating = false;
     // this.updateComplete.dispatch(); // TODO: signals??
-  }
+  };
 
   // *query(...componentClasses: ComponentClass[]) {
   //   // TODO: ...
@@ -164,7 +164,7 @@ class Engine {
   //   }
   // }
 
-  query(callback: QueryCallback, ...componentClasses: ComponentClass[]) {
+  query = (callback: QueryCallback, ...componentClasses: ComponentClass[]) => {
     // TODO: ...
     // Query function will take shortest componentlist and loop throught the dense list of it.
     // For each denselist component with valid entityid, will check that components entityid against the rest of desired component lists and get those components (if present).
@@ -198,9 +198,10 @@ class Engine {
       // });
 
       const entityId = component.id;
+      const shortestListComponent = shortestComponentList.get(entityId) as Component;
 
       // TODO: optimize by caching querySet array ??
-      const querySet: QuerySet = [];
+      const querySet: QuerySet = [shortestListComponent];
 
       const componentClassesLength = componentClasses.length;
       for (let i = 0; i < componentClassesLength; i++) {
@@ -217,7 +218,7 @@ class Engine {
         if (i + 1 === componentClassesLength) callback(querySet);
       }
     }
-  }
+  };
 
   get deltaTime() {
     return this._deltaTime;

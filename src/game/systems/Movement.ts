@@ -11,20 +11,20 @@ class Movement extends System {
     // const query = this.engine.query(Position, Velocity);
     // for (const querySet of query) this.updateEntity(querySet);
 
-    this.engine.query(this.updateEntity, Transform, PhysicsBody);
+    // this.engine.query(this.updateEntity, Transform, PhysicsBody);
   }
 
-  private updateEntity = (querySet: QuerySet) => {
-    const [transform, physicsBody] = querySet as [Transform, PhysicsBody];
+  // private updateEntity = (querySet: QuerySet) => {
+  //   const [transform, physicsBody] = querySet as [Transform, PhysicsBody];
 
-    transform.position.x = physicsBody.linearVelocity.x * this.deltaTime;
-    transform.position.y = physicsBody.linearVelocity.y * this.deltaTime;
-    transform.position.z = physicsBody.linearVelocity.z * this.deltaTime;
+  //   transform.position.x = physicsBody.linearVelocity.x * this.deltaTime;
+  //   transform.position.y = physicsBody.linearVelocity.y * this.deltaTime;
+  //   transform.position.z = physicsBody.linearVelocity.z * this.deltaTime;
 
-    transform.rotation.x = physicsBody.angularVelocity.x * this.deltaTime;
-    transform.rotation.y = physicsBody.angularVelocity.y * this.deltaTime;
-    transform.rotation.z = physicsBody.angularVelocity.z * this.deltaTime;
-  };
+  //   transform.rotation.x = physicsBody.angularVelocity.x * this.deltaTime;
+  //   transform.rotation.y = physicsBody.angularVelocity.y * this.deltaTime;
+  //   transform.rotation.z = physicsBody.angularVelocity.z * this.deltaTime;
+  // };
 
   destroy(): void {}
 }
