@@ -1,5 +1,5 @@
 import { Engine, Nullable } from "babylonjs";
-import Scene from "./Scene";
+import Scene from "./_legacy_Scene";
 
 // Testing...
 import SAMPLE_GAME_STATE from "./tests/gameState";

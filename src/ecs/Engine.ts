@@ -74,14 +74,14 @@ class Engine {
   // TODO: ...
   // getComponent = (componentClass, entityId) => {};
 
-  createEntity = (): Entity => {
-    return new Entity(this.generateEntityId(), this);
+  // createEntity = (): Entity => {
+  //   return new Entity(this.generateEntityId(), this);
 
-    // TODO: every single entity have PositionComponent and TagComponent by default ????
-    // entity.addComponent(new PositionComponent(...))
-    // entity.addComponent(new TagComponent(...))
-    // return entity;
-  };
+  //   // TODO: every single entity have PositionComponent and TagComponent by default ????
+  //   // entity.addComponent(new PositionComponent(...))
+  //   // entity.addComponent(new TagComponent(...))
+  //   // return entity;
+  // };
 
   generateEntityId = (): EntityId => this._entityIdPool.getId();
 
@@ -97,7 +97,7 @@ class Engine {
   removeAllEntities = () => {
     Object.values(this._componentLists).forEach(componentList => componentList.clear());
 
-    this._entityIdPool.reset();
+    this._entityIdPool.clearPool();
   };
 
   update(deltaTime: DeltaTime) {
