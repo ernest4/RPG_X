@@ -24,13 +24,14 @@ const setUpTestScene = (system: System) => {
   const sprite1 = system.engine.generateEntityId();
 
   const transform1 = new Transform(sprite1);
+  transform1.scale.z = 1;
   system.engine.addComponent(transform1);
 
   const display1 = new Display(sprite1);
   const display1SpriteManager = display1.spriteManager;
   display1SpriteManager.url = "assets/turtle.jpg";
   display1SpriteManager.capacity = 1;
-  display1SpriteManager.cellSize = 6400;
+  display1SpriteManager.cellSize = 640;
 
   system.engine.addComponent(display1);
 };

@@ -77,9 +77,6 @@ class Render extends System {
       sprite.isPickable = display.sprite.isPickable;
       display.sprite.ref = sprite;
 
-      console.log("added turtle"); // TESTING
-      console.log(display);  // TESTING
-
       display.inScene = true;
     }
 
