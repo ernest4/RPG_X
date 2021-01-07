@@ -34,7 +34,7 @@ class Render extends System {
     const camera = new ArcRotateCamera("Camera", 1, 0.8, 8, new Vector3(0, 0, 0), this._scene);
     camera.attachControl(canvas, true);
 
-    const light = new PointLight("Point", new Vector3(5, 10, 5), this._scene);
+    // const light = new PointLight("Point", new Vector3(5, 10, 5), this._scene);
 
     // // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     // // Hemispheric light provides ambient lighting
@@ -55,14 +55,13 @@ class Render extends System {
   }
 
   update(): void {
-    this.engine.query(this.renderEntity, Transform, Display);
+    this.engine.query(this.updateSceneEntity, Transform, Display);
+    this._scene.render();
   }
 
-  renderEntity = (querySet: QuerySet) => {
+  updateSceneEntity = (querySet: QuerySet) => {
     const [transform, display] = querySet as [Transform, Display];
 
-    // TODO: add / remove items from scene graph.
-    // If removed from scene graph, remove render component?
     if (!display.inScene) {
       const spriteManager = new SpriteManager(
         display.id.toString(),
@@ -77,9 +76,17 @@ class Render extends System {
       const sprite = new Sprite(display.id.toString(), spriteManager);
       sprite.isPickable = display.sprite.isPickable;
       display.sprite.ref = sprite;
+
+      console.log("added turtle"); // TESTING
+      console.log(display);  // TESTING
+
+      display.inScene = true;
     }
 
     if (display.shouldDispose) {
+      // TODO: remove items from scene graph.
+      // If removed from scene graph, remove render component?
+      //
       // TODO: ...
       // dispose...
       // ... return

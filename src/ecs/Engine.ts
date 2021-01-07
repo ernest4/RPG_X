@@ -110,60 +110,6 @@ class Engine {
     // this.updateComplete.dispatch(); // TODO: signals??
   };
 
-  // *query(...componentClasses: ComponentClass[]) {
-  //   // TODO: ...
-  //   // Query function will take shortest componentlist and loop throught the dense list of it.
-  //   // For each denselist component with valid entityid, will check that components entityid against the rest of desired component lists and get those components (if present).
-  //   // If no early bailouts (so all query conditions met) yield the queryset.
-  //   // Query should be streamed via the query set, letting you operate on each component, instead of constructing an array of all results (dont waste time creating intermediary array...)
-
-  //   // NOTE: finding shortest component list
-  //   let shortestComponentListIndex = 0;
-
-  //   let shortestComponentList = this._componentLists[
-  //     componentClasses[shortestComponentListIndex].name
-  //   ];
-  //   componentClasses.forEach((componentClass, index) => {
-  //     const nextShortestComponentList = this._componentLists[componentClass.name];
-
-  //     if (nextShortestComponentList.size < shortestComponentList.size) {
-  //       shortestComponentList = nextShortestComponentList;
-  //       shortestComponentListIndex = index;
-  //     }
-  //   });
-
-  //   // NOTE: cycling through the shortest component list
-  //   // const componentsIterator = shortestComponentList.denseListStream();
-  //   const componentsIterator = shortestComponentList.stream();
-
-  //   for (const component of componentsIterator) {
-  //     // TODO: if the entity of this component, has all the other componentClasses, yield it and it's components
-  //     // otherwise, continue
-  //     // componentClasses.forEach((componentClass, index) => {
-
-  //     // });
-
-  //     const entityId = component.id;
-
-  //     // TODO: optimize by caching querySet array ??
-  //     const querySet: QuerySet = [];
-
-  //     const componentClassesLength = componentClasses.length;
-  //     for (let i = 0; i < componentClassesLength; i++) {
-  //       if (i === shortestComponentListIndex) continue; // NOTE: skip checking the shortest list !
-
-  //       const componentClassName = componentClasses[i].name;
-  //       const anotherComponent = this._componentLists[componentClassName].get(entityId);
-
-  //       if (anotherComponent) querySet.push(anotherComponent);
-  //       else break; // NOTE: soon as we discover a missing component, abandon further pointless search for that entityId !
-
-  //       // NOTE: yield querySet if all components found for entityId
-  //       if (i + 1 === componentClassesLength) yield querySet;
-  //     }
-  //   }
-  // }
-
   query = (callback: QueryCallback, ...componentClasses: ComponentClass[]) => {
     // TODO: ...
     // Query function will take shortest componentlist and loop throught the dense list of it.

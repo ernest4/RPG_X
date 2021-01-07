@@ -30,7 +30,7 @@ const setUpTestScene = (system: System) => {
   const display1SpriteManager = display1.spriteManager;
   display1SpriteManager.url = "assets/turtle.jpg";
   display1SpriteManager.capacity = 1;
-  display1SpriteManager.cellSize = 64;
+  display1SpriteManager.cellSize = 6400;
 
   system.engine.addComponent(display1);
 };

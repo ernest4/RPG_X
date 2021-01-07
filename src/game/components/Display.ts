@@ -38,6 +38,10 @@ class Display extends Component {
     return this._inScene;
   }
 
+  set inScene(value: boolean) {
+    this._inScene = value;
+  }
+
   get shouldDispose() {
     return this._shouldDispose;
   }
