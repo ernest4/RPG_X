@@ -13,6 +13,7 @@ abstract class Component extends SparseSetItem {
 export default Component;
 
 // OK. Step back. We need to purify the approach.
+// [DONE]
 // [Components] need to be pure, primitive data only, numbers and strings.
 // 1. this will let them be pure serializable data containers (can't serialize pointers)
 // 2. ecs can stay decoupled and still have scope for ArrayBuffer optimizations
@@ -26,7 +27,7 @@ export default Component;
 // [GameManager] this first system will orchestrate everything. Signal game serialization and
 // deserialization, switch scenes signals etc.
 
-// Need to get own external tick provider for the ECS. https://github.com/abiyasa/ashteroids-js/blob/master/src/utils/tickprovider.js
+// [DONE] Need to get own external tick provider for the ECS. https://github.com/abiyasa/ashteroids-js/blob/master/src/utils/tickprovider.js
 
 // ECS stays pure. Any optimizations will be transparent to the game !!!
 

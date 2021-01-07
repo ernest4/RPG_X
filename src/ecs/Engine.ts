@@ -10,12 +10,16 @@ class Engine {
   _deltaTime: DeltaTime;
   _updating: boolean;
   // updateComplete: any; // TODO: better type?
-  _systemUpdateFunctions: ((engine: Engine, deltaTime: DeltaTime) => void)[];
+  // NOTE: for faster iteration, reference straight to update function, one indirection instead of 2
+  // (-> system -> update)
+  // _systemUpdateFunctions: ((engine: Engine, deltaTime: DeltaTime) => void)[];
+  _systems: System[]; // NOTE: handle onn system to call start() and destroy()
   _componentLists: { [key: string]: SparseSet };
   _entityIdPool: EntityIdPool;
 
   constructor() {
-    this._systemUpdateFunctions = [];
+    // this._systemUpdateFunctions = [];
+    this._systems = [];
     this._deltaTime = 0;
     this._updating = false;
     this._componentLists = {};
@@ -23,15 +27,19 @@ class Engine {
     this._entityIdPool = new EntityIdPool();
   }
 
-  addSystem = (system: System, priority?: number) => {
+  addSystem = (system: System) => {
+    // addSystem = (system: System, priority?: number) => {
     // TODO: priority integer sorting
     // simple priority based on insertion order for now...
-    this._systemUpdateFunctions.push(system.update);
+    // this._systemUpdateFunctions.push(system.update);
+    this._systems.push(system);
+    system.start();
   };
 
   // getSystem
 
   // removeSystem
+  // () => { ... system.destroy()}
 
   // removeAllSystems
 
@@ -96,7 +104,8 @@ class Engine {
     this._deltaTime = deltaTime;
     // TODO: cycle through the systems, in priority
     this._updating = true;
-    this._systemUpdateFunctions.forEach(this.callSystemUpdateFunction);
+    // this._systemUpdateFunctions.forEach(this.callSystemUpdateFunction);
+    this._systems.forEach(this.updateSystem);
     this._updating = false;
     // this.updateComplete.dispatch(); // TODO: signals??
   }
@@ -216,9 +225,13 @@ class Engine {
 
   // private
 
-  private callSystemUpdateFunction = (
-    systemUpdateFunction: (engine: Engine, deltaTime: DeltaTime) => void
-  ) => systemUpdateFunction(this, this.deltaTime);
+  // private callSystemUpdateFunction = (
+  //   systemUpdateFunction: (engine: Engine, deltaTime: DeltaTime) => void
+  // ) => systemUpdateFunction(this, this.deltaTime);
+
+  // private callSystemUpdateFunction = (systemUpdateFunction: () => void) => systemUpdateFunction();
+
+  private updateSystem = (system: System) => system.update();
 }
 
 export default Engine;

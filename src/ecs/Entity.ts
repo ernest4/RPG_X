@@ -18,13 +18,14 @@ class Entity {
     return this._entityId;
   }
 
-  // getComponent = <T extends Component>(componentClass: T) => {
-  //   return this._engine.getComponent(componentClass);
+  // addComponent = (component: Component): Component => {
+  //   return this._engine.addComponent(component);
   // };
 
-  addComponent = (component: Component): Component => {
-    return this._engine.addComponent(component);
+  addComponent = (assignmentFunction: (id: EntityId) => Component): Component => {
+    return this._engine.addComponent(assignmentFunction(this._entityId));
   };
+  // usage entity.addComponent(id => new Transform(id, ... other params));
 
   // other util methods... ??
 

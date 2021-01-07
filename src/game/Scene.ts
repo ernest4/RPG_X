@@ -1,6 +1,6 @@
 import { Scene as BabylonScene, Vector3 } from "babylonjs";
 import { Engine } from "../ecs";
-import ScenesManager from "./ScenesManager";
+import ScenesManager from "./_legacy_ScenesManager";
 import componentClasses from "./components";
 import Movement from "./systems/Movement";
 import Render from "./systems/Render";
