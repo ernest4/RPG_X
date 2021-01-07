@@ -1,3 +1,4 @@
+import { Sprite, SpriteManager } from "babylonjs";
 import Component from "../../ecs/Component";
 import { EntityId } from "../../ecs/types";
 
@@ -7,14 +8,25 @@ import { EntityId } from "../../ecs/types";
 class Display extends Component {
   private _inScene: boolean;
   private _shouldDispose: boolean;
+  private _is2d: boolean;
   // TODO: make this into class / buffer view ...
-  private _spriteManager: { url: string; capacity: number; cellSize: number; isPickable: false };
-  private _sprite: { isPickable: boolean };
+  private _spriteManager: {
+    url: string;
+    capacity: number;
+    cellSize: number;
+    isPickable: false;
+    ref?: SpriteManager; // This is just for render engine, wont be useful when serialized...
+  };
+  private _sprite: {
+    isPickable: boolean;
+    ref?: Sprite; // This is just for render engine, wont be useful when serialized...
+  };
 
   constructor(entityId: EntityId) {
     super(entityId);
     this._inScene = false;
     this._shouldDispose = false;
+    this._is2d = true;
 
     // TODO: move sprite manager to it's own component? then use parent/child connection for any
     // sprites that need the manager?
@@ -28,6 +40,10 @@ class Display extends Component {
 
   get shouldDispose() {
     return this._shouldDispose;
+  }
+
+  get is2d(){
+    return this._is2d
   }
 
   get spriteManager() {
