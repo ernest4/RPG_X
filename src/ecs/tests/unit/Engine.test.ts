@@ -1,9 +1,14 @@
 import Engine from "../../Engine";
 import System from "../../System";
 
-class TestySystem extends System {
+class TestySystem1 extends System {
   // TODO: ...
+  constructor(engine: Engine) {
+    super(engine);
+  }
+
   start(): void {
+    // TODO: add some entities for testing...
     throw new Error("Method not implemented.");
   }
   update(): void {
@@ -13,6 +18,14 @@ class TestySystem extends System {
     throw new Error("Method not implemented.");
   }
 }
+
+// class TestySystem2 extends System {
+//
+// }
+
+// class TestySystem3 extends System {
+//
+// }
 
 describe(Engine, () => {
   //
