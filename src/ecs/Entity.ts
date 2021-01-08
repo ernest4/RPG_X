@@ -12,6 +12,9 @@ class Entity {
   constructor(entityId: EntityId, engine: Engine) {
     this._entityId = entityId;
     this._engine = engine;
+
+    // TODO: store entity refs so can loop through that when removing? faster than engine looping
+    // through all component lists.
   }
 
   get entityId(): EntityId {

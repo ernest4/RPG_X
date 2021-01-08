@@ -31,7 +31,7 @@ export default Component;
 
 // ECS stays pure. Any optimizations will be transparent to the game !!!
 
-// Renderer doesn't care about ecs, only manages it's scene graph. Scene graph will be updated from
+// [DONE] Renderer doesn't care about ecs, only manages it's scene graph. Scene graph will be updated from
 // components found in ECS.
 
 // NOTE: for serializing text to binary

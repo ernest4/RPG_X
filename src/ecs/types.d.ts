@@ -41,6 +41,13 @@ declare const enum ColliderValueIndexes {
   BOX_SIZE_Z = 4,
 }
 
+// String enums are enforceable by typescript :), unlike numeric enums :/
+declare const enum SceneItemType {
+  SPRITE_MANGER = "SpriteManager",
+  SPRITE = "Sprite",
+  // TODO: will be others...
+}
+
 type BoxColliderSize = { x: number; y: number; z: number };
 
 type URL = string;

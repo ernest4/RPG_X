@@ -1,7 +1,9 @@
 import System from "../../ecs/System";
 import Transform from "../components/Transform";
 import Display from "../components/Display";
-import { QuerySet } from "../../ecs/types";
+import { EntityId, QuerySet, SceneItemType } from "../../ecs/types";
+import SparseSet from "../../ecs/utils/SparseSet";
+import SceneItem from "./render/SceneItem";
 import {
   Scene,
   Engine as RenderEngine,
@@ -18,6 +20,7 @@ import {
 class Render extends System {
   private _renderEngine!: RenderEngine;
   private _scene!: Scene;
+  private _sceneItemsLists!: { [key: string]: SparseSet };
 
   start(): void {
     const canvas = document.getElementById("canvas") as Nullable<
@@ -51,6 +54,13 @@ class Render extends System {
     // light.specular = new Color3(0.95, 0.95, 0.95);
     // light.groundColor = new Color3(0.3, 0.3, 0.3);
 
+    // NOTE: need to keep a ref of scene graph items, so can dispose once Display component is
+    // removed from entity
+    this._sceneItemsLists = {
+      SpriteManager: new SparseSet(),
+      Sprite: new SparseSet(),
+    };
+
     // TODO: set up action manager to send input events... (code in testScene.ts)
   }
 
@@ -62,8 +72,21 @@ class Render extends System {
   updateSceneEntity = (querySet: QuerySet) => {
     const [transform, display] = querySet as [Transform, Display];
 
-    if (!display.inScene) {
-      const spriteManager = new SpriteManager(
+    const spriteManagerItem = this.getSceneItem<SpriteManager>(
+      display.id,
+      SceneItemType.SPRITE_MANGER
+    );
+    let spriteManager = spriteManagerItem?.ref;
+
+    const spriteItem = this.getSceneItem<Sprite>(display.id, SceneItemType.SPRITE);
+    let sprite = spriteItem?.ref;
+
+    // TODO: refactor this once SpriteManager and Sprite are treated as separate components instead
+    // of both being bundled into Display.
+    // At the moment, it's just sufficient to check for SpriteManager presence, later on, both
+    // SpriteManager and Sprite will need their own checks!
+    if (!spriteManager) {
+      spriteManager = new SpriteManager(
         display.id.toString(),
         display.spriteManager.url,
         display.spriteManager.capacity,
@@ -71,42 +94,52 @@ class Render extends System {
         this._scene
       );
       spriteManager.isPickable = display.spriteManager.isPickable;
-      display.spriteManager.ref = spriteManager;
+      this.addSceneItem(display.id, SceneItemType.SPRITE_MANGER, spriteManager);
 
-      const sprite = new Sprite(display.id.toString(), spriteManager);
+      sprite = new Sprite(display.id.toString(), spriteManager);
       sprite.isPickable = display.sprite.isPickable;
-      display.sprite.ref = sprite;
-
-      display.inScene = true;
+      this.addSceneItem(display.id, SceneItemType.SPRITE, sprite);
     }
 
-    if (display.shouldDispose) {
-      // TODO: remove items from scene graph.
-      // If removed from scene graph, remove render component?
-      //
-      // TODO: ...
-      // dispose...
-      // ... return
-    }
+    // if (...) {
+    // TODO: remove items from scene graph.
+    // If removed from scene graph, when Display component is found to be missing (some other
+    // system removed it)
+    //
+    // TODO: ...
+    // dispose...
+    // ... return
+    // }
 
     // NOTE: reducing indirection by caching objects
-    const displaySpriteRef = display.sprite.ref!;
-    const displayPosition = displaySpriteRef.position;
+    const spritePosition = sprite!.position;
     const transformPosition = transform.position;
     const transformScale = transform.scale;
     const transformRotation = transform.rotation;
 
-    displayPosition.x = transformPosition.x;
-    displayPosition.y = transformPosition.y;
-    displayPosition.z = transformPosition.z;
+    spritePosition.x = transformPosition.x;
+    spritePosition.y = transformPosition.y;
+    spritePosition.z = transformPosition.z;
 
     if (display.is2d) {
-      displaySpriteRef.size = transformScale.z; // NOTE: just using 'z' value to represent 2d scale
-      displaySpriteRef.angle = transformRotation.z; // NOTE: just using 'z' value to represent 2d angle
+      sprite!.size = transformScale.z; // NOTE: just using 'z' value to represent 2d scale
+      sprite!.angle = transformRotation.z; // NOTE: just using 'z' value to represent 2d angle
     } else {
       // TODO: will need to handle rotation and scale in all 3 dimensions for meshes...
       // mesh.position... / mesh.rotation... / mesh.scale...
     }
+  };
+
+  getSceneItem = <T>(entityId: EntityId, itemClassName: SceneItemType): SceneItem<T> | null => {
+    return this._sceneItemsLists[itemClassName].get(entityId) as SceneItem<T> | null;
+  };
+
+  addSceneItem = (
+    entityId: EntityId,
+    itemClassName: SceneItemType,
+    item: SpriteManager | Sprite
+  ) => {
+    this._sceneItemsLists[itemClassName].add(new SceneItem(entityId, item));
   };
 
   destroy(): void {}
