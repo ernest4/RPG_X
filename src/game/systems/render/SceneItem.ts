@@ -12,6 +12,8 @@ class SceneItem<T> extends SparseSetItem {
   get ref() {
     return this._ref;
   }
+
+  // TODO: some notion of rendered or not...
 }
 
 export default SceneItem;

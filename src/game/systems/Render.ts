@@ -66,6 +66,7 @@ class Render extends System {
 
   update(): void {
     this.engine.query(this.updateSceneEntity, Transform, Display);
+    this.disposeUnusedSceneEntities();
     this._scene.render();
   }
 
@@ -101,16 +102,6 @@ class Render extends System {
       this.addSceneItem(display.id, SceneItemType.SPRITE, sprite);
     }
 
-    // if (...) {
-    // TODO: remove items from scene graph.
-    // If removed from scene graph, when Display component is found to be missing (some other
-    // system removed it)
-    //
-    // TODO: ...
-    // dispose...
-    // ... return
-    // }
-
     // NOTE: reducing indirection by caching objects
     const spritePosition = sprite!.position;
     const transformPosition = transform.position;
@@ -128,6 +119,8 @@ class Render extends System {
       // TODO: will need to handle rotation and scale in all 3 dimensions for meshes...
       // mesh.position... / mesh.rotation... / mesh.scale...
     }
+
+    // TODO: mark scene items as rendered, so disposeUnusedSceneEntities() leaves it alone 
   };
 
   getSceneItem = <T>(entityId: EntityId, itemClassName: SceneItemType): SceneItem<T> | null => {
@@ -140,6 +133,22 @@ class Render extends System {
     item: SpriteManager | Sprite
   ) => {
     this._sceneItemsLists[itemClassName].add(new SceneItem(entityId, item));
+  };
+
+  disposeUnusedSceneEntities = () => {
+    // TODO: [DISPOSALS]
+    //
+    // if (...) {
+    // TODO: remove items from scene graph when Display component is found to be missing !!
+    // (some other system removed it, with intent on making item not renderable anymore !!)
+    //
+    // Loop thorough entity sets and check for anything that wasn't render in this update and
+    // dispose of it...
+    //
+    // TODO: ...
+    // dispose...
+    // ... return
+    // }
   };
 
   destroy(): void {}
