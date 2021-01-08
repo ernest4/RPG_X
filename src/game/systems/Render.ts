@@ -17,6 +17,8 @@ import {
   PointLight,
 } from "babylonjs";
 
+// NOTE: Render tends to be the heaviest system, so the code is leaning towards lots of caching and
+// inlining of variables to reduce indirection and increase speed.
 class Render extends System {
   private _renderEngine!: RenderEngine;
   private _scene!: Scene;
@@ -73,13 +75,16 @@ class Render extends System {
   updateSceneEntity = (querySet: QuerySet) => {
     const [transform, display] = querySet as [Transform, Display];
 
-    const spriteManagerItem = this.getSceneItem<SpriteManager>(
-      display.id,
+    // NOTE: reducing indirection by caching objects
+    const displayId = display.id;
+
+    let spriteManagerItem = this.getSceneItem<SpriteManager>(
+      displayId,
       SceneItemType.SPRITE_MANGER
     );
     let spriteManager = spriteManagerItem?.ref;
 
-    const spriteItem = this.getSceneItem<Sprite>(display.id, SceneItemType.SPRITE);
+    let spriteItem = this.getSceneItem<Sprite>(displayId, SceneItemType.SPRITE);
     let sprite = spriteItem?.ref;
 
     // TODO: refactor this once SpriteManager and Sprite are treated as separate components instead
@@ -87,19 +92,23 @@ class Render extends System {
     // At the moment, it's just sufficient to check for SpriteManager presence, later on, both
     // SpriteManager and Sprite will need their own checks!
     if (!spriteManager) {
+      // NOTE: reducing indirection by caching objects
+      const displaySpriteManager = display.spriteManager;
+      const displayIdString = displayId.toString();
+
       spriteManager = new SpriteManager(
-        display.id.toString(),
-        display.spriteManager.url,
-        display.spriteManager.capacity,
-        display.spriteManager.cellSize,
+        displayIdString,
+        displaySpriteManager.url,
+        displaySpriteManager.capacity,
+        displaySpriteManager.cellSize,
         this._scene
       );
-      spriteManager.isPickable = display.spriteManager.isPickable;
-      this.addSceneItem(display.id, SceneItemType.SPRITE_MANGER, spriteManager);
+      spriteManager.isPickable = displaySpriteManager.isPickable;
+      spriteManagerItem = this.addSceneItem(displayId, SceneItemType.SPRITE_MANGER, spriteManager);
 
-      sprite = new Sprite(display.id.toString(), spriteManager);
+      sprite = new Sprite(displayIdString, spriteManager);
       sprite.isPickable = display.sprite.isPickable;
-      this.addSceneItem(display.id, SceneItemType.SPRITE, sprite);
+      spriteItem = this.addSceneItem(displayId, SceneItemType.SPRITE, sprite);
     }
 
     // NOTE: reducing indirection by caching objects
@@ -120,35 +129,44 @@ class Render extends System {
       // mesh.position... / mesh.rotation... / mesh.scale...
     }
 
-    // TODO: mark scene items as rendered, so disposeUnusedSceneEntities() leaves it alone 
+    // NOTE: mark scene items as rendered, so disposeUnusedSceneEntities() leaves it alone
+    spriteManagerItem!.rendered = true;
+    spriteItem!.rendered = true;
   };
 
-  getSceneItem = <T>(entityId: EntityId, itemClassName: SceneItemType): SceneItem<T> | null => {
+  private getSceneItem = <T>(entityId: EntityId, itemClassName: SceneItemType): SceneItem<T> | null => {
     return this._sceneItemsLists[itemClassName].get(entityId) as SceneItem<T> | null;
   };
 
-  addSceneItem = (
-    entityId: EntityId,
-    itemClassName: SceneItemType,
-    item: SpriteManager | Sprite
-  ) => {
-    this._sceneItemsLists[itemClassName].add(new SceneItem(entityId, item));
+  private addSceneItem = <T>(entityId: EntityId, itemClassName: SceneItemType, item: T) => {
+    const sceneItem = new SceneItem<T>(entityId, item);
+    this._sceneItemsLists[itemClassName].add(sceneItem);
+    return sceneItem;
   };
 
-  disposeUnusedSceneEntities = () => {
-    // TODO: [DISPOSALS]
-    //
-    // if (...) {
-    // TODO: remove items from scene graph when Display component is found to be missing !!
-    // (some other system removed it, with intent on making item not renderable anymore !!)
-    //
-    // Loop thorough entity sets and check for anything that wasn't render in this update and
-    // dispose of it...
-    //
-    // TODO: ...
-    // dispose...
-    // ... return
-    // }
+  private removeSceneItem = (entityId: EntityId, itemClassName: SceneItemType) => {
+    this._sceneItemsLists[itemClassName].remove(entityId);
+  };
+
+  private disposeUnusedSceneEntities = () => {
+    Object.entries(this._sceneItemsLists).forEach(([sceneItemsListType, sceneItemsList]) =>
+      sceneItemsList.stream((sceneItem: SceneItem<SpriteManager | Sprite>) =>
+        this.disposeUnusedSceneEntity(sceneItemsListType as SceneItemType, sceneItem)
+      )
+    );
+  };
+
+  private disposeUnusedSceneEntity = (
+    itemClassName: SceneItemType,
+    sceneItem: SceneItem<SpriteManager | Sprite>
+  ) => {
+    if (sceneItem.rendered) {
+      sceneItem.rendered = false; // NOTE: reset the flag before next render
+      return;
+    }
+
+    sceneItem.ref.dispose();
+    this.removeSceneItem(sceneItem.id, itemClassName);
   };
 
   destroy(): void {}
