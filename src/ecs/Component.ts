@@ -1,9 +1,9 @@
 import { EntityId } from "./types";
 import { SparseSetItem } from "./utils/SparseSet";
 
-// custom components will extend this.
+// NOTE: custom components will extend this.
 abstract class Component extends SparseSetItem {
-  // NO METHODS ON COMPONENTS !!!
+  // NOTE: NO METHODS ON COMPONENTS !!!
 
   constructor(entityId: EntityId) {
     super(entityId);
@@ -13,16 +13,16 @@ abstract class Component extends SparseSetItem {
 export default Component;
 
 // OK. Step back. We need to purify the approach.
-// [DONE]
+//
 // [Components] need to be pure, primitive data only, numbers and strings.
-// 1. this will let them be pure serializable data containers (can't serialize pointers)
+// [DONE] 1. this will let them be pure serializable data containers (can't serialize pointers)
 // 2. ecs can stay decoupled and still have scope for ArrayBuffer optimizations
 
 // [Renderer] needs to be entirely encapsulated in the Render system.
-// 1. Will hold a scenes graph from the renderer.
-// 2. Initialize and Add items to scene graph from info of Render component.
+// [DONE] 1. Will hold a scenes graph from the renderer.
+// [DONE] 2. Initialize and Add items to scene graph from info of Render component.
 // 3. Dispose and Swap scenes based on signals from GameManger etc.
-// Some sprite specific stuff, animation, instancing and events (picking) https://playground.babylonjs.com/#9RUHH#5
+// 4. Some sprite specific stuff, animation, instancing and events (picking) https://playground.babylonjs.com/#9RUHH#5
 
 // [GameManager] this first system will orchestrate everything. Signal game serialization and
 // deserialization, switch scenes signals etc.

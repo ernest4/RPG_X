@@ -35,7 +35,7 @@ class Render extends System {
 
     this._scene = new Scene(this._renderEngine);
 
-    // TODO: move some of this set up out ?!?!
+    // TODO: move some of this set up out ?!?! there should be a camera component !!
     const camera = new ArcRotateCamera("Camera", 1, 0.8, 8, new Vector3(0, 0, 0), this._scene);
     camera.attachControl(canvas, true);
 
@@ -61,6 +61,8 @@ class Render extends System {
     this._sceneItemsLists = {
       SpriteManager: new SparseSet(),
       Sprite: new SparseSet(),
+      // some camera ...
+      // TODO: rest ... 
     };
 
     // TODO: set up action manager to send input events... (code in testScene.ts)
