@@ -1,5 +1,5 @@
 import System from "../../ecs/System";
-import Display from "../components/Display";
+import Sprite from "../components/Sprite";
 import Transform from "../components/Transform";
 
 // TODO: [GameManager] this first system will orchestrate everything. Signal game serialization and
@@ -27,7 +27,7 @@ const setUpTestScene = (system: System) => {
   transform1.scale.z = 1;
   system.engine.addComponent(transform1);
 
-  const display1 = new Display(sprite1);
+  const display1 = new Sprite(sprite1);
   const display1SpriteManager = display1.spriteManager;
   display1SpriteManager.url = "assets/turtle.jpg";
   display1SpriteManager.capacity = 1;

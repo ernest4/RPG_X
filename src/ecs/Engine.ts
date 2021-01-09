@@ -14,7 +14,7 @@ class Engine {
   // (-> system -> update)
   // _systemUpdateFunctions: ((engine: Engine, deltaTime: DeltaTime) => void)[];
   _systems: System[]; // NOTE: handle onn system to call start() and destroy()
-  _componentLists: { [key: string]: SparseSet };
+  _componentLists: { [key: string]: SparseSet | undefined };
   _entityIdPool: EntityIdPool;
 
   constructor() {
@@ -87,7 +87,7 @@ class Engine {
 
   removeEntity = (entityId: EntityId) => {
     // NOTE: In EnTT this happens by iterating every single sparse set in the registry, checking if it contains the entity, and deleting it if it does.
-    Object.values(this._componentLists).forEach(componentList => componentList.remove(entityId));
+    Object.values(this._componentLists).forEach(componentList => componentList?.remove(entityId));
 
     // TODO: reclaim entityId to be reused only when deleting Entity (for now) i.e. when all components gone...
     this._entityIdPool.reclaimId(entityId);
@@ -95,7 +95,7 @@ class Engine {
 
   // NOTE: fast O(1) bulk operations
   removeAllEntities = () => {
-    Object.values(this._componentLists).forEach(componentList => componentList.clear());
+    Object.values(this._componentLists).forEach(componentList => componentList?.clear());
 
     this._entityIdPool.clearPool();
   };
@@ -123,12 +123,17 @@ class Engine {
     let shortestComponentList = this._componentLists[
       componentClasses[shortestComponentListIndex].name
     ];
+
+    if (!shortestComponentList) return;
+
     componentClasses.forEach((componentClass, index) => {
       const nextShortestComponentList = this._componentLists[componentClass.name];
 
-      if (nextShortestComponentList.size < shortestComponentList.size) {
-        shortestComponentList = nextShortestComponentList;
-        shortestComponentListIndex = index;
+      if (nextShortestComponentList && shortestComponentList) {
+        if (nextShortestComponentList.size < shortestComponentList.size) {
+          shortestComponentList = nextShortestComponentList;
+          shortestComponentListIndex = index;
+        }
       }
     });
 
@@ -154,7 +159,7 @@ class Engine {
         if (i === shortestComponentListIndex) continue; // NOTE: skip checking the shortest list !
 
         const componentClassName = componentClasses[i].name;
-        const anotherComponent = this._componentLists[componentClassName].get(entityId);
+        const anotherComponent = this._componentLists[componentClassName]?.get(entityId);
 
         if (anotherComponent) querySet.push(anotherComponent);
         else break; // NOTE: soon as we discover a missing component, abandon further pointless search for that entityId !

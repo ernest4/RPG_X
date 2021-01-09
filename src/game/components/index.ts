@@ -1,13 +1,15 @@
 import Collider from "./Collider";
 import PhysicsBody from "./PhysicsBody";
-import Display from "./Display";
+import Sprite from "./Sprite";
+import Mesh from "./Mesh";
 import Tag from "./Tag";
 import Transform from "./Transform";
 
 export default {
   Collider,
   PhysicsBody,
-  Display,
+  Sprite,
+  Mesh,
   Tag,
   Transform,
 };

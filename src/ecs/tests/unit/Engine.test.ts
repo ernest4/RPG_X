@@ -38,6 +38,10 @@ describe(Engine, () => {
   describe("#removeEntity", () => {});
   describe("#removeAllEntities", () => {});
   describe("#update", () => {});
-  describe("#query", () => {});
+  describe("#query", () => {
+    // context -> when no components exist in a list
+    // context -> when lists are different lengths
+    // ...
+  });
   describe("#deltaTime", () => {});
 });

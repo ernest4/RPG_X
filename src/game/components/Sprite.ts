@@ -1,27 +1,19 @@
 import Component from "../../ecs/Component";
 import { EntityId } from "../../ecs/types";
 
-// TODO: Sprite a separate (and only) render component ? (A Mesh for 3d one ?)
-
 // TODO: optimize with ArrayBuffers ??
-class Display extends Component {
-  private _is2d: boolean;
+class Sprite extends Component {
   // TODO: make this into class / buffer view ...
   private _spriteManager: { url: string; capacity: number; cellSize: number; isPickable: boolean };
   private _sprite: { isPickable: boolean };
 
   constructor(entityId: EntityId) {
     super(entityId);
-    this._is2d = true;
 
-    // TODO: move sprite manager to it's own component? then use parent/child connection for any
-    // sprites that need the manager?
+    // TODO: move sprite manager to it's own 'SpriteManager' component? then use parent/child
+    // connection for any sprites that need the manager?
     this._spriteManager = { url: "", capacity: 0, cellSize: 0, isPickable: false };
     this._sprite = { isPickable: false };
-  }
-
-  get is2d() {
-    return this._is2d;
   }
 
   get spriteManager() {
@@ -39,4 +31,4 @@ class Display extends Component {
   // sorting order (draw order) ?? need that...
 }
 
-export default Display;
+export default Sprite;
