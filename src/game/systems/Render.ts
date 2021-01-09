@@ -37,7 +37,11 @@ class Render extends System {
 
     this._scene = new BabylonScene(this._renderEngine);
 
-    // TODO: move some of this set up out ?!?! there should be a camera component !!
+    // TODO: add the fps counter back in ASAP to track performance !!!
+
+    // TODO: move some of this set up out ?!?! there should be a camera component so it can be 
+    // accessible to other systems !!!
+    // TODO: remember we basically want arc with vertical tilt only, no left-right rotation...wip
     const camera = new ArcRotateCamera("Camera", 1, 0.8, 8, new Vector3(0, 0, 0), this._scene);
     camera.attachControl(canvas, true);
 
