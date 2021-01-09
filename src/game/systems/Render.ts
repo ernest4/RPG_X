@@ -18,6 +18,7 @@ import {
   PointLight,
 } from "babylonjs";
 import Mesh from "../components/Mesh";
+import Camera from "../components/Camera";
 
 // NOTE: Render tends to be the heaviest system, so the code is leaning towards lots of caching and
 // inlining of variables to reduce indirection and increase speed.
@@ -39,7 +40,7 @@ class Render extends System {
 
     // TODO: add the fps counter back in ASAP to track performance !!!
 
-    // TODO: move some of this set up out ?!?! there should be a camera component so it can be 
+    // TODO: move some of this set up out ?!?! there should be a camera component so it can be
     // accessible to other systems !!!
     // TODO: remember we basically want arc with vertical tilt only, no left-right rotation...wip
     const camera = new ArcRotateCamera("Camera", 1, 0.8, 8, new Vector3(0, 0, 0), this._scene);
@@ -75,11 +76,20 @@ class Render extends System {
   }
 
   update(): void {
+    this.engine.query(this.updateCameras, Transform, Camera);
     this.engine.query(this.updateSprites, Transform, Sprite);
     this.engine.query(this.updateMeshes, Transform, Mesh);
     this.disposeUnusedSceneEntities();
     this._scene.render();
   }
+
+  updateCameras = (querySet: QuerySet) => {
+    const [transform, camera] = querySet as [Transform, Camera];
+
+    // wip...
+    // if (...) create
+    // update
+  };
 
   updateSprites = (querySet: QuerySet) => {
     const [transform, sprite] = querySet as [Transform, Sprite];
@@ -170,6 +180,7 @@ class Render extends System {
   };
 
   private disposeUnusedSceneEntities = () => {
+    // TODO: handle cameras here too...??
     Object.entries(this._sceneItemsLists).forEach(([sceneItemsListType, sceneItemsList]) =>
       sceneItemsList.stream((sceneItem: SceneItem<BabylonSpriteManager | BabylonSprite>) =>
         this.disposeUnusedSceneEntity(sceneItemsListType as SceneItemType, sceneItem)
