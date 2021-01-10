@@ -16,6 +16,7 @@ import {
   HemisphericLight,
   Color3,
   PointLight,
+  Tools,
 } from "babylonjs";
 import Mesh from "../components/Mesh";
 import Camera from "../components/Camera";
@@ -44,6 +45,13 @@ class Render extends System {
     // accessible to other systems !!!
     // TODO: remember we basically want arc with vertical tilt only, no left-right rotation...wip
     const camera = new ArcRotateCamera("Camera", 1, 0.8, 8, new Vector3(0, 0, 0), this._scene);
+    // NOTE: confine vertical bounds of movement
+    // camera.lowerBetaLimit = BABYLON.Tools.ToRadians(45); // NOTE: Locked 45 deg.
+    camera.upperBetaLimit = Math.PI / 2.2; // NOTE: 45 to 0 deg (ground level)
+    camera.lowerBetaLimit = BABYLON.Tools.ToRadians(45);
+    // NOTE: confine horizontal bounds of movement (no movement)
+    camera.upperAlphaLimit = 0;
+    camera.lowerAlphaLimit = 0;
     camera.attachControl(canvas, true);
 
     // const light = new PointLight("Point", new Vector3(5, 10, 5), this._scene);
@@ -145,7 +153,7 @@ class Render extends System {
     babylonSpritePosition.z = transformPosition.z;
 
     babylonSprite!.size = transformScale.z; // NOTE: just using 'z' value to represent 2d scale
-    babylonSprite!.angle = transformRotation.z; // NOTE: just using 'z' value to represent 2d angle
+    babylonSprite!.angle = Tools.ToRadians(transformRotation.z); // NOTE: just using 'z' value to represent 2d angle
 
     // NOTE: mark scene items as rendered, so disposeUnusedSceneEntities() leaves it alone
     spriteManagerItem!.rendered = true;
