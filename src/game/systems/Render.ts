@@ -52,6 +52,7 @@ class Render extends System {
     // NOTE: confine horizontal bounds of movement (no movement)
     camera.upperAlphaLimit = 0;
     camera.lowerAlphaLimit = 0;
+    // camera.parent = mesh/sprite; // NOTE: jumpy...
     camera.attachControl(canvas, true);
 
     // const light = new PointLight("Point", new Vector3(5, 10, 5), this._scene);
@@ -213,3 +214,19 @@ class Render extends System {
 }
 
 export default Render;
+
+// TODO: sprite experiments https://playground.babylonjs.com/#2GYRPB#21
+
+// based on above, we'll need to make our own custom sprite abstraction that wraps around babylons
+// standard Plane mesh, but allows us to skew it by manipulating vertices!
+// This will allow us to mimic shadow tech used in Beat Cop, using secondary grey, skewed texture of
+// original (or even use 3D shadows powered by shadow generator and a light source !).
+// 
+// Unfortunately that means we'll need to implement our own Sprite (possibly sprite manager?) and
+// animations system. Thankfully all that is a proof of concept show in the link (and 
+// RENDER_TEST.txt as back up).
+// 
+// SpireManager will probably handle loading texture, setting up material and creating instances of
+// same sprite.
+// Sprite is basically combination of Plane mesh, standard material and texture. Will probably just 
+// request sprite manager to create an instance of itself.

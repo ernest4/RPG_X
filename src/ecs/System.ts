@@ -2,7 +2,7 @@ import Engine from "./Engine";
 
 // TODO: jest tests !!!!
 abstract class System {
-  private _engine: Engine;
+  private readonly _engine: Engine;
 
   constructor(engine: Engine) {
     this._engine = engine;
