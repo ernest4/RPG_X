@@ -215,7 +215,7 @@ class Render extends System {
 
 export default Render;
 
-// TODO: sprite experiments https://playground.babylonjs.com/#2GYRPB#21
+// TODO: sprite experiments https://playground.babylonjs.com/#2GYRPB#25
 
 // based on above, we'll need to make our own custom sprite abstraction that wraps around babylons
 // standard Plane mesh, but allows us to skew it by manipulating vertices!
