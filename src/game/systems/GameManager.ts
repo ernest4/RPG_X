@@ -21,17 +21,16 @@ export default GameManager;
 
 const setUpTestScene = (system: System) => {
   // TODO: ...
-  const sprite1 = system.engine.generateEntityId();
+  const entity1 = system.engine.generateEntityId();
 
-  const transform1 = new Transform(sprite1);
+  const transform1 = new Transform(entity1);
   transform1.scale.z = 1;
   system.engine.addComponent(transform1);
 
-  const display1 = new Sprite(sprite1);
+  const display1 = new Sprite(entity1);
   const display1SpriteManager = display1.spriteManager;
   display1SpriteManager.url = "assets/turtle.jpg";
   display1SpriteManager.capacity = 1;
   display1SpriteManager.cellSize = 640;
-
   system.engine.addComponent(display1);
 };

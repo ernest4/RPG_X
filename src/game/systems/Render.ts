@@ -4,6 +4,8 @@ import Sprite from "../components/Sprite";
 import { EntityId, QuerySet, SceneItemType } from "../../ecs/types";
 import SparseSet from "../../ecs/utils/SparseSet";
 import SceneItem from "./render/SceneItem";
+
+import Phaser, { Game, Scene } from "phaser";
 // import {
 //   Scene as BabylonScene,
 //   Engine as BabylonEngine,
@@ -20,13 +22,19 @@ import SceneItem from "./render/SceneItem";
 // } from "babylonjs";
 // import Mesh from "../components/Mesh";
 import Camera from "../components/Camera";
+import { Engine } from "../../ecs";
 
 // NOTE: Render tends to be the heaviest system, so the code is leaning towards lots of caching and
 // inlining of variables to reduce indirection and increase speed.
 class Render extends System {
   // private _renderEngine!: BabylonEngine;
-  // private _scene!: BabylonScene;
+  private _scene: Scene;
   private _sceneItemsLists!: { [key: string]: SparseSet };
+
+  constructor(engine: Engine, scene: Scene) {
+    super(engine);
+    this._scene = scene;
+  }
 
   // start(): void {
   //   const canvas = document.getElementById("canvas") as Nullable<
@@ -85,11 +93,22 @@ class Render extends System {
   // }
 
   start(): void {
-    // TODO: phaser 3 game init stuff...
+    // TODO: phaser 3 scene init stuff...
+    // TODO: add the fps counter back in ASAP to track performance !!!
+
+    // NOTE: need to keep a ref of scene graph items, so can dispose once Sprite/Mesh etc components
+    // are removed from entity
+    // this._sceneItemsLists = {
+    //   Sprite: new SparseSet(),
+    //   // some camera ...
+    //   // TODO: rest ...
+    // };
+
+    // TODO: send input events to create input event entities
   }
 
   update(): void {
-    this.engine.query(this.updateCameras, Transform, Camera);
+    // this.engine.query(this.updateCameras, Transform, Camera);
     this.engine.query(this.updateSprites, Transform, Sprite);
     // this.engine.query(this.updateMeshes, Transform, Mesh);
     // this.disposeUnusedSceneEntities();
