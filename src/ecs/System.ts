@@ -22,7 +22,7 @@ abstract class System {
   }
 
   get deltaTime() {
-    return this._engine.deltaTime;
+    return this.engine.deltaTime;
   }
 }
 

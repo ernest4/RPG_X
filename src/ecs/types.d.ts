@@ -1,3 +1,4 @@
+import "jest-extended";
 // NOTE: more custom type examples
 // type Foot = number;
 // type Pound = number;

@@ -89,7 +89,6 @@ class Engine {
     // NOTE: In EnTT this happens by iterating every single sparse set in the registry, checking if it contains the entity, and deleting it if it does.
     Object.values(this._componentLists).forEach(componentList => componentList?.remove(entityId));
 
-    // TODO: reclaim entityId to be reused only when deleting Entity (for now) i.e. when all components gone...
     this._entityIdPool.reclaimId(entityId);
   };
 
@@ -97,7 +96,7 @@ class Engine {
   removeAllEntities = () => {
     Object.values(this._componentLists).forEach(componentList => componentList?.clear());
 
-    this._entityIdPool.clearPool();
+    this._entityIdPool.clear();
   };
 
   update = (deltaTime: DeltaTime) => {
@@ -111,6 +110,8 @@ class Engine {
   };
 
   query = (callback: QueryCallback, ...componentClasses: ComponentClass[]) => {
+    if (componentClasses.length === 0) throw Error("Empty Query");
+
     // TODO: ...
     // Query function will take shortest componentlist and loop throught the dense list of it.
     // For each denselist component with valid entityid, will check that components entityid against the rest of desired component lists and get those components (if present).
@@ -149,14 +150,13 @@ class Engine {
       // });
 
       const entityId = component.id;
-      const shortestListComponent = shortestComponentList.get(entityId) as Component;
 
       // TODO: optimize by caching querySet array ??
-      const querySet: QuerySet = [shortestListComponent];
+      const querySet: QuerySet = [];
 
       const componentClassesLength = componentClasses.length;
       for (let i = 0; i < componentClassesLength; i++) {
-        if (i === shortestComponentListIndex) continue; // NOTE: skip checking the shortest list !
+        // if (i === shortestComponentListIndex) continue; // NOTE: skip checking the shortest list !
 
         const componentClassName = componentClasses[i].name;
         const anotherComponent = this._componentLists[componentClassName]?.get(entityId);
@@ -187,35 +187,3 @@ class Engine {
 }
 
 export default Engine;
-
-// TODO: not responsibility of this class !!
-// serialize = () => {
-//   // TODO: export all component state to object
-// };
-
-// load = (ecsObject): void => {
-//   // TODO: import all component state to Engine
-
-//   const { entityIdPool, componentLists, systemLists } = ecsObject;
-
-//   // TODO: preload the default set of update functions + any active update systems from the serialization?
-//   // Look them up using string system name from the key of import object
-
-//   // WIP...
-//   // systemLists.forEach(system => this.addSystem(system, priority))
-
-//   this._componentLists = this.loadComponentLists(componentLists);
-//   this._entityIdPool.load(entityIdPool);
-// };
-
-// private loadComponentLists = (componentListsObject): { [key: string]: SparseSet } => {
-//   const componentLists = {};
-
-//   Object.entries(componentLists).forEach(([componentClassName, componentsData]) => {
-//     const componentList = new SparseSet(this._componentClasses);
-//     componentList.load({ componentClassName, componentsData });
-//     this._componentLists[componentClassName] = componentList;
-//   });
-
-//   return componentLists;
-// };

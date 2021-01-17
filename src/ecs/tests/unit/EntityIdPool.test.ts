@@ -56,7 +56,7 @@ describe(EntityIdPool, () => {
     });
   });
 
-  describe("#clearPool", () => {
+  describe("#clear", () => {
     beforeEach(() => {
       [subject.getId(), subject.getId(), subject.getId()].forEach(id => {
         subject.reclaimId(id);
@@ -64,17 +64,17 @@ describe(EntityIdPool, () => {
     });
 
     it("returns pool size", () => {
-      expect(subject.clearPool()).toEqual(3);
+      expect(subject.clear()).toEqual(3);
     });
 
     it("sets size to 0", () => {
-      subject.clearPool();
+      subject.clear();
       expect(subject.size).toEqual(0);
     });
 
     it("generates a new id", () => {
-      subject.clearPool();
-      expect(subject.getId()).toEqual(3);
+      subject.clear();
+      expect(subject.getId()).toEqual(0);
     });
   });
 });

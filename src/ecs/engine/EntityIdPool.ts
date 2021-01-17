@@ -29,9 +29,10 @@ class EntityIdPool {
     return ++this._lastUsedEntityId;
   };
 
-  clearPool = (): number => {
+  clear = (): number => {
     const oldReclaimedEntityIdPoolSize = this._reclaimedEntityIdPoolSize;
     this._reclaimedEntityIdPoolSize = 0;
+    this._lastUsedEntityId = -1;
     return oldReclaimedEntityIdPoolSize;
   };
 
