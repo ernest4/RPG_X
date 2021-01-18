@@ -11,6 +11,8 @@ class SceneItem<T> extends SparseSetItem {
     this._rendered = false;
   }
 
+  // get loading
+
   get ref() {
     return this._ref;
   }

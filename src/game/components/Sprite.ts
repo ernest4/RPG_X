@@ -7,6 +7,13 @@ class Sprite extends Component {
   // private _spriteManager: { url: string; capacity: number; cellSize: number; isPickable: boolean };
   // private _sprite: { isPickable: boolean };
 
+  // private _key: string;
+  url: string;
+  frame: number;
+  normalMap: null;
+  frameWidth: number;
+  frameHeight: number;
+
   constructor(entityId: EntityId) {
     super(entityId);
 
@@ -31,12 +38,12 @@ class Sprite extends Component {
     //   },
     // };
 
-    this._frame = 0;
-    this._key = ""; // NOTE: will be same as url basically
-    this._url = "";
-    this._normalMap = null;
-    this._frameWidth = 1024; // Arbitrary high value unless specified
-    this._frameHeight = 1024;
+    // this._key = ""; // NOTE: will be same as url basically
+    this.url = "";
+    this.frame = 0;
+    this.normalMap = null;
+    this.frameWidth = 1024; // Arbitrary high value unless specified
+    this.frameHeight = 1024;
     // startFrame: 0,
     // endFrame: endFrame,
     // margin: margin,
@@ -51,9 +58,13 @@ class Sprite extends Component {
   //   return this._sprite;
   // }
 
-  get quad() {
-    return this._quad;
-  }
+  // get frame() {
+  //   return this._quad;
+  // }
+
+  // get quad() {
+  //   return this._quad;
+  // }
 
   // TODO: ...s
   // color

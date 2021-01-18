@@ -4,9 +4,11 @@ import Sprite from "../components/Sprite";
 import { EntityId, QuerySet, SceneItemType } from "../../ecs/types";
 import SparseSet from "../../ecs/utils/SparseSet";
 import SceneItem from "./render/SceneItem";
-import Phaser, { Game, Scene, GameObjects } from "phaser";
+import Phaser, { Math, Game, Scene, GameObjects } from "phaser";
 import Camera from "../components/Camera";
 import { Engine } from "../../ecs";
+
+// TODO: TESTS !!!
 
 // NOTE: Render tends to be the heaviest system, so the code is leaning towards lots of caching and
 // inlining of variables to reduce indirection and increase speed.
@@ -25,11 +27,12 @@ class Render extends System {
     // TODO: add the fps counter back in ASAP to track performance !!!
     // NOTE: need to keep a ref of scene graph items, so can dispose once Sprite/Mesh etc components
     // are removed from entity
-    // this._sceneItemsLists = {
-    //   Sprite: new SparseSet(),
-    //   // some camera ...
-    //   // TODO: rest ...
-    // };
+    this._sceneItemsLists = {
+      // Sprite: new SparseSet(),
+      Quad: new SparseSet(),
+      // some camera ...
+      // TODO: rest ...
+    };
     // TODO: send input events to create input event entities
   }
 
@@ -37,7 +40,7 @@ class Render extends System {
     // this.engine.query(this.updateCameras, Transform, Camera);
     this.engine.query(this.updateSprites, Transform, Sprite);
     // this.engine.query(this.updateMeshes, Transform, Mesh);
-    // this.disposeUnusedSceneEntities();
+    this.disposeUnusedSceneEntities();
     // this._scene.render();
   }
 
@@ -113,8 +116,8 @@ class Render extends System {
   updateSprites = (querySet: QuerySet) => {
     const [transform, sprite] = querySet as [Transform, Sprite];
 
-    // NOTE: reducing indirection by caching objects
-    const spriteId = sprite.id;
+    // TODO: reducing indirection by caching objects
+    // const spriteId = sprite.id;
 
     // let spriteManagerItem = this.getSceneItem<BabylonSpriteManager>(
     //   spriteId,
@@ -124,61 +127,37 @@ class Render extends System {
 
     // let spriteItem = this.getSceneItem<GameObjects.Sprite>(spriteId, SceneItemType.SPRITE);
     // let babylonSprite = spriteItem?.ref;
+    const { url, frame, frameWidth, frameHeight, normalMap } = sprite;
 
-    let quadItem = this.getSceneItem<GameObjects.Quad>(spriteId, SceneItemType.QUAD);
+    let quadItem = this.getSceneItem<GameObjects.Quad>(sprite.id, SceneItemType.QUAD);
     let phaserQuad = quadItem?.ref;
 
-    // TODO: refactor this once SpriteManager and Sprite are treated as separate components instead
-    // of both being bundled into Sprite component.
-    // At the moment, it's just sufficient to check for SpriteManager presence, later on, both
-    // SpriteManager and Sprite will need their own checks!
-    // if (!babylonSpriteManager) {
+    // TODO: async asset loading race conditions...need to somehow not use the entity entirely until
+    // sprite is loaded...
     if (!phaserQuad) {
-      // NOTE: reducing indirection by caching objects
-      // const spriteSpriteManager = sprite.spriteManager;
-      const spriteIdString = spriteId.toString();
-
-      // babylonSpriteManager = new BabylonSpriteManager(
-      //   spriteIdString,
-      //   spriteSpriteManager.url,
-      //   spriteSpriteManager.capacity,
-      //   spriteSpriteManager.cellSize,
-      //   this._scene
-      // );
-      // babylonSpriteManager.isPickable = spriteSpriteManager.isPickable;
-      // spriteManagerItem = this.addSceneItem(
-      //   spriteId,
-      //   SceneItemType.SPRITE_MANGER,
-      //   babylonSpriteManager
-      // );
-
-      // check texture presence, load if missing....(will need callback logic...)
-      this.textures.get('some_key').key === "__MISSING"
-
-      // phaserQuad = new BabylonSprite(spriteIdString, babylonSpriteManager);
-      phaserQuad = this._scene.add.quad(0, 0, texture, frame);
-      // phaserQuad = new GameObjects.Quad(this._scene);
-      phaserQuad.isPickable = sprite.sprite.isPickable;
-      quadItem = this.addSceneItem(spriteId, SceneItemType.SPRITE, phaserQuad);
+      if (this._scene.textures.get(url).key === "__MISSING") {
+        this._scene.load.spritesheet(url, url, { frameWidth, frameHeight });
+        this._scene.load.on("filecomplete", () => {
+          // phaserQuad = new BabylonSprite(spriteIdString, babylonSpriteManager);
+          phaserQuad = this._scene.add.quad(0, 0, url, frame);
+          // phaserQuad = new GameObjects.Quad(this._scene);
+          // phaserQuad.isPickable = sprite.sprite.isPickable;
+          this.addSceneItem(sprite.id, SceneItemType.QUAD, phaserQuad);
+          this.applyTransformToPhaserQuad(transform, phaserQuad);
+        });
+        this._scene.load.start();
+      }
     }
-
-    // NOTE: reducing indirection by caching objects
-    const babylonSpritePosition = phaserQuad!.position;
-    const transformPosition = transform.position;
-    const transformScale = transform.scale;
-    const transformRotation = transform.rotation;
-
-    babylonSpritePosition.x = transformPosition.x;
-    babylonSpritePosition.y = transformPosition.y;
-    babylonSpritePosition.z = transformPosition.z;
-
-    phaserQuad!.size = transformScale.z; // NOTE: just using 'z' value to represent 2d scale
-    phaserQuad!.angle = Tools.ToRadians(transformRotation.z); // NOTE: just using 'z' value to represent 2d angle
-
-    // NOTE: mark scene items as rendered, so disposeUnusedSceneEntities() leaves it alone
-    spriteManagerItem!.rendered = true;
-    quadItem!.rendered = true;
   };
+
+  // private attachLoadedQuadToScene = (transform: Transform, sprite: Sprite) => {
+  //   // phaserQuad = new BabylonSprite(spriteIdString, babylonSpriteManager);
+  //   const phaserQuad = this._scene.add.quad(0, 0, sprite.url, sprite.frame);
+  //   // phaserQuad = new GameObjects.Quad(this._scene);
+  //   // phaserQuad.isPickable = sprite.sprite.isPickable;
+  //   this.addSceneItem(sprite.id, SceneItemType.QUAD, phaserQuad);
+  //   this.applyTransformToPhaserQuad(transform, phaserQuad);
+  // };
 
   // updateMeshes = (querySet: QuerySet) => {
   //   const [transform, mesh] = querySet as [Transform, Mesh];
@@ -190,12 +169,12 @@ class Render extends System {
   //   // mesh.position... / mesh.rotation... / mesh.scale...
   // };
 
-  // private getSceneItem = <T>(
-  //   entityId: EntityId,
-  //   itemClassName: SceneItemType
-  // ): SceneItem<T> | null => {
-  //   return this._sceneItemsLists[itemClassName].get(entityId) as SceneItem<T> | null;
-  // };
+  private getSceneItem = <T>(
+    entityId: EntityId,
+    itemClassName: SceneItemType
+  ): SceneItem<T> | null => {
+    return this._sceneItemsLists[itemClassName].get(entityId) as SceneItem<T> | null;
+  };
 
   private addSceneItem = <T>(entityId: EntityId, itemClassName: SceneItemType, item: T) => {
     const sceneItem = new SceneItem<T>(entityId, item);
@@ -203,31 +182,54 @@ class Render extends System {
     return sceneItem;
   };
 
-  // private removeSceneItem = (entityId: EntityId, itemClassName: SceneItemType) => {
-  //   this._sceneItemsLists[itemClassName].remove(entityId);
-  // };
+  private applyTransformToPhaserQuad = (transform: Transform, quad: GameObjects.Quad) => {
+    // NOTE: reducing indirection by caching objects
+    const phaserQuadPosition = quad!.position;
 
-  // private disposeUnusedSceneEntities = () => {
-  //   // TODO: handle cameras here too...??
-  //   Object.entries(this._sceneItemsLists).forEach(([sceneItemsListType, sceneItemsList]) =>
-  //     sceneItemsList.stream((sceneItem: SceneItem<BabylonSpriteManager | BabylonSprite>) =>
-  //       this.disposeUnusedSceneEntity(sceneItemsListType as SceneItemType, sceneItem)
-  //     )
-  //   );
-  // };
+    const transformPosition = transform.position;
+    const transformScale = transform.scale;
+    const transformRotation = transform.rotation;
 
-  // private disposeUnusedSceneEntity = (
-  //   itemClassName: SceneItemType,
-  //   sceneItem: SceneItem<BabylonSpriteManager | BabylonSprite>
-  // ) => {
-  //   if (sceneItem.rendered) {
-  //     sceneItem.rendered = false; // NOTE: reset the flag before next render
-  //     return;
-  //   }
+    phaserQuadPosition.x = transformPosition.x;
+    phaserQuadPosition.y = transformPosition.y;
+    // phaserQuadPosition.z = transformPosition.z;
 
-  //   sceneItem.ref.dispose();
-  //   this.removeSceneItem(sceneItem.id, itemClassName);
-  // };
+    quad!.scaleX = transformScale.x;
+    quad!.scaleY = transformScale.y;
+
+    quad!.rotation = Math.DegToRad(transformRotation.z); // NOTE: just using 'z' value to represent 2d angle
+
+    // NOTE: mark scene items as rendered, so disposeUnusedSceneEntities() leaves it alone
+    quadItem!.rendered = true;
+  };
+
+  private disposeUnusedSceneEntities = () => {
+    // TODO: handle cameras here too...??
+    Object.entries(this._sceneItemsLists).forEach(([sceneItemsListType, sceneItemsList]) =>
+      sceneItemsList.stream((sceneItem: SceneItem<GameObjects.Quad>) =>
+        this.disposeUnusedSceneEntity(sceneItemsListType as SceneItemType, sceneItem)
+      )
+    );
+  };
+
+  private disposeUnusedSceneEntity = (
+    itemClassName: SceneItemType,
+    sceneItem: SceneItem<GameObjects.Quad>
+  ) => {
+    if (sceneItem.rendered) {
+      sceneItem.rendered = false; // NOTE: reset the flag before next render
+      return;
+    }
+
+    // TODO: once we introduce pooling, will need to
+    // sceneItem.ref.active(false); sceneItem.ref.visible(false); to keep reference around for reuse
+    sceneItem.ref.destroy();
+    this.removeSceneItem(sceneItem.id, itemClassName);
+  };
+
+  private removeSceneItem = (entityId: EntityId, itemClassName: SceneItemType) => {
+    this._sceneItemsLists[itemClassName].remove(entityId);
+  };
 
   destroy(): void {}
 }
