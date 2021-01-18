@@ -44,8 +44,9 @@ declare const enum ColliderValueIndexes {
 
 // String enums are enforceable by typescript :), unlike numeric enums :/
 declare const enum SceneItemType {
-  SPRITE_MANGER = "SpriteManager",
+  // SPRITE_MANGER = "SpriteManager",
   SPRITE = "Sprite",
+  QUAD = "Quad"
   // TODO: will be others...
 }
 

@@ -27,10 +27,13 @@ const setUpTestScene = (system: System) => {
   transform1.scale.z = 1;
   system.engine.addComponent(transform1);
 
-  const display1 = new Sprite(entity1);
-  const display1SpriteManager = display1.spriteManager;
-  display1SpriteManager.url = "assets/turtle.jpg";
-  display1SpriteManager.capacity = 1;
-  display1SpriteManager.cellSize = 640;
-  system.engine.addComponent(display1);
+  const sprite1 = new Sprite(entity1);
+  // const display1SpriteManager = display1.spriteManager;
+  // display1SpriteManager.url = "assets/turtle.jpg";
+  // display1SpriteManager.capacity = 1;
+  // display1SpriteManager.cellSize = 640;
+
+  sprite1.url = "assets/turtle.jpg";
+
+  system.engine.addComponent(sprite1);
 };
