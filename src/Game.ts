@@ -10,6 +10,7 @@ class Game {
       width: window.innerWidth,
       height: window.innerHeight,
       parent: "phaser-game",
+      pixelArt: true, // NOTE: prevents anti-aliasing
       scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
