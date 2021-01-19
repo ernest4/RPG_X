@@ -16,6 +16,7 @@ class Entity {
   // add standardized callbacks to standardized events?
   constructor(id?: EntityId) {
     // this._id = id || ... generate ID...
+    // this._events = ... assign the global event emitter ...scene.registry.events...
     this._components = [];
     this._systems = [];
   }
@@ -23,14 +24,23 @@ class Entity {
   // TODO: will have default load system that will execute when loadable resource is added
 }
 
-class Render extends System {}
+class Action {
+  // call
+}
 
-class Movement extends System {}
+class Render extends Action {}
 
-class AI extends System {
+class Movement extends Action {}
+
+class AI extends Action {
   constructor(entity: Entity) {
     // TODO: ...
     // TODO: register itself to callback based on some event
+  }
+
+  // inherited override...
+  call = () => {
+    // logic here
   }
 
   private callbackLogic = () => {
@@ -39,11 +49,16 @@ class AI extends System {
 }
 
 const entity1 = new Entity();
+// components determine data available on an entity.
+// this determines what, if anything an action/system can do e.g.:
+// TakeDamage (action) will apply damage to entity's Health component if it has one (e.g. Enemy)
+// but will not do anything if the entity does not have Health component (e.g. Enemy has gained
+// vulnerability, so Health component was removed to represent that...)
 entity1.addComponent(new Transform());
 entity1.addComponent(new Sprite());
-entity1.addSystem(movementCallback);
-entity1.addSystem(renderCallback);
-
+entity1.addAction(new Movement());
+entity1.addAction(new Render());
+// TODO: need some way to keep the entity inactive until all components / systems ready?
 
 // https://phasergames.com/phaser-3-dispatching-custom-events/
 // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/eventemitter3/
@@ -59,17 +74,24 @@ scene.events.on('ATTACK', callback, scope); // Called many times....
 scene.events.emit('ATTACK_123', {weapon:'sword'});
 scene.events.on('ATTACK_123', callback, scope); // Called once !!
 
+// EVENT better, use the registry, game wide global data bus !! (so all scenes can access it)
+scene.registry.events.emit(...);
+scene.registry.events.on(...);
+
 export default class Main extends Scene {
-  // preload() {
-  //   // debugger
-  //   // TODO: load these assets in some ECS step...
-  //   this.load.image("turtle", "assets/turtle.jpg");
-  //   // this.load.image("sky", "assets/sky.png");
-  //   // this.load.image("ground", "assets/platform.png");
-  //   // this.load.image("star", "assets/star.png");
-  //   // this.load.image("bomb", "assets/bomb.png");
-  //   this.load.spritesheet("dude", "assets/dude.png", { frameWidth: 32, frameHeight: 48 });
-  // }
+  dudeQuads!: any[];
+  lastDeltaTime: any;
+  lastFrame: any;
+
+  preload() {
+    // TODO: testing. Most assets will loaded async !!!
+    this.load.image("turtle", "assets/turtle.jpg");
+    // this.load.image("sky", "assets/sky.png");
+    // this.load.image("ground", "assets/platform.png");
+    // this.load.image("star", "assets/star.png");
+    // this.load.image("bomb", "assets/bomb.png");
+    this.load.spritesheet("dude", "assets/dude.png", { frameWidth: 32, frameHeight: 48 });
+  }
 
   create() {
     // const text = this.add.text(250, 250, "Toggle UI", {
@@ -108,15 +130,26 @@ export default class Main extends Scene {
 
     this.dudeQuads = [];
 
+    const vertices = [-1, 1, 1, 1, -1, -1, 1, -1];
+
+    const uvs = [0, 0, 1, 0, 0, 1, 1, 1];
+
+    const indices = [0, 2, 1, 2, 3, 1];
+
     // can handle 40k @ 60fps; 60k at 45fps;
     // for (let i = 0; i < 40000; i++) {
     for (let i = 0; i < 4; i++) {
-      quadPlayer = this.add.quad(100 + 20 * (i % 50), 300, "dude");
+      // QUAD IS GONE !!!!
+      // quadPlayer = this.add.quad(100 + 20 * (i % 50), 300, "dude");
+      quadPlayer = this.add.mesh(100 + 20 * (i % 50), 600, "dude");
+      // quadPlayer = this.add.sprite(100 + 20 * (i % 50), 600, "dude");
+      quadPlayer.addVertices(vertices, uvs, indices);
+      quadPlayer.panZ(9);
       // quadPlayer.topLeftX = -10;
       quadPlayer.scaleY = 0.4;
-      const skewFactor = 40;
-      quadPlayer.topLeftX = quadPlayer.x - 32 / 2 - skewFactor;
-      quadPlayer.topRightX = quadPlayer.x + 32 / 2 - skewFactor;
+      // const skewFactor = 40;
+      // quadPlayer.topLeftX = quadPlayer.x - 32 / 2 - skewFactor;
+      // quadPlayer.topRightX = quadPlayer.x + 32 / 2 - skewFactor;
       this.dudeQuads.push(quadPlayer);
     }
 
