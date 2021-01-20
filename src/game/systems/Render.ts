@@ -5,21 +5,6 @@ import { EntityId, QuerySet, SceneItemType } from "../../ecs/types";
 import SparseSet from "../../ecs/utils/SparseSet";
 import SceneItem from "./render/SceneItem";
 import { utils } from "pixi.js";
-
-// import {
-//   Scene as BabylonScene,
-//   Engine as BabylonEngine,
-//   Nullable,
-//   SpriteManager as BabylonSpriteManager,
-//   Sprite as BabylonSprite,
-//   Mesh as BabylonMesh,
-//   ArcRotateCamera,
-//   Vector3,
-//   HemisphericLight,
-//   Color3,
-//   PointLight,
-//   Tools,
-// } from "babylonjs";
 // import Mesh from "../components/Mesh";
 import Camera from "../components/Camera";
 
@@ -89,6 +74,8 @@ class Render extends System {
   start(): void {
     // TODO: pixi init stuff...
     this.smokeTest();
+
+    
   }
 
   update(): void {
@@ -230,3 +217,15 @@ class Render extends System {
 }
 
 export default Render;
+
+
+// TODO: pixi.js filters: https://filters.pixijs.download/main/demo/index.html
+// 1. displacement filter (water)
+// 2. colorReplacement / multiColorReplacement filter for changing character clothes appearance dynamically
+// 3. dropShadow filter for cars?
+// 4. godRay filter (water) ?
+// 5. outline filter for highlights of Entities.
+// 6. reflection filter (water)
+// 7. shockwave filter (explosion)
+// 8. simpleLightMap/tiltShift filter (focus effect)?
+// 9. twistFilter - some special 'black hole' weapon ?
