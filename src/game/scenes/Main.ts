@@ -78,6 +78,10 @@ scene.events.on('ATTACK_123', callback, scope); // Called once !!
 scene.registry.events.emit(...);
 scene.registry.events.on(...);
 
+// IT's a bust (for now anyway :/) phaser 3.5 removed quads and replaced it with lower level mesh.
+// not only is lower level mesh pain to deal with, it also seems broken in that setting frames don't
+// work. The new 3.5 also introduced lots of breaking changes to animations etc.. disappointing.
+
 export default class Main extends Scene {
   dudeQuads!: any[];
   lastDeltaTime: any;
