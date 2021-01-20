@@ -4,6 +4,8 @@ import Sprite from "../components/Sprite";
 import { EntityId, QuerySet, SceneItemType } from "../../ecs/types";
 import SparseSet from "../../ecs/utils/SparseSet";
 import SceneItem from "./render/SceneItem";
+import { utils } from "pixi.js";
+
 // import {
 //   Scene as BabylonScene,
 //   Engine as BabylonEngine,
@@ -85,7 +87,8 @@ class Render extends System {
   // }
 
   start(): void {
-    // TODO: phaser 3 game init stuff...
+    // TODO: pixi init stuff...
+    this.smokeTest();
   }
 
   update(): void {
@@ -96,7 +99,12 @@ class Render extends System {
     // this._scene.render();
   }
 
-  updateCameras = (querySet: QuerySet) => {
+  private smokeTest = () => {
+    const type = utils.isWebGLSupported() ? "WebGL" : "canvas";
+    utils.sayHello(type);
+  };
+
+  private updateCameras = (querySet: QuerySet) => {
     const [transform, camera] = querySet as [Transform, Camera];
 
     // wip...
@@ -165,8 +173,8 @@ class Render extends System {
   //   spriteItem!.rendered = true;
   // };
 
-  updateSprites = (querySet: QuerySet) => {
-    // TODO: ... phaser 3 API ...
+  private updateSprites = (querySet: QuerySet) => {
+    // TODO: ... pixi API ...
   };
 
   // updateMeshes = (querySet: QuerySet) => {
