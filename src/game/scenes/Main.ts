@@ -78,10 +78,6 @@ scene.events.on('ATTACK_123', callback, scope); // Called once !!
 scene.registry.events.emit(...);
 scene.registry.events.on(...);
 
-// IT's a bust (for now anyway :/) phaser 3.5 removed quads and replaced it with lower level mesh.
-// not only is lower level mesh pain to deal with, it also seems broken in that setting frames don't
-// work. The new 3.5 also introduced lots of breaking changes to animations etc.. disappointing.
-
 export default class Main extends Scene {
   dudeQuads!: any[];
   lastDeltaTime: any;
@@ -230,4 +226,81 @@ export default class Main extends Scene {
 
     // this.dudeQuads.forEach(dudeQuad => dudeQuad.setFrame(this.lastFrame));
   }
+}
+
+
+// cracking the new mesh...
+
+class Example extends Phaser.Scene
+{
+    preload ()
+    {
+      // this is 5 x 5 sprite sheet
+        this.load.spritesheet('mummy', 'assets/sprites/metalslug_mummy37x45.png', { frameWidth: 37, frameHeight: 45 });
+    }
+
+    create ()
+    {
+        // const vertices = [
+        //     -1, 1,
+        //     1, 1,
+        //     -1, -1,
+        //     1, -1
+        // ];
+
+        const vertices = [
+          -2, 0.4,
+          0, 0.4,
+          -1, -1,
+          1, -1
+        ];
+
+        // const uvs = [
+        //     0, 0,
+        //     1, 0,
+        //     0, 1,
+        //     1, 1
+        // ];
+
+        console.log(this.textures.get('mummy'));
+
+        // display the 3rd frame, top row. tweak this for animation / frame selection
+        const uvs = [
+            2/5, 0,
+            3/5, 0,
+            2/5, 1/5,
+            3/5, 1/5
+        ];
+
+        const indicies = [ 0, 2, 1, 2, 3, 1 ];
+
+
+        const mesh = this.add.mesh(400, 300, 'mummy');
+        mesh.addVertices(vertices, uvs, indicies);
+        // to set tint:
+        mesh.addVertices(vertices, uvs, indicies, false, null, 0xff0000);
+        // CANT FIGURE OUT THE PANZ value or what to set it to while preserving original sprite dimensions...
+        mesh.panZ(100);
+        // mesh.displayWidth = 37;
+        mesh.displayHeight = 40;
+        // mesh.setScale(0.5);
+        mesh.setDepth(1);
+        mesh.x = 0;
+        mesh.y = 40;
+        // mesh.scaleY = 0.5 * 0.5;
+
+        console.log(mesh);
+
+        const mesh2 = this.add.mesh(0, 0, 'mummy');
+        mesh2.addVertices(vertices, uvs, indicies);
+        // to set tint:
+        mesh2.addVertices(vertices, uvs, indicies, false, null, 0x00ff00);
+        mesh2.panZ(100);
+        // mesh2.setScale(0.5);
+        mesh2.displayHeight = 40;
+        mesh2.setDepth(0);
+        // mesh.setTint(0x000000); // not a function
+
+        this.cameras.main.centerOn(400, 400);
+    }
 }
