@@ -146,11 +146,13 @@ export default class Main extends Scene {
       sprite.anims.play("left");
 
       // positions will be relative to the Container x/y
-      spriteShadow = this.add.sprite(100 + 20 * (i % 50) - 10, 300, "dude");
+      spriteShadow = this.add.sprite(100 + 20 * (i % 50), 300, "dude");
+      let scaleY = 0.4;
+      spriteShadow.y = spriteShadow.y + (spriteShadow.height * (1 - scaleY)) / 2;
+      spriteShadow.scaleY = scaleY;
       spriteShadow.setDepth(0);
       spriteShadow.anims.play("left");
       // quadPlayer.topLeftX = -10;
-      spriteShadow.scaleY = 0.4;
       spriteShadow.tint = 0x000000;
       spriteShadow.alpha = 0.5;
       // spriteShadow.setPipeline(); // WIP add vertex shader
