@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import FpsCounter from "../utils/FpsCounter";
 // import store from "../store";
 // import * as gameActions from "../store/actions/game";
 
@@ -10,78 +11,79 @@ import { Scene } from "phaser";
 // Some reactive (React?) like inspired architecture??
 // Service workers to simulate threading... (compute path-finding, AI etc)
 
-// Some sketches below:
-class Entity {
-  // TODO: ...
-  // add standardized callbacks to standardized events?
-  constructor(id?: EntityId) {
-    // this._id = id || ... generate ID...
-    // this._events = ... assign the global event emitter ...scene.registry.events...
-    this._components = [];
-    this._systems = [];
-  }
+// // Some sketches below:
+// class Entity {
+//   // TODO: ...
+//   // add standardized callbacks to standardized events?
+//   constructor(id?: EntityId) {
+//     // this._id = id || ... generate ID...
+//     // this._events = ... assign the global event emitter ...scene.registry.events...
+//     this._components = [];
+//     this._systems = [];
+//   }
 
-  // TODO: will have default load system that will execute when loadable resource is added
-}
+//   // TODO: will have default load system that will execute when loadable resource is added
+// }
 
-class Action {
-  // call
-}
+// class Action {
+//   // call
+// }
 
-class Render extends Action {}
+// class Render extends Action {}
 
-class Movement extends Action {}
+// class Movement extends Action {}
 
-class AI extends Action {
-  constructor(entity: Entity) {
-    // TODO: ...
-    // TODO: register itself to callback based on some event
-  }
+// class AI extends Action {
+//   constructor(entity: Entity) {
+//     // TODO: ...
+//     // TODO: register itself to callback based on some event
+//   }
 
-  // inherited override...
-  call = () => {
-    // logic here
-  }
+//   // inherited override...
+//   call = () => {
+//     // logic here
+//   }
 
-  private callbackLogic = () => {
-    // TODO: ...
-  };
-}
+//   private callbackLogic = () => {
+//     // TODO: ...
+//   };
+// }
 
-const entity1 = new Entity();
-// components determine data available on an entity.
-// this determines what, if anything an action/system can do e.g.:
-// TakeDamage (action) will apply damage to entity's Health component if it has one (e.g. Enemy)
-// but will not do anything if the entity does not have Health component (e.g. Enemy has gained
-// vulnerability, so Health component was removed to represent that...)
-entity1.addComponent(new Transform());
-entity1.addComponent(new Sprite());
-entity1.addAction(new Movement());
-entity1.addAction(new Render());
-// TODO: need some way to keep the entity inactive until all components / systems ready?
+// const entity1 = new Entity();
+// // components determine data available on an entity.
+// // this determines what, if anything an action/system can do e.g.:
+// // TakeDamage (action) will apply damage to entity's Health component if it has one (e.g. Enemy)
+// // but will not do anything if the entity does not have Health component (e.g. Enemy has gained
+// // vulnerability, so Health component was removed to represent that...)
+// entity1.addComponent(new Transform());
+// entity1.addComponent(new Sprite());
+// entity1.addAction(new Movement());
+// entity1.addAction(new Render());
+// // TODO: need some way to keep the entity inactive until all components / systems ready?
 
-// https://phasergames.com/phaser-3-dispatching-custom-events/
-// https://rexrainbow.github.io/phaser3-rex-notes/docs/site/eventemitter3/
+// // https://phasergames.com/phaser-3-dispatching-custom-events/
+// // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/eventemitter3/
 
-// Broadcast approach? Each entity that listens to 'ATTACK' will process.
-// Most will discard this as their entityId wont match.
-// Many callbacks will be fired.
-scene.events.emit('ATTACK', {weapon:'sword',entityId:123});
-scene.events.on('ATTACK', callback, scope); // Called many times....
+// // Broadcast approach? Each entity that listens to 'ATTACK' will process.
+// // Most will discard this as their entityId wont match.
+// // Many callbacks will be fired.
+// scene.events.emit('ATTACK', {weapon:'sword',entityId:123});
+// scene.events.on('ATTACK', callback, scope); // Called many times....
 
-// Namespace events? Each entity will know to register to it's own listener based on entityId and
-// sender will need to grab their entityId to construct event.
-scene.events.emit('ATTACK_123', {weapon:'sword'});
-scene.events.on('ATTACK_123', callback, scope); // Called once !!
+// // Namespace events? Each entity will know to register to it's own listener based on entityId and
+// // sender will need to grab their entityId to construct event.
+// scene.events.emit('ATTACK_123', {weapon:'sword'});
+// scene.events.on('ATTACK_123', callback, scope); // Called once !!
 
-// EVENT better, use the registry, game wide global data bus !! (so all scenes can access it)
-scene.registry.events.emit(...);
-scene.registry.events.on(...);
+// // EVENT better, use the registry, game wide global data bus !! (so all scenes can access it)
+// scene.registry.events.emit(...);
+// scene.registry.events.on(...);
 
 export default class Main extends Scene {
   dudeQuads!: any[];
   lastDeltaTime: any;
   lastFrame: any;
+  fpsCounter!: FpsCounter;
 
   preload() {
     // TODO: testing. Most assets will loaded async !!!
@@ -115,8 +117,9 @@ export default class Main extends Scene {
       repeat: -1,
     });
 
-    let player;
-    let quadPlayer;
+    let sprite;
+    let spriteShadow;
+    let spriteContainer;
 
     // TODO: perf test vs Babylon JS.
     // TODO: animate & skew!
@@ -128,29 +131,42 @@ export default class Main extends Scene {
     //   player.anims.play("left", true);
     // }
 
-    this.dudeQuads = [];
-
-    const vertices = [-1, 1, 1, 1, -1, -1, 1, -1];
-
-    const uvs = [0, 0, 1, 0, 0, 1, 1, 1];
-
-    const indices = [0, 2, 1, 2, 3, 1];
+    // this.dudeQuads = [];
 
     // can handle 40k @ 60fps; 60k at 45fps;
     // for (let i = 0; i < 40000; i++) {
     for (let i = 0; i < 4; i++) {
-      // QUAD IS GONE !!!!
-      // quadPlayer = this.add.quad(100 + 20 * (i % 50), 300, "dude");
-      quadPlayer = this.add.mesh(100 + 20 * (i % 50), 600, "dude");
-      // quadPlayer = this.add.sprite(100 + 20 * (i % 50), 600, "dude");
-      quadPlayer.addVertices(vertices, uvs, indices);
-      quadPlayer.panZ(9);
+      spriteContainer = this.add.container(100 + 20 * (i % 50), 600);
+
+      // positions will be relative to the Container x/y
+      sprite = this.add.sprite(0, 0, "dude");
+      sprite.setDepth(1);
+
+      // positions will be relative to the Container x/y
+      spriteShadow = this.add.sprite(0, 0, "dude");
       // quadPlayer.topLeftX = -10;
-      quadPlayer.scaleY = 0.4;
+      spriteShadow.scaleY = 0.4;
+      spriteShadow.tint = 0xffffff;
+      spriteShadow.alpha = 0.5;
+      spriteShadow.setDepth(0);
+      // spriteShadow.setPipeline(); // WIP add vertex shader
+
       // const skewFactor = 40;
       // quadPlayer.topLeftX = quadPlayer.x - 32 / 2 - skewFactor;
       // quadPlayer.topRightX = quadPlayer.x + 32 / 2 - skewFactor;
-      this.dudeQuads.push(quadPlayer);
+      // this.dudeQuads.push(sprite);
+
+      spriteContainer.add(sprite);
+      spriteContainer.add(spriteShadow);
+
+      this.tweens.add({
+        targets: spriteContainer,
+        x: 400,
+        duration: 2000,
+        yoyo: true,
+        // delay: 1000,
+        repeat: -1,
+      });
     }
 
     // const entity1 = new Entity();
@@ -196,9 +212,12 @@ export default class Main extends Scene {
 
     // this.lastFrame = 0;
     // this.lastDeltaTime = 0;
+
+    this.fpsCounter = new FpsCounter();
   }
 
   update(time: number, deltaTime: number) {
+    this.fpsCounter.update(deltaTime);
     // TODO: ...
 
     // if (cursors.up.isDown) {
@@ -214,93 +233,80 @@ export default class Main extends Scene {
 
     // FPS count
     // this.fpsElement.innerHTML = 1000 / deltaTime;
-
-    this.lastDeltaTime += deltaTime;
-    if (125 < this.lastDeltaTime) {
-      this.lastDeltaTime = 0;
-      this.lastFrame++;
-      // this.fpsElement.innerHTML = 1000 / deltaTime;
-    }
-
-    if (3 < this.lastFrame) this.lastFrame = 0;
-
-    // this.dudeQuads.forEach(dudeQuad => dudeQuad.setFrame(this.lastFrame));
   }
 }
 
-
 // cracking the new mesh...
 
-class Example extends Phaser.Scene
-{
-    preload ()
-    {
-      // this is 5 x 5 sprite sheet
-        this.load.spritesheet('mummy', 'assets/sprites/metalslug_mummy37x45.png', { frameWidth: 37, frameHeight: 45 });
-    }
+// class Example extends Phaser.Scene
+// {
+//     preload ()
+//     {
+//       // this is 5 x 5 sprite sheet
+//         this.load.spritesheet('mummy', 'assets/sprites/metalslug_mummy37x45.png', { frameWidth: 37, frameHeight: 45 });
+//     }
 
-    create ()
-    {
-        // const vertices = [
-        //     -1, 1,
-        //     1, 1,
-        //     -1, -1,
-        //     1, -1
-        // ];
+//     create ()
+//     {
+//         // const vertices = [
+//         //     -1, 1,
+//         //     1, 1,
+//         //     -1, -1,
+//         //     1, -1
+//         // ];
 
-        const vertices = [
-          -2, 0.4,
-          0, 0.4,
-          -1, -1,
-          1, -1
-        ];
+//         const vertices = [
+//           -2, 0.4,
+//           0, 0.4,
+//           -1, -1,
+//           1, -1
+//         ];
 
-        // const uvs = [
-        //     0, 0,
-        //     1, 0,
-        //     0, 1,
-        //     1, 1
-        // ];
+//         // const uvs = [
+//         //     0, 0,
+//         //     1, 0,
+//         //     0, 1,
+//         //     1, 1
+//         // ];
 
-        console.log(this.textures.get('mummy'));
+//         console.log(this.textures.get('mummy'));
 
-        // display the 3rd frame, top row. tweak this for animation / frame selection
-        const uvs = [
-            2/5, 0,
-            3/5, 0,
-            2/5, 1/5,
-            3/5, 1/5
-        ];
+//         // display the 3rd frame, top row. tweak this for animation / frame selection
+//         const uvs = [
+//             2/5, 0,
+//             3/5, 0,
+//             2/5, 1/5,
+//             3/5, 1/5
+//         ];
 
-        const indicies = [ 0, 2, 1, 2, 3, 1 ];
+//         const indicies = [ 0, 2, 1, 2, 3, 1 ];
 
+//         const mesh = this.add.mesh(400, 300, 'mummy');
+//         mesh.addVertices(vertices, uvs, indicies);
+//         // to set tint:
+//         mesh.addVertices(vertices, uvs, indicies, false, null, 0xff0000);
+//         // CANT FIGURE OUT THE PANZ value or what to set it to while preserving original sprite dimensions...
+//         mesh.panZ(100);
+//         // mesh.displayWidth = 37;
+//         mesh.displayHeight = 40;
+//         // mesh.setScale(0.5);
+//         mesh.setDepth(1);
+//         mesh.x = 0;
+//         mesh.y = 40;
+//         // mesh.scaleY = 0.5 * 0.5;
 
-        const mesh = this.add.mesh(400, 300, 'mummy');
-        mesh.addVertices(vertices, uvs, indicies);
-        // to set tint:
-        mesh.addVertices(vertices, uvs, indicies, false, null, 0xff0000);
-        // CANT FIGURE OUT THE PANZ value or what to set it to while preserving original sprite dimensions...
-        mesh.panZ(100);
-        // mesh.displayWidth = 37;
-        mesh.displayHeight = 40;
-        // mesh.setScale(0.5);
-        mesh.setDepth(1);
-        mesh.x = 0;
-        mesh.y = 40;
-        // mesh.scaleY = 0.5 * 0.5;
+//         console.log(mesh);
 
-        console.log(mesh);
+//         const mesh2 = this.add.mesh(0, 0, 'mummy');
+//         mesh2.addVertices(vertices, uvs, indicies);
+//         // to set tint:
+//         mesh2.addVertices(vertices, uvs, indicies, false, null, 0x00ff00);
+//         mesh2.panZ(100);
+//         // mesh2.setScale(0.5);
+//         mesh2.displayHeight = 40;
+//         mesh2.setDepth(0);
+//         // mesh.setTint(0x000000); // not a function
 
-        const mesh2 = this.add.mesh(0, 0, 'mummy');
-        mesh2.addVertices(vertices, uvs, indicies);
-        // to set tint:
-        mesh2.addVertices(vertices, uvs, indicies, false, null, 0x00ff00);
-        mesh2.panZ(100);
-        // mesh2.setScale(0.5);
-        mesh2.displayHeight = 40;
-        mesh2.setDepth(0);
-        // mesh.setTint(0x000000); // not a function
-
-        this.cameras.main.centerOn(400, 400);
-    }
-}
+//         this.cameras.main.centerOn(400, 400);
+//     }
+// }
