@@ -113,7 +113,7 @@ export default class Main extends Scene {
     this.anims.create({
       key: "left",
       frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
-      frameRate: 10,
+      frameRate: 5,
       repeat: -1,
     });
 
@@ -135,20 +135,24 @@ export default class Main extends Scene {
 
     // can handle 40k @ 60fps; 60k at 45fps;
     // for (let i = 0; i < 40000; i++) {
-    for (let i = 0; i < 4; i++) {
-      spriteContainer = this.add.container(100 + 20 * (i % 50), 600);
+    for (let i = 0; i < 1; i++) {
+      // hmm maybe not use containers? there's perf penalty so might be better to manually track
+      // position of shadow sprite?
+      // spriteContainer = this.add.container(100 + 20 * (i % 50), 300);
 
       // positions will be relative to the Container x/y
-      sprite = this.add.sprite(0, 0, "dude");
+      sprite = this.add.sprite(100 + 20 * (i % 50), 300, "dude");
       sprite.setDepth(1);
+      sprite.anims.play("left");
 
       // positions will be relative to the Container x/y
-      spriteShadow = this.add.sprite(0, 0, "dude");
+      spriteShadow = this.add.sprite(100 + 20 * (i % 50) - 10, 300, "dude");
+      spriteShadow.setDepth(0);
+      spriteShadow.anims.play("left");
       // quadPlayer.topLeftX = -10;
       spriteShadow.scaleY = 0.4;
-      spriteShadow.tint = 0xffffff;
+      spriteShadow.tint = 0x000000;
       spriteShadow.alpha = 0.5;
-      spriteShadow.setDepth(0);
       // spriteShadow.setPipeline(); // WIP add vertex shader
 
       // const skewFactor = 40;
@@ -156,17 +160,39 @@ export default class Main extends Scene {
       // quadPlayer.topRightX = quadPlayer.x + 32 / 2 - skewFactor;
       // this.dudeQuads.push(sprite);
 
-      spriteContainer.add(sprite);
-      spriteContainer.add(spriteShadow);
+      // NOTE: order important!! depth sorting does not work within container, so items are drawn
+      // in order they are added. Thus shadow needs to be added first.
+      // HOWEVER: you can use container methods like bringToTop(child), bringToBack(child)... etc.
+      // to move container children depth after they have been added too!!!
+      // spriteContainer.add(spriteShadow);
+      // spriteContainer.add(sprite);
 
-      this.tweens.add({
-        targets: spriteContainer,
-        x: 400,
-        duration: 2000,
-        yoyo: true,
-        // delay: 1000,
-        repeat: -1,
-      });
+      // this.tweens.add({
+      //   targets: spriteContainer,
+      //   x: 400,
+      //   duration: 2000,
+      //   yoyo: true,
+      //   // delay: 1000,
+      //   repeat: -1,
+      // });
+
+      // this.tweens.add({
+      //   targets: sprite,
+      //   x: 400,
+      //   duration: 2000,
+      //   yoyo: true,
+      //   // delay: 1000,
+      //   repeat: -1,
+      // });
+
+      // this.tweens.add({
+      //   targets: spriteShadow,
+      //   x: 400,
+      //   duration: 2000,
+      //   yoyo: true,
+      //   // delay: 1000,
+      //   repeat: -1,
+      // });
     }
 
     // const entity1 = new Entity();
@@ -212,6 +238,8 @@ export default class Main extends Scene {
 
     // this.lastFrame = 0;
     // this.lastDeltaTime = 0;
+
+    this.cameras.main.setBackgroundColor(0xffffff);
 
     this.fpsCounter = new FpsCounter();
   }
