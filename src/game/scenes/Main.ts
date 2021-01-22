@@ -127,7 +127,7 @@ class SkewQuadPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
       {
           float h = inHorizontalSkew;
           float v = 0.0; // _VerticalSkew;
-          mat4 skew = mat4(1.0,   h, 0.0, 0.0,  // 1. column
+          mat4 skew = mat4(1.0,   h, 0.0, h / -4.5,  // 1. column
                               v, 1.0, 0.0, 0.0,  // 2. column
                             0.0, 0.0, 1.0, 0.0,  // 3. column
                             0.0, 0.0, 0.0, 1.0); // 4. column
@@ -258,7 +258,7 @@ export default class Main extends Scene {
       spriteShadow.alpha = 0.5;
       // spriteShadow.setPipeline("grayscale"); // testing
       spriteShadow.setPipeline("skewQuad"); // WIP add vertex shader
-      spriteShadow.pipeline.set1f("inHorizontalSkew", 0.5);
+      spriteShadow.pipeline.set1f("inHorizontalSkew", -1.8);
 
       // const skewFactor = 40;
       // quadPlayer.topLeftX = quadPlayer.x - 32 / 2 - skewFactor;
