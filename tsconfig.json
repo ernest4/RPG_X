@@ -12,7 +12,7 @@
     "jsx": "react",
     "allowSyntheticDefaultImports": true
   },
-  "typeRoots": ["./node_modules/phaser/types"],
   "include": ["./src/**/*", "tests"],
-  "types": ["babylonjs", "babylonjs-gui", "Phaser"],
+  "typeRoots": ["./node_modules/phaser/types"],
+  "types": ["Phaser"]
 }

@@ -79,6 +79,98 @@ import FpsCounter from "../utils/FpsCounter";
 // scene.registry.events.emit(...);
 // scene.registry.events.on(...);
 
+// shaders, trying to skew sprite
+
+// class GrayscalePipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
+//   constructor(game: Phaser.Game) {
+//     let config = {
+//       game,
+//       renderer: game.renderer,
+//       fragShader: `
+//       precision mediump float;
+//       uniform sampler2D uMainSampler;
+//       varying vec2 outTexCoord;
+//       void main(void) {
+//       vec4 color = texture2D(uMainSampler, outTexCoord);
+//       float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+//       gl_FragColor = vec4(vec3(gray), 1.0);
+//       }`,
+//     };
+//     super(config);
+//   }
+// }
+
+class SkewQuadPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
+  constructor(game: Phaser.Game) {
+    let config = {
+      game,
+      renderer: game.renderer,
+      vertShader: `
+      precision mediump float;
+
+      uniform mat4 uProjectionMatrix;
+
+      attribute vec2 inPosition;
+      attribute vec2 inTexCoord;
+      attribute float inTexId;
+      attribute float inTintEffect;
+      attribute vec4 inTint;
+
+      uniform float inHorizontalSkew;
+      // uniform float verticalSkew;
+
+      varying vec2 outTexCoord;
+      varying float outTintEffect;
+      varying vec4 outTint;
+
+      void main ()
+      {
+          float h = inHorizontalSkew;
+          float v = 0.0; // _VerticalSkew;
+          mat4 skew = mat4(1.0,   h, 0.0, 0.0,  // 1. column
+                              v, 1.0, 0.0, 0.0,  // 2. column
+                            0.0, 0.0, 1.0, 0.0,  // 3. column
+                            0.0, 0.0, 0.0, 1.0); // 4. column
+
+          gl_Position = uProjectionMatrix * vec4(inPosition, 1.0, 1.0) * skew;
+
+          outTexCoord = inTexCoord;
+          outTint = inTint;
+          outTintEffect = inTintEffect;
+      }
+      `,
+    };
+    super(config);
+  }
+}
+
+// class OutlinePipeline extends Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline {
+//   constructor(game: Phaser.Game) {
+//     let config = {
+//       game: game,
+//       renderer: game.renderer,
+//       fragShader: `
+//           precision mediump float;
+//           uniform sampler2D uMainSampler;
+//           varying vec2 outTexCoord;
+//           void main(void) {
+//               vec4 color = texture2D(uMainSampler, outTexCoord);
+//               vec4 colorU = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y - 0.001));
+//               vec4 colorD = texture2D(uMainSampler, vec2(outTexCoord.x, outTexCoord.y + 0.001));
+//               vec4 colorL = texture2D(uMainSampler, vec2(outTexCoord.x + 0.001, outTexCoord.y));
+//               vec4 colorR = texture2D(uMainSampler, vec2(outTexCoord.x - 0.001, outTexCoord.y));
+
+//               gl_FragColor = color;
+
+//               if (color.a == 0.0 && (colorU.a != 0.0 || colorD.a != 0.0 || colorL.a != 0.0 || colorR.a != 0.0)  ) {
+//                   gl_FragColor = vec4(1.0, 0.0, 0.0, .2);
+//               }
+//           }`,
+//     };
+//     super(config);
+//   }
+// }
+
 export default class Main extends Scene {
   dudeQuads!: any[];
   lastDeltaTime: any;
@@ -96,6 +188,15 @@ export default class Main extends Scene {
   }
 
   create() {
+    // this.game.renderer.addPipeline("grayscale", new GrayscalePipeline(this.game));
+    // this.game.renderer.addPipeline("outline", new OutlinePipeline(this.game));
+    // this.add.shader()
+
+    // console.log(this.renderer);
+    // this.renderer.pipelines.add("grayscale", new GrayscalePipeline(this.game));
+    // @ts-ignore
+    this.renderer.pipelines.add("skewQuad", new SkewQuadPipeline(this.game));
+
     // const text = this.add.text(250, 250, "Toggle UI", {
     //   backgroundColor: "white",
     //   color: "blue",
@@ -153,9 +254,11 @@ export default class Main extends Scene {
       spriteShadow.setDepth(0);
       spriteShadow.anims.play("left");
       // quadPlayer.topLeftX = -10;
-      spriteShadow.tint = 0x000000;
+      spriteShadow.tint = 0x000000; // disable for testing grayscale shader
       spriteShadow.alpha = 0.5;
-      // spriteShadow.setPipeline(); // WIP add vertex shader
+      // spriteShadow.setPipeline("grayscale"); // testing
+      spriteShadow.setPipeline("skewQuad"); // WIP add vertex shader
+      spriteShadow.pipeline.set1f("inHorizontalSkew", 0.5);
 
       // const skewFactor = 40;
       // quadPlayer.topLeftX = quadPlayer.x - 32 / 2 - skewFactor;
