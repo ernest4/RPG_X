@@ -119,25 +119,25 @@ class SkewQuadPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
       uniform float inHorizontalSkew;
       // uniform float verticalSkew;
 
-      uniform float r1c1;
-      uniform float r1c2;
-      uniform float r1c3;
-      uniform float r1c4;
+      // uniform float r1c1;
+      // uniform float r1c2;
+      // uniform float r1c3;
+      // uniform float r1c4;
 
-      uniform float r2c1;
-      uniform float r2c2;
-      uniform float r2c3;
-      uniform float r2c4;
+      // uniform float r2c1;
+      // uniform float r2c2;
+      // uniform float r2c3;
+      // uniform float r2c4;
 
-      uniform float r3c1;
-      uniform float r3c2;
-      uniform float r3c3;
-      uniform float r3c4;
+      // uniform float r3c1;
+      // uniform float r3c2;
+      // uniform float r3c3;
+      // uniform float r3c4;
 
-      uniform float r4c1;
-      uniform float r4c2;
-      uniform float r4c3;
-      uniform float r4c4;
+      // uniform float r4c1;
+      // uniform float r4c2;
+      // uniform float r4c3;
+      // uniform float r4c4;
 
       varying vec2 outTexCoord;
       varying float outTintEffect;
@@ -146,7 +146,6 @@ class SkewQuadPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
       void main ()
       {
           float h = inHorizontalSkew;
-          float v = 0.0; // _VerticalSkew;
 
           // TODO: keep exploring the rest of the mat4 to perfectly align the shadow to the sprite
 
@@ -171,10 +170,18 @@ class SkewQuadPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
           // h = 7, correction = -1.48
           // h = 8, correction = -1.70
 
-          mat4 skew = mat4(r1c1, r1c2, r1c3, r1c4,
-                           r2c1, r2c2, r2c3, r2c4,
-                           r3c1, r3c2, r3c3, r3c4,
-                           r4c1, r4c2, r4c3, r4c4);
+          // curve fitted function: https://www.dcode.fr/function-equation-finder
+          // f(h) = 0.00428571 - (0.212619 * h)= correction
+
+          // mat4 skew = mat4(r1c1, r1c2, r1c3, r1c4,
+          //                  r2c1, r2c2, r2c3, r2c4,
+          //                  r3c1, r3c2, r3c3, r3c4,
+          //                  r4c1, r4c2, r4c3, r4c4);
+
+          mat4 skew = mat4(1.0,   h, 0.0, 0.00428571 - (0.212619 * h),  // 1. column
+                           0.0, 1.0, 0.0, 0.0,  // 2. column
+                           0.0, 0.0, 1.0, 0.0,  // 3. column
+                           0.0, 0.0, 0.0, 1.0); // 4. column
 
           gl_Position = uProjectionMatrix * vec4(inPosition, 1.0, 1.0) * skew;
 
@@ -412,25 +419,27 @@ export default class Main extends Scene {
 
 const attachSliderControls = (sprite: Phaser.GameObjects.Sprite) => {
   const vec4values = [
-    { name: "r1c1", value: 1 },
-    { name: "r1c2", value: 0 },
-    { name: "r1c3", value: 0 },
-    { name: "r1c4", value: 0 },
+    // { name: "r1c1", value: 1 },
+    // { name: "r1c2", value: 0 },
+    // { name: "r1c3", value: 0 },
+    // { name: "r1c4", value: 0 },
 
-    { name: "r2c1", value: 0 },
-    { name: "r2c2", value: 1 },
-    { name: "r2c3", value: 0 },
-    { name: "r2c4", value: 0 },
+    // { name: "r2c1", value: 0 },
+    // { name: "r2c2", value: 1 },
+    // { name: "r2c3", value: 0 },
+    // { name: "r2c4", value: 0 },
 
-    { name: "r3c1", value: 0 },
-    { name: "r3c2", value: 0 },
-    { name: "r3c3", value: 1 },
-    { name: "r3c4", value: 0 },
+    // { name: "r3c1", value: 0 },
+    // { name: "r3c2", value: 0 },
+    // { name: "r3c3", value: 1 },
+    // { name: "r3c4", value: 0 },
 
-    { name: "r4c1", value: 0 },
-    { name: "r4c2", value: 0 },
-    { name: "r4c3", value: 0 },
-    { name: "r4c4", value: 1 },
+    // { name: "r4c1", value: 0 },
+    // { name: "r4c2", value: 0 },
+    // { name: "r4c3", value: 0 },
+    // { name: "r4c4", value: 1 },
+
+    { name: "inHorizontalSkew", value: 0 },
   ];
 
   const controlContainer = document.createElement("div");
