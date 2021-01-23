@@ -119,6 +119,26 @@ class SkewQuadPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
       uniform float inHorizontalSkew;
       // uniform float verticalSkew;
 
+      uniform float r1c1;
+      uniform float r1c2;
+      uniform float r1c3;
+      uniform float r1c4;
+
+      uniform float r2c1;
+      uniform float r2c2;
+      uniform float r2c3;
+      uniform float r2c4;
+
+      uniform float r3c1;
+      uniform float r3c2;
+      uniform float r3c3;
+      uniform float r3c4;
+
+      uniform float r4c1;
+      uniform float r4c2;
+      uniform float r4c3;
+      uniform float r4c4;
+
       varying vec2 outTexCoord;
       varying float outTintEffect;
       varying vec4 outTint;
@@ -127,10 +147,34 @@ class SkewQuadPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
       {
           float h = inHorizontalSkew;
           float v = 0.0; // _VerticalSkew;
-          mat4 skew = mat4(1.0,   h, 0.0, h / -4.5,  // 1. column
-                              v, 1.0, 0.0, 0.0,  // 2. column
-                            0.0, 0.0, 1.0, 0.0,  // 3. column
-                            0.0, 0.0, 0.0, 1.0); // 4. column
+
+          // TODO: keep exploring the rest of the mat4 to perfectly align the shadow to the sprite
+
+          // TODO: build shader playground with slider for every value in the mat4 to quickly find
+          // best combo and explore how it works.
+
+          // mat4 skew = mat4(1.0,    h, 0.0, 0.0,  // 1. column
+          //                     v, 1.0, 0.0, 0.0,  // 2. column
+          //                   0.0, 0.0, 1.0, 0.0,  // 3. column
+          //                   0.0, 0.0, 0.0, 1.0); // 4. column
+
+          // Based on investigation
+          // h => r1c1
+          // correction => r1c4
+
+          // h = 1, correction = -0.21
+          // h = 2, correction = -0.42
+          // h = 3, correction = -0.63
+          // h = 4, correction = -0.85
+          // h = 5, correction = -1.06
+          // h = 6, correction = -1.27
+          // h = 7, correction = -1.48
+          // h = 8, correction = -1.70
+
+          mat4 skew = mat4(r1c1, r1c2, r1c3, r1c4,
+                           r2c1, r2c2, r2c3, r2c4,
+                           r3c1, r3c2, r3c3, r3c4,
+                           r4c1, r4c2, r4c3, r4c4);
 
           gl_Position = uProjectionMatrix * vec4(inPosition, 1.0, 1.0) * skew;
 
@@ -258,12 +302,9 @@ export default class Main extends Scene {
       spriteShadow.alpha = 0.5;
       // spriteShadow.setPipeline("grayscale"); // testing
       spriteShadow.setPipeline("skewQuad"); // WIP add vertex shader
-      spriteShadow.pipeline.set1f("inHorizontalSkew", -1.8);
+      // spriteShadow.pipeline.set1f("inHorizontalSkew", 0.2);
 
-      // const skewFactor = 40;
-      // quadPlayer.topLeftX = quadPlayer.x - 32 / 2 - skewFactor;
-      // quadPlayer.topRightX = quadPlayer.x + 32 / 2 - skewFactor;
-      // this.dudeQuads.push(sprite);
+      attachSliderControls(spriteShadow);
 
       // NOTE: order important!! depth sorting does not work within container, so items are drawn
       // in order they are added. Thus shadow needs to be added first.
@@ -368,6 +409,68 @@ export default class Main extends Scene {
     // this.fpsElement.innerHTML = 1000 / deltaTime;
   }
 }
+
+const attachSliderControls = (sprite: Phaser.GameObjects.Sprite) => {
+  const vec4values = [
+    { name: "r1c1", value: 1 },
+    { name: "r1c2", value: 0 },
+    { name: "r1c3", value: 0 },
+    { name: "r1c4", value: 0 },
+
+    { name: "r2c1", value: 0 },
+    { name: "r2c2", value: 1 },
+    { name: "r2c3", value: 0 },
+    { name: "r2c4", value: 0 },
+
+    { name: "r3c1", value: 0 },
+    { name: "r3c2", value: 0 },
+    { name: "r3c3", value: 1 },
+    { name: "r3c4", value: 0 },
+
+    { name: "r4c1", value: 0 },
+    { name: "r4c2", value: 0 },
+    { name: "r4c3", value: 0 },
+    { name: "r4c4", value: 1 },
+  ];
+
+  const controlContainer = document.createElement("div");
+  controlContainer.style.cssText = `
+    position: fixed;
+    top: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+  `;
+
+  vec4values.forEach(vec4valueObject => {
+    const labelElement = document.createElement("label");
+    labelElement.innerHTML = `${vec4valueObject.name}: ${vec4valueObject.value}`;
+
+    controlContainer.appendChild(labelElement);
+
+    // <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+    const inputElement = document.createElement("input");
+    inputElement.style.cssText = `
+      padding-bottom: 10px;
+    `;
+    inputElement.type = "number";
+    inputElement.min = "-10";
+    inputElement.max = "10";
+    inputElement.value = vec4valueObject.value.toString();
+    inputElement.id = vec4valueObject.name;
+    sprite.pipeline.set1f(vec4valueObject.name, vec4valueObject.value);
+    inputElement.addEventListener("change", range => {
+      // @ts-ignore
+      sprite.pipeline.set1f(vec4valueObject.name, range.target.value);
+      // @ts-ignore
+      labelElement.innerHTML = `${vec4valueObject.name}: ${range.target.value}`;
+    });
+
+    controlContainer.appendChild(inputElement);
+  });
+
+  document.body.appendChild(controlContainer);
+};
 
 // cracking the new mesh...
 
