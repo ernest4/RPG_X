@@ -1,6 +1,6 @@
-import Component from "./Component";
-import Vector3BufferView from "../utils/Vector3BufferView";
-import Entity from "../Entity";
+import Component from "../../ecs/Component";
+import { EntityId } from "../../ecs/types";
+import Vector3BufferView from "../../ecs/utils/Vector3BufferView";
 
 class Transform extends Component {
   private _values: Uint32Array;
@@ -8,45 +8,24 @@ class Transform extends Component {
   rotation: Vector3BufferView;
   scale: Vector3BufferView;
 
-  constructor(
-    entity: Entity,
-    x = 0,
-    y = 0,
-    z = 0,
-    rotationX = 0,
-    rotationY = 0,
-    rotationZ = 0,
-    scaleX = 1,
-    scaleY = 1,
-    scaleZ = 1
-  ) {
-    super(entity);
+  constructor(entityId: EntityId) {
+    super(entityId);
     this._values = new Uint32Array(9);
     this.position = new Vector3BufferView(this._values);
     this.rotation = new Vector3BufferView(this._values, 3 * 4);
     this.scale = new Vector3BufferView(this._values, 6 * 4);
 
-    this.position.x = x;
-    this.position.y = y;
-    this.position.z = z;
-
-    this.rotation.x = rotationX;
-    this.rotation.y = rotationY;
-    this.rotation.z = rotationZ;
-
-    this.scale.x = scaleX;
-    this.scale.y = scaleY;
-    this.scale.z = scaleZ;
+    // TODO: hold the parent here ???
+    // this._sparent = entityId;
+    // when parent transform changes, child transform changes (thats how Unity does it)
+    // get/set parent ???
+    // this._children = entityId[]; ???
   }
 
-  onAdd(onReadyCallback: Function): void {
-    // throw new Error("Method not implemented.");
-    onReadyCallback();
-  }
-
-  onRemove(): void {
-    // throw new Error("Method not implemented.");
-  }
+  // NO METHODS IN COMPONENTS !!! (just put this in some util library or system...)
+  // distanceTo = (position: Position): number => {
+  //   // TODO: wip...
+  // };
 }
 
 export default Transform;
