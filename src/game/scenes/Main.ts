@@ -1,5 +1,11 @@
 import { Scene } from "phaser";
+import Sprite from "../components/Sprite";
+import Transform from "../components/Transform";
+import Controls from "../components/Controls";
+import Entity from "../Entity";
 import FpsCounter from "../utils/FpsCounter";
+import PhysicsBody from "../components/PhysicsBody";
+import Movement from "../behaviors/Movement";
 // import store from "../store";
 // import * as gameActions from "../store/actions/game";
 
@@ -11,44 +17,6 @@ import FpsCounter from "../utils/FpsCounter";
 // Some reactive (React?) like inspired architecture??
 // Service workers to simulate threading... (compute path-finding, AI etc)
 
-// // Some sketches below:
-// class Entity {
-//   // TODO: ...
-//   // add standardized callbacks to standardized events?
-//   constructor(id?: EntityId) {
-//     // this._id = id || ... generate ID...
-//     // this._events = ... assign the global event emitter ...scene.registry.events...
-//     this._components = [];
-//     this._systems = [];
-//   }
-
-//   // TODO: will have default load system that will execute when loadable resource is added
-// }
-
-// class Action {
-//   // call
-// }
-
-// class Render extends Action {}
-
-// class Movement extends Action {}
-
-// class AI extends Action {
-//   constructor(entity: Entity) {
-//     // TODO: ...
-//     // TODO: register itself to callback based on some event
-//   }
-
-//   // inherited override...
-//   call = () => {
-//     // logic here
-//   }
-
-//   private callbackLogic = () => {
-//     // TODO: ...
-//   };
-// }
-
 // const entity1 = new Entity();
 // // components determine data available on an entity.
 // // this determines what, if anything an action/system can do e.g.:
@@ -57,27 +25,9 @@ import FpsCounter from "../utils/FpsCounter";
 // // vulnerability, so Health component was removed to represent that...)
 // entity1.addComponent(new Transform());
 // entity1.addComponent(new Sprite());
-// entity1.addAction(new Movement());
+// entity1.addAction(new Input()); // for player, Input will change transform, for NPCs AI will change transform
 // entity1.addAction(new Render());
-// // TODO: need some way to keep the entity inactive until all components / systems ready?
-
-// // https://phasergames.com/phaser-3-dispatching-custom-events/
-// // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/eventemitter3/
-
-// // Broadcast approach? Each entity that listens to 'ATTACK' will process.
-// // Most will discard this as their entityId wont match.
-// // Many callbacks will be fired.
-// scene.events.emit('ATTACK', {weapon:'sword',entityId:123});
-// scene.events.on('ATTACK', callback, scope); // Called many times....
-
-// // Namespace events? Each entity will know to register to it's own listener based on entityId and
-// // sender will need to grab their entityId to construct event.
-// scene.events.emit('ATTACK_123', {weapon:'sword'});
-// scene.events.on('ATTACK_123', callback, scope); // Called once !!
-
-// // EVENT better, use the registry, game wide global data bus !! (so all scenes can access it)
-// scene.registry.events.emit(...);
-// scene.registry.events.on(...);
+// // TODO: need some way to keep the entity inactive until all components / systems (particularly render) ready?
 
 export default class Main extends Scene {
   dudeQuads!: any[];
@@ -92,7 +42,7 @@ export default class Main extends Scene {
     // this.load.image("ground", "assets/platform.png");
     // this.load.image("star", "assets/star.png");
     // this.load.image("bomb", "assets/bomb.png");
-    this.load.spritesheet("dude", "assets/dude.png", { frameWidth: 32, frameHeight: 48 });
+    // this.load.spritesheet("dude", "assets/dude.png", { frameWidth: 32, frameHeight: 48 });
   }
 
   create() {
@@ -103,7 +53,7 @@ export default class Main extends Scene {
     // console.log(this.renderer);
     // this.renderer.pipelines.add("grayscale", new GrayscalePipeline(this.game));
     // @ts-ignore
-    this.renderer.pipelines.add("skewQuad", new SkewQuadPipeline(this.game));
+    // this.renderer.pipelines.add("skewQuad", new SkewQuadPipeline(this.game));
 
     // const text = this.add.text(250, 250, "Toggle UI", {
     //   backgroundColor: "white",
@@ -119,135 +69,127 @@ export default class Main extends Scene {
 
     // this.add.image(800, 800, "turtle").setScale(2, 2);
 
-    this.anims.create({
-      key: "left",
-      frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
-      frameRate: 5,
-      repeat: -1,
-    });
+    // this.anims.create({
+    //   key: "left",
+    //   frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
+    //   frameRate: 5,
+    //   repeat: -1,
+    // });
 
-    let sprite;
-    let spriteShadow;
-    let spriteContainer;
+    // // this.anims.exists("left");
 
-    // TODO: perf test vs Babylon JS.
-    // TODO: animate & skew!
-    // for (let i = 0; i < 10; i++) {
-    //   // const image1 = this.add.image(100 * (i % 7), 300, 'ayu');
-    //   player = this.add.sprite(100 + 20 * (i % 50), 300, "dude");
-    //   // player = this.add.quad(100 * (i % 7), 300, 'dude');
-    //   // player = new Phaser.GameObjects.Quad(this, 100 * (i % 7), 300, 'dude');
-    //   player.anims.play("left", true);
-    // }
+    // let sprite;
+    // let spriteShadow;
+    // let spriteContainer;
 
-    // this.dudeQuads = [];
+    // // this.dudeQuads = [];
 
     // can handle 40k @ 60fps; 60k at 45fps;
     // for (let i = 0; i < 40000; i++) {
+    // for (let i = 0; i < 1; i++) {
+    //   // hmm maybe not use containers? there's perf penalty so might be better to manually track
+    //   // position of shadow sprite?
+    //   // spriteContainer = this.add.container(100 + 20 * (i % 50), 300);
+
+    //   // positions will be relative to the Container x/y
+    //   sprite = this.add.sprite(100 + 20 * (i % 50), 300, "dude");
+    //   sprite.setDepth(1);
+    //   sprite.anims.play("left");
+
+    //   // positions will be relative to the Container x/y
+    //   spriteShadow = this.add.sprite(100 + 20 * (i % 50), 300, "dude");
+    //   let scaleY = 0.4;
+    //   spriteShadow.y = spriteShadow.y + (spriteShadow.height * (1 - scaleY)) / 2;
+    //   spriteShadow.scaleY = scaleY;
+    //   spriteShadow.setDepth(0);
+    //   spriteShadow.anims.play("left");
+    //   // quadPlayer.topLeftX = -10;
+    //   spriteShadow.tint = 0x000000; // disable for testing grayscale shader
+    //   spriteShadow.alpha = 0.5;
+    //   // spriteShadow.setPipeline("grayscale"); // testing
+    //   spriteShadow.setPipeline("skewQuad"); // WIP add vertex shader
+    //   // spriteShadow.pipeline.set1f("inHorizontalSkew", 0.2);
+
+    //   attachSliderControls(spriteShadow);
+
+    //   // NOTE: order important!! depth sorting does not work within container, so items are drawn
+    //   // in order they are added. Thus shadow needs to be added first.
+    //   // HOWEVER: you can use container methods like bringToTop(child), bringToBack(child)... etc.
+    //   // to move container children depth after they have been added too!!!
+    //   // spriteContainer.add(spriteShadow);
+    //   // spriteContainer.add(sprite);
+
+    //   // this.tweens.add({
+    //   //   targets: spriteContainer,
+    //   //   x: 400,
+    //   //   duration: 2000,
+    //   //   yoyo: true,
+    //   //   // delay: 1000,
+    //   //   repeat: -1,
+    //   // });
+
+    //   // this.tweens.add({
+    //   //   targets: sprite,
+    //   //   x: 400,
+    //   //   duration: 2000,
+    //   //   yoyo: true,
+    //   //   // delay: 1000,
+    //   //   repeat: -1,
+    //   // });
+
+    //   // this.tweens.add({
+    //   //   targets: spriteShadow,
+    //   //   x: 400,
+    //   //   duration: 2000,
+    //   //   yoyo: true,
+    //   //   // delay: 1000,
+    //   //   repeat: -1,
+    //   // });
+    // }
+
+    const entities = [];
+    let entity;
+
     for (let i = 0; i < 1; i++) {
-      // hmm maybe not use containers? there's perf penalty so might be better to manually track
-      // position of shadow sprite?
-      // spriteContainer = this.add.container(100 + 20 * (i % 50), 300);
+      let x = 100 + 20 * (i % 50);
+      let y = 300;
 
-      // positions will be relative to the Container x/y
-      sprite = this.add.sprite(100 + 20 * (i % 50), 300, "dude");
-      sprite.setDepth(1);
-      sprite.anims.play("left");
+      entity = new Entity(this, i);
+      entity.addComponent(new Sprite(entity, x, y, "assets/dude.png", 0, 32, 48));
+      entity.addComponent(new PhysicsBody(entity));
+      // entity.addComponent(new Shadow());
+      // entity.addComponent(new Animation());
+      // entity.addAction(new Render());
+      entity.addComponent(new Controls(entity));
+      entity.addBehavior(new Movement(entity));
 
-      // positions will be relative to the Container x/y
-      spriteShadow = this.add.sprite(100 + 20 * (i % 50), 300, "dude");
-      let scaleY = 0.4;
-      spriteShadow.y = spriteShadow.y + (spriteShadow.height * (1 - scaleY)) / 2;
-      spriteShadow.scaleY = scaleY;
-      spriteShadow.setDepth(0);
-      spriteShadow.anims.play("left");
-      // quadPlayer.topLeftX = -10;
-      spriteShadow.tint = 0x000000; // disable for testing grayscale shader
-      spriteShadow.alpha = 0.5;
-      // spriteShadow.setPipeline("grayscale"); // testing
-      spriteShadow.setPipeline("skewQuad"); // WIP add vertex shader
-      // spriteShadow.pipeline.set1f("inHorizontalSkew", 0.2);
+      entities.push(entity);
 
-      attachSliderControls(spriteShadow);
+      // // hmm maybe not use containers? there's perf penalty so might be better to manually track
+      // // position of shadow sprite?
+      // // spriteContainer = this.add.container(100 + 20 * (i % 50), 300);
 
-      // NOTE: order important!! depth sorting does not work within container, so items are drawn
-      // in order they are added. Thus shadow needs to be added first.
-      // HOWEVER: you can use container methods like bringToTop(child), bringToBack(child)... etc.
-      // to move container children depth after they have been added too!!!
-      // spriteContainer.add(spriteShadow);
-      // spriteContainer.add(sprite);
+      // // positions will be relative to the Container x/y
+      // sprite = this.add.sprite(100 + 20 * (i % 50), 300, "dude", 0);
+      // sprite.setDepth(1);
+      // sprite.anims.play("left");
 
-      // this.tweens.add({
-      //   targets: spriteContainer,
-      //   x: 400,
-      //   duration: 2000,
-      //   yoyo: true,
-      //   // delay: 1000,
-      //   repeat: -1,
-      // });
+      // // positions will be relative to the Container x/y
+      // spriteShadow = this.add.sprite(100 + 20 * (i % 50), 300, "dude");
+      // let scaleY = 0.4;
+      // spriteShadow.y = spriteShadow.y + (spriteShadow.height * (1 - scaleY)) / 2;
+      // spriteShadow.scaleY = scaleY;
+      // spriteShadow.setDepth(0);
+      // spriteShadow.anims.play("left");
+      // // quadPlayer.topLeftX = -10;
+      // spriteShadow.tint = 0x000000; // disable for testing grayscale shader
+      // spriteShadow.alpha = 0.5;
+      // // spriteShadow.setPipeline("grayscale"); // testing
+      // spriteShadow.setPipeline("skewQuad"); // WIP add vertex shader
+      // // spriteShadow.pipeline.set1f("inHorizontalSkew", 0.2);
 
-      // this.tweens.add({
-      //   targets: sprite,
-      //   x: 400,
-      //   duration: 2000,
-      //   yoyo: true,
-      //   // delay: 1000,
-      //   repeat: -1,
-      // });
-
-      // this.tweens.add({
-      //   targets: spriteShadow,
-      //   x: 400,
-      //   duration: 2000,
-      //   yoyo: true,
-      //   // delay: 1000,
-      //   repeat: -1,
-      // });
+      // attachSliderControls(spriteShadow);
     }
-
-    // const entity1 = new Entity();
-
-    // debugger;
-
-    // cursors = this.input.keyboard.onKeyDown(e => {
-    //   console.log(e);
-    // });
-
-    // this.input.keyboard.on("keydown_UP", e => {
-    //   // TODO: need access to delta time, maybe set flag here and act on it in update?
-    //   console.log(e);
-    //   // this.cameras.main.y += this.scrollSpeed;
-
-    //   this.cameras.main.pan(500, 500, 2000, "Power2"); // messing around with pan and zoom
-    //   this.cameras.main.zoomTo(4, 3000);
-    // });
-
-    // this.input.keyboard.on("keydown_DOWN", e => {
-    //   this.cameras.main.y -= this.scrollSpeed;
-    // });
-
-    // this.input.keyboard.on("keydown_LEFT", e => {
-    //   this.cameras.main.x += this.scrollSpeed;
-    // });
-
-    // this.input.keyboard.on("keydown_RIGHT", e => {
-    //   this.cameras.main.x -= this.scrollSpeed;
-    // });
-
-    // fpsCounter();
-
-    // fps
-    // this.fpsElement = document.createElement("span");
-    // this.fpsElement.style.cssText = `
-    //   position: fixed;
-    //   bottom: 0px;
-    //   color: black;
-    //   background: white;
-    // `;
-    // document.body.appendChild(this.fpsElement);
-
-    // this.lastFrame = 0;
-    // this.lastDeltaTime = 0;
 
     this.cameras.main.setBackgroundColor(0xffffff);
 
@@ -256,7 +198,6 @@ export default class Main extends Scene {
 
   update(time: number, deltaTime: number) {
     this.fpsCounter.update(deltaTime);
-    // TODO: ...
 
     // if (cursors.up.isDown) {
     //   this.game.camera.y -= this.scrollSpeed;
@@ -268,9 +209,6 @@ export default class Main extends Scene {
     // } else if (cursors.right.isDown) {
     //   this.game.camera.x += this.scrollSpeed;
     // }
-
-    // FPS count
-    // this.fpsElement.innerHTML = 1000 / deltaTime;
   }
 }
 
@@ -337,78 +275,3 @@ const attachSliderControls = (sprite: Phaser.GameObjects.Sprite) => {
 
   document.body.appendChild(controlContainer);
 };
-
-// cracking the new mesh...
-
-// class Example extends Phaser.Scene
-// {
-//     preload ()
-//     {
-//       // this is 5 x 5 sprite sheet
-//         this.load.spritesheet('mummy', 'assets/sprites/metalslug_mummy37x45.png', { frameWidth: 37, frameHeight: 45 });
-//     }
-
-//     create ()
-//     {
-//         // const vertices = [
-//         //     -1, 1,
-//         //     1, 1,
-//         //     -1, -1,
-//         //     1, -1
-//         // ];
-
-//         const vertices = [
-//           -2, 0.4,
-//           0, 0.4,
-//           -1, -1,
-//           1, -1
-//         ];
-
-//         // const uvs = [
-//         //     0, 0,
-//         //     1, 0,
-//         //     0, 1,
-//         //     1, 1
-//         // ];
-
-//         console.log(this.textures.get('mummy'));
-
-//         // display the 3rd frame, top row. tweak this for animation / frame selection
-//         const uvs = [
-//             2/5, 0,
-//             3/5, 0,
-//             2/5, 1/5,
-//             3/5, 1/5
-//         ];
-
-//         const indicies = [ 0, 2, 1, 2, 3, 1 ];
-
-//         const mesh = this.add.mesh(400, 300, 'mummy');
-//         mesh.addVertices(vertices, uvs, indicies);
-//         // to set tint:
-//         mesh.addVertices(vertices, uvs, indicies, false, null, 0xff0000);
-//         // CANT FIGURE OUT THE PANZ value or what to set it to while preserving original sprite dimensions...
-//         mesh.panZ(100);
-//         // mesh.displayWidth = 37;
-//         mesh.displayHeight = 40;
-//         // mesh.setScale(0.5);
-//         mesh.setDepth(1);
-//         mesh.x = 0;
-//         mesh.y = 40;
-//         // mesh.scaleY = 0.5 * 0.5;
-
-//         console.log(mesh);
-
-//         const mesh2 = this.add.mesh(0, 0, 'mummy');
-//         mesh2.addVertices(vertices, uvs, indicies);
-//         // to set tint:
-//         mesh2.addVertices(vertices, uvs, indicies, false, null, 0x00ff00);
-//         mesh2.panZ(100);
-//         // mesh2.setScale(0.5);
-//         mesh2.displayHeight = 40;
-//         mesh2.setDepth(0);
-//         // mesh.setTint(0x000000); // not a function
-
-//         this.cameras.main.centerOn(400, 400);
-//     }
-// }
