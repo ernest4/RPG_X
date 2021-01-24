@@ -115,16 +115,17 @@ class Manager extends System {
       let entityId = this.engine.generateEntityId();
 
       let transform = new Transform(entityId);
-      transform.position.x = 100;
+      transform.position.x = 200;
       transform.position.y = 200;
       transform.scale.x = 1;
       transform.scale.y = 1;
-      this.engine.addComponent(new Transform(entityId));
+      this.engine.addComponent(transform);
 
       let sprite = new Sprite(entityId);
       sprite.textureUrl = "assets/dude.png";
       sprite.frameWidth = 32;
       sprite.frameHeight = 48;
+      this.engine.addComponent(sprite);
 
       // entity = new Entity(this, i);
       // entity.addComponent(new Sprite(entity, x, y, "assets/dude.png", 0, 32, 48));
