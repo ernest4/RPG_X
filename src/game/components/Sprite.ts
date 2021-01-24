@@ -2,7 +2,7 @@ import Component from "../../ecs/Component";
 import { EntityId } from "../../ecs/types";
 
 class Sprite extends Component {
-  url!: string;
+  textureUrl!: string;
   frame: number;
   frameWidth!: number;
   frameHeight!: number;

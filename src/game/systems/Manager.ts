@@ -122,7 +122,7 @@ class Manager extends System {
       this.engine.addComponent(new Transform(entityId));
 
       let sprite = new Sprite(entityId);
-      sprite.url = "assets/dude.png";
+      sprite.textureUrl = "assets/dude.png";
       sprite.frameWidth = 32;
       sprite.frameHeight = 48;
 
