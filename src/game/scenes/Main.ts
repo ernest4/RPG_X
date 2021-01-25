@@ -30,6 +30,7 @@ export default class Main extends Scene {
   create() {
     // this._engine = new Engine();
     this._engine = new Engine(true);
+    // TODO: test all systems.
     this._engine.addSystem(new Manager(this._engine));
     this._engine.addSystem(new Input(this._engine, this));
     this._engine.addSystem(new MovementControl(this._engine));

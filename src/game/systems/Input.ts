@@ -13,6 +13,15 @@ const DEFAULT_INPUTS = [
   { type: InputEventType.KEYDOWN, key: "W" },
   { type: InputEventType.KEYDOWN, key: "S" },
   { type: InputEventType.KEYDOWN, key: "D" },
+
+  { type: InputEventType.KEYUP, key: "UP" },
+  { type: InputEventType.KEYUP, key: "DOWN" },
+  { type: InputEventType.KEYUP, key: "LEFT" },
+  { type: InputEventType.KEYUP, key: "RIGHT" },
+  { type: InputEventType.KEYUP, key: "A" },
+  { type: InputEventType.KEYUP, key: "W" },
+  { type: InputEventType.KEYUP, key: "S" },
+  { type: InputEventType.KEYUP, key: "D" },
 ];
 
 class Input extends System {

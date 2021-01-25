@@ -10,14 +10,19 @@ const MOVEMENT_INPUTS = [
   { type: InputEventType.KEYDOWN, key: "W" },
   { type: InputEventType.KEYDOWN, key: "S" },
   { type: InputEventType.KEYDOWN, key: "D" },
+
+  { type: InputEventType.KEYUP, key: "A" },
+  { type: InputEventType.KEYUP, key: "W" },
+  { type: InputEventType.KEYUP, key: "S" },
+  { type: InputEventType.KEYUP, key: "D" },
 ];
 
 class MovementControl extends System {
-  private _inputEventBuffer: InputEvent[];
+  private _filteredInputEvents: InputEvent[];
 
   constructor(engine: Engine) {
     super(engine);
-    this._inputEventBuffer = [];
+    this._filteredInputEvents = [];
   }
 
   start(): void {
@@ -39,7 +44,7 @@ class MovementControl extends System {
   private filterInputEvents = (querySet: QuerySet) => {
     const [inputEvent] = querySet as [InputEvent];
 
-    if (this.isMovementInput(inputEvent)) this._inputEventBuffer.push(inputEvent);
+    if (this.isMovementInput(inputEvent)) this._filteredInputEvents.push(inputEvent);
   };
 
   private isMovementInput = ({ type, key }: InputEvent): boolean =>
@@ -50,33 +55,69 @@ class MovementControl extends System {
   private applyInputEvents = (querySet: QuerySet) => {
     const [player, physicsBody] = querySet as [Player, PhysicsBody];
 
-    this._inputEventBuffer.forEach(({ type, key }) => {
-      switch (key) {
-        case "A":
-          // TODO: magic values for now, but will probably come from some 'Stats' component that
-          // defines the min/max speed of the Entity etc. (which in turn will be affected by
-          // what mode of transport is in use e.g. 'on foot' or 'car' or 'helicopter' etc.)
-          physicsBody.linearVelocity.x = -40;
-          break;
-        case "D":
-          physicsBody.linearVelocity.x = 40;
-          break;
-        case "W":
-          physicsBody.linearVelocity.y = -40;
-          break;
-        case "S":
-          physicsBody.linearVelocity.y = 40;
-          break;
-        default:
-          console.warn(
-            "[MovementControl]: Input event not recognized, though it passed the filtering stage!"
-          );
-          console.warn({ key, type });
-      }
-    });
-
-    this._inputEventBuffer = [];
+    this._filteredInputEvents.forEach(inputEvent => this.applyInputEvent(inputEvent, physicsBody));
+    this._filteredInputEvents = [];
   };
+
+  private applyInputEvent = ({ type, key }: InputEvent, physicsBody: PhysicsBody) => {
+    switch (key) {
+      // TODO: magic values for now, but will probably come from some 'Stats' component that
+      // defines the min/max speed of the Entity etc. (which in turn will be affected by
+      // what mode of transport is in use e.g. 'on foot' or 'car' or 'helicopter' etc.)
+      case "A":
+        // this.applyKeyToVelocity(physicsBody, "x", type, -80);
+        if (type === InputEventType.KEYUP && physicsBody.linearVelocity.x < 0) {
+          physicsBody.linearVelocity.x = 0;
+          break;
+        }
+
+        if (type === InputEventType.KEYDOWN) physicsBody.linearVelocity.x = -80;
+        break;
+      case "D":
+        if (type === InputEventType.KEYUP && 0 < physicsBody.linearVelocity.x) {
+          physicsBody.linearVelocity.x = 0;
+          break;
+        }
+
+        if (type === InputEventType.KEYDOWN) physicsBody.linearVelocity.x = 80;
+        break;
+      case "W":
+        if (type === InputEventType.KEYUP && physicsBody.linearVelocity.y < 0) {
+          physicsBody.linearVelocity.y = 0;
+          break;
+        }
+
+        if (type === InputEventType.KEYDOWN) physicsBody.linearVelocity.y = -80;
+        break;
+      case "S":
+        if (type === InputEventType.KEYUP && 0 < physicsBody.linearVelocity.y) {
+          physicsBody.linearVelocity.y = 0;
+          break;
+        }
+
+        if (type === InputEventType.KEYDOWN) physicsBody.linearVelocity.y = 80;
+        break;
+      default:
+        console.warn(
+          "[MovementControl]: Input event not recognized, though it passed the filtering stage!"
+        );
+        console.warn({ key, type });
+    }
+  };
+
+  // private applyKeyToVelocity = (
+  //   physicsBody: PhysicsBody,
+  //   axis: "x" | "y",
+  //   type: InputEventType,
+  //   value: number
+  // ) => {
+  //   if (type === InputEventType.KEYUP && physicsBody.linearVelocity.x < 0) {
+  //     physicsBody.linearVelocity[axis] = 0;
+  //     return;
+  //   }
+
+  //   if (type === InputEventType.KEYDOWN) physicsBody.linearVelocity.x = -80;
+  // };
 }
 
 export default MovementControl;
