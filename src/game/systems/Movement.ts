@@ -25,10 +25,12 @@ class Movement extends System {
   private updateTransforms = (querySet: QuerySet) => {
     const [transform, physicsBody] = querySet as [Transform, PhysicsBody];
 
-    transform.position.x += physicsBody.linearVelocity.x * this.deltaTime;
-    transform.position.y += physicsBody.linearVelocity.y * this.deltaTime;
+    const seconds = this.deltaTime / 1000;
 
-    transform.rotation.z += physicsBody.angularVelocity.z * this.deltaTime;
+    transform.position.x += physicsBody.linearVelocity.x * seconds;
+    transform.position.y += physicsBody.linearVelocity.y * seconds;
+
+    transform.rotation.z += physicsBody.angularVelocity.z * seconds;
   };
 }
 

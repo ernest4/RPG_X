@@ -2,13 +2,13 @@ const X_INDEX = 0;
 const Y_INDEX = 1;
 const Z_INDEX = 2;
 class Vector3BufferView {
-  private _values: Int32Array;
+  private _values: Float32Array;
 
   constructor(values: ArrayBuffer, startByteOffset = 0) {
     // Extract ArrayBuffer out of TypedArray if values is not already ArrayBuffer
-    const buffer = (values as Int32Array).buffer || values;
-    // Int32Array will error out at runtime if it can't construct itself at the right size
-    this._values = new Int32Array(buffer, startByteOffset, 3);
+    const buffer = (values as Float32Array).buffer || values;
+    // Float32Array will error out at runtime if it can't construct itself at the right size
+    this._values = new Float32Array(buffer, startByteOffset, 3);
   }
 
   get x() {

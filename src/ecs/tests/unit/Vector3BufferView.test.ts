@@ -7,7 +7,7 @@ describe(Vector3BufferView, () => {
 
   let arrayBufferSize = 3;
   let arrayBuffer: ArrayBuffer;
-  let arrayBufferUInt32View: Int32Array;
+  let arrayBufferFloat32View: Float32Array;
 
   let bufferValueAtIndex0 = 5;
   let bufferValueAtIndex1 = -6;
@@ -15,10 +15,10 @@ describe(Vector3BufferView, () => {
 
   beforeEach(() => {
     arrayBuffer = new ArrayBuffer(arrayBufferSize * 4);
-    arrayBufferUInt32View = new Int32Array(arrayBuffer);
-    arrayBufferUInt32View[0] = bufferValueAtIndex0;
-    arrayBufferUInt32View[1] = bufferValueAtIndex1;
-    arrayBufferUInt32View[2] = bufferValueAtIndex2;
+    arrayBufferFloat32View = new Float32Array(arrayBuffer);
+    arrayBufferFloat32View[0] = bufferValueAtIndex0;
+    arrayBufferFloat32View[1] = bufferValueAtIndex1;
+    arrayBufferFloat32View[2] = bufferValueAtIndex2;
 
     subject = new describedClass(arrayBuffer);
   });
@@ -29,7 +29,7 @@ describe(Vector3BufferView, () => {
 
   it("sets x", () => {
     subject.x = 89;
-    expect(arrayBufferUInt32View[0]).toEqual(89);
+    expect(arrayBufferFloat32View[0]).toEqual(89);
   });
 
   it("gets y", () => {
@@ -38,7 +38,7 @@ describe(Vector3BufferView, () => {
 
   it("sets y", () => {
     subject.y = -67;
-    expect(arrayBufferUInt32View[1]).toEqual(-67);
+    expect(arrayBufferFloat32View[1]).toEqual(-67);
   });
 
   it("gets z", () => {
@@ -46,8 +46,8 @@ describe(Vector3BufferView, () => {
   });
 
   it("sets z", () => {
-    subject.z = 34;
-    expect(arrayBufferUInt32View[2]).toEqual(34);
+    subject.z = 0.34;
+    expect(arrayBufferFloat32View[2]).toBeCloseTo(0.34);
   });
 
   context("when Vector3BufferView does not fit in the buffer", () => {
@@ -69,13 +69,13 @@ describe(Vector3BufferView, () => {
 
     beforeEach(() => {
       arrayBuffer = new ArrayBuffer(arrayBufferSize * 4 * 2);
-      arrayBufferUInt32View = new Int32Array(arrayBuffer);
-      arrayBufferUInt32View[0] = 9;
-      arrayBufferUInt32View[1] = 8;
-      arrayBufferUInt32View[2] = 7;
-      arrayBufferUInt32View[3] = bufferValueAtIndex3;
-      arrayBufferUInt32View[4] = bufferValueAtIndex4;
-      arrayBufferUInt32View[5] = bufferValueAtIndex5;
+      arrayBufferFloat32View = new Float32Array(arrayBuffer);
+      arrayBufferFloat32View[0] = 9;
+      arrayBufferFloat32View[1] = 8;
+      arrayBufferFloat32View[2] = 7;
+      arrayBufferFloat32View[3] = bufferValueAtIndex3;
+      arrayBufferFloat32View[4] = bufferValueAtIndex4;
+      arrayBufferFloat32View[5] = bufferValueAtIndex5;
 
       subject = new describedClass(arrayBuffer, startOffset * 4);
     });
