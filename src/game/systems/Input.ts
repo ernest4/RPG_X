@@ -18,13 +18,13 @@ const DEFAULT_INPUTS = [
 class Input extends System {
   private _scene: Scene;
   private _inputs: InputObject[];
-  private _inputEventBuffer: InputObject[];
+  private _inputEventObjectBuffer: InputObject[];
 
   constructor(engine: Engine, scene: Scene, inputs?: InputObject[] | undefined) {
     super(engine);
     this._scene = scene;
     this._inputs = inputs || DEFAULT_INPUTS;
-    this._inputEventBuffer = [];
+    this._inputEventObjectBuffer = [];
   }
 
   start(): void {
@@ -42,7 +42,7 @@ class Input extends System {
 
   private registerInputCallback = ({ type, key }: InputObject) => {
     this._scene.input.keyboard.on(`${type}-${key}`, (e: any) => {
-      this._inputEventBuffer.push({ type, key });
+      this._inputEventObjectBuffer.push({ type, key });
     });
   };
 
@@ -56,7 +56,7 @@ class Input extends System {
   };
 
   private createInputEventEntities = () => {
-    this._inputEventBuffer.forEach(({ type, key }) => {
+    this._inputEventObjectBuffer.forEach(({ type, key }) => {
       const entityId = this.engine.generateEntityId();
       const inputEvent = new InputEvent(entityId);
       inputEvent.type = type;
@@ -64,7 +64,7 @@ class Input extends System {
       this.engine.addComponent(inputEvent);
     });
 
-    this._inputEventBuffer = [];
+    this._inputEventObjectBuffer = [];
   };
 }
 

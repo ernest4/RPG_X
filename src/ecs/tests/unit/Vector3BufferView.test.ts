@@ -7,15 +7,15 @@ describe(Vector3BufferView, () => {
 
   let arrayBufferSize = 3;
   let arrayBuffer: ArrayBuffer;
-  let arrayBufferUInt32View: Uint32Array;
+  let arrayBufferUInt32View: Int32Array;
 
   let bufferValueAtIndex0 = 5;
-  let bufferValueAtIndex1 = 6;
+  let bufferValueAtIndex1 = -6;
   let bufferValueAtIndex2 = 7;
 
   beforeEach(() => {
     arrayBuffer = new ArrayBuffer(arrayBufferSize * 4);
-    arrayBufferUInt32View = new Uint32Array(arrayBuffer);
+    arrayBufferUInt32View = new Int32Array(arrayBuffer);
     arrayBufferUInt32View[0] = bufferValueAtIndex0;
     arrayBufferUInt32View[1] = bufferValueAtIndex1;
     arrayBufferUInt32View[2] = bufferValueAtIndex2;
@@ -37,8 +37,8 @@ describe(Vector3BufferView, () => {
   });
 
   it("sets y", () => {
-    subject.y = 67;
-    expect(arrayBufferUInt32View[1]).toEqual(67);
+    subject.y = -67;
+    expect(arrayBufferUInt32View[1]).toEqual(-67);
   });
 
   it("gets z", () => {
@@ -69,7 +69,7 @@ describe(Vector3BufferView, () => {
 
     beforeEach(() => {
       arrayBuffer = new ArrayBuffer(arrayBufferSize * 4 * 2);
-      arrayBufferUInt32View = new Uint32Array(arrayBuffer);
+      arrayBufferUInt32View = new Int32Array(arrayBuffer);
       arrayBufferUInt32View[0] = 9;
       arrayBufferUInt32View[1] = 8;
       arrayBufferUInt32View[2] = 7;

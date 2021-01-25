@@ -3,14 +3,14 @@ import { EntityId } from "../../ecs/types";
 import Vector3BufferView from "../../ecs/utils/Vector3BufferView";
 
 class Transform extends Component {
-  private _values: Uint32Array;
+  private _values: Int32Array;
   position: Vector3BufferView;
   rotation: Vector3BufferView;
   scale: Vector3BufferView;
 
   constructor(entityId: EntityId) {
     super(entityId);
-    this._values = new Uint32Array(9);
+    this._values = new Int32Array(9);
     this.position = new Vector3BufferView(this._values);
     this.rotation = new Vector3BufferView(this._values, 3 * 4);
     this.scale = new Vector3BufferView(this._values, 6 * 4);

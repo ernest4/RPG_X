@@ -56,16 +56,16 @@ class MovementControl extends System {
           // TODO: magic values for now, but will probably come from some 'Stats' component that
           // defines the min/max speed of the Entity etc. (which in turn will be affected by
           // what mode of transport is in use e.g. 'on foot' or 'car' or 'helicopter' etc.)
-          physicsBody.linearVelocity.x = -10;
+          physicsBody.linearVelocity.x = -1;
           break;
         case "D":
-          physicsBody.linearVelocity.x = 10;
+          physicsBody.linearVelocity.x = 1;
           break;
         case "W":
-          physicsBody.linearVelocity.y = 10;
+          physicsBody.linearVelocity.y = -1;
           break;
         case "S":
-          physicsBody.linearVelocity.y = -10;
+          physicsBody.linearVelocity.y = 1;
           break;
         default:
           console.warn(
