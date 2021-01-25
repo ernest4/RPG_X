@@ -1,4 +1,5 @@
 import System from "../../ecs/System";
+import PhysicsBody from "../components/PhysicsBody";
 import Player from "../components/Player";
 import Sprite from "../components/Sprite";
 import Transform from "../components/Transform";
@@ -127,6 +128,9 @@ class Manager extends System {
       sprite.frameWidth = 32;
       sprite.frameHeight = 48;
       this.engine.addComponent(sprite);
+
+      let physicsBody = new PhysicsBody(entityId);
+      this.engine.addComponent(physicsBody);
 
       this.engine.addComponent(new Player(entityId));
 

@@ -50,22 +50,25 @@ class MovementControl extends System {
   private applyInputEvents = (querySet: QuerySet) => {
     const [player, physicsBody] = querySet as [Player, PhysicsBody];
 
+    // TODO: debug... this is not being hit !!!
+    if (0 < this._inputEventBuffer.length) debugger;
+
     this._inputEventBuffer.forEach(({ type, key }) => {
       switch (key) {
         case "A":
           // TODO: magic values for now, but will probably come from some 'Stats' component that
           // defines the min/max speed of the Entity etc. (which in turn will be affected by
           // what mode of transport is in use e.g. 'on foot' or 'car' or 'helicopter' etc.)
-          physicsBody.linearVelocity.x = -10;
+          physicsBody.linearVelocity.x = -100;
           break;
         case "D":
-          physicsBody.linearVelocity.x = 10;
+          physicsBody.linearVelocity.x = 100;
           break;
         case "W":
-          physicsBody.linearVelocity.y = 10;
+          physicsBody.linearVelocity.y = 100;
           break;
         case "S":
-          physicsBody.linearVelocity.y = -10;
+          physicsBody.linearVelocity.y = -100;
           break;
         default:
           console.warn(
