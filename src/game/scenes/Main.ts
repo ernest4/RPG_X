@@ -3,6 +3,8 @@ import FpsCounter from "../utils/FpsCounter";
 import { Engine } from "../../ecs";
 import Manager from "../systems/Manager";
 import Render from "../systems/Render";
+import Input from "../systems/Input";
+import Movement from "../systems/Movement";
 // import Movement from "../behaviors/Movement";
 // import store from "../store";
 // import * as gameActions from "../store/actions/game";
@@ -27,11 +29,12 @@ export default class Main extends Scene {
   create() {
     this._engine = new Engine();
     this._engine.addSystem(new Manager(this._engine));
-    // input
+    this._engine.addSystem(new Input(this._engine, this));
     // ai
     // physics
-    // movement
+    this._engine.addSystem(new Movement(this._engine));
     this._engine.addSystem(new Render(this._engine, this));
+    // analysis -> print how long each system is taking / where is the bottleneck?
 
     // TODO: move to camera component
     this.cameras.main.setBackgroundColor(0xffffff);

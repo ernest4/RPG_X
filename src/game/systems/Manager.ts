@@ -1,4 +1,5 @@
 import System from "../../ecs/System";
+import Player from "../components/Player";
 import Sprite from "../components/Sprite";
 import Transform from "../components/Transform";
 
@@ -115,7 +116,7 @@ class Manager extends System {
       let entityId = this.engine.generateEntityId();
 
       let transform = new Transform(entityId);
-      transform.position.x = 200;
+      transform.position.x = x;
       transform.position.y = 200;
       transform.scale.x = 1;
       transform.scale.y = 1;
@@ -126,6 +127,8 @@ class Manager extends System {
       sprite.frameWidth = 32;
       sprite.frameHeight = 48;
       this.engine.addComponent(sprite);
+
+      this.engine.addComponent(new Player(entityId));
 
       // entity = new Entity(this, i);
       // entity.addComponent(new Sprite(entity, x, y, "assets/dude.png", 0, 32, 48));

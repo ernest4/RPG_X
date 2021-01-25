@@ -48,6 +48,13 @@ declare const enum SceneItemType {
   // TODO: will be others...
 }
 
+declare const enum InputEventType {
+  KEYDOWN = "keydown",
+  KEYUP = "keyup",
+}
+type InputKey = string;
+type InputObject = { type: InputEventType; key: InputKey };
+
 type BoxColliderSize = { x: number; y: number; z: number };
 
 type URL = string;
