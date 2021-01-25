@@ -129,9 +129,7 @@ class Manager extends System {
       sprite.frameHeight = 48;
       this.engine.addComponent(sprite);
 
-      let physicsBody = new PhysicsBody(entityId);
-      this.engine.addComponent(physicsBody);
-
+      this.engine.addComponent(new PhysicsBody(entityId));
       this.engine.addComponent(new Player(entityId));
 
       // entity = new Entity(this, i);

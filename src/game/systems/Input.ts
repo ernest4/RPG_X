@@ -18,30 +18,31 @@ const DEFAULT_INPUTS = [
 class Input extends System {
   private _scene: Scene;
   private _inputs: InputObject[];
+  private _inputEventBuffer: InputObject[];
 
   constructor(engine: Engine, scene: Scene, inputs?: InputObject[] | undefined) {
     super(engine);
     this._scene = scene;
     this._inputs = inputs || DEFAULT_INPUTS;
+    this._inputEventBuffer = [];
   }
 
   start(): void {
+    // async collect input events into buffer
     this._inputs.forEach(this.registerInputCallback);
   }
 
   update(): void {
     this.engine.query(this.cleanUpEvents, InputEvent);
+    // sync flush input event buffer and create a sequence of input events
+    this.createInputEventEntities();
   }
 
   destroy(): void {}
 
   private registerInputCallback = ({ type, key }: InputObject) => {
     this._scene.input.keyboard.on(`${type}-${key}`, (e: any) => {
-      const entityId = this.engine.generateEntityId();
-      const inputEvent = new InputEvent(entityId);
-      inputEvent.type = type;
-      inputEvent.key = key;
-      this.engine.addComponent(inputEvent);
+      this._inputEventBuffer.push({ type, key });
     });
   };
 
@@ -52,6 +53,18 @@ class Input extends System {
     // NOTE: for the moment, this is non-leaky as removeEntity will reclaim the entityId. This is
     // good as input events will occur and disappear all the time...
     this.engine.removeEntity(inputEvent.id);
+  };
+
+  private createInputEventEntities = () => {
+    this._inputEventBuffer.forEach(({ type, key }) => {
+      const entityId = this.engine.generateEntityId();
+      const inputEvent = new InputEvent(entityId);
+      inputEvent.type = type;
+      inputEvent.key = key;
+      this.engine.addComponent(inputEvent);
+    });
+
+    this._inputEventBuffer = [];
   };
 }
 

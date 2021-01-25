@@ -5,9 +5,11 @@ import { EntityId, InputEventType } from "../../ecs/types";
 class InputEvent extends Component {
   type!: InputEventType;
   key!: string;
+  processed: boolean;
 
   constructor(entityId: EntityId) {
     super(entityId);
+    this.processed = false;
   }
 }
 
