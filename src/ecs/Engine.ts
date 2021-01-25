@@ -16,8 +16,10 @@ class Engine {
   _systems: System[]; // NOTE: handle onn system to call start() and destroy()
   _componentLists: { [key: string]: SparseSet | undefined };
   _entityIdPool: EntityIdPool;
+  private _debug: boolean | undefined;
 
-  constructor() {
+  constructor(debug?: boolean) {
+    this._debug = debug;
     // this._systemUpdateFunctions = [];
     this._systems = [];
     this._deltaTime = 0;
@@ -34,6 +36,8 @@ class Engine {
     // this._systemUpdateFunctions.push(system.update);
     this._systems.push(system);
     system.start();
+
+    if (this._debug) console.log(`[Engine]: Started system: ${system.constructor.name}`);
   };
 
   // getSystem

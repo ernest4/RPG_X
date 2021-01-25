@@ -33,6 +33,8 @@ class Input extends System {
     this.engine.query(this.cleanUpEvents, InputEvent);
   }
 
+  destroy(): void {}
+
   private registerInputCallback = ({ type, key }: InputObject) => {
     this._scene.input.keyboard.on(`${type}-${key}`, (e: any) => {
       const entityId = this.engine.generateEntityId();
@@ -51,8 +53,6 @@ class Input extends System {
     // good as input events will occur and disappear all the time...
     this.engine.removeEntity(inputEvent.id);
   };
-
-  destroy(): void {}
 }
 
 export default Input;

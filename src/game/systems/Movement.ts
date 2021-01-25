@@ -1,5 +1,8 @@
 import { Engine } from "../../ecs";
 import System from "../../ecs/System";
+import { QuerySet } from "../../ecs/types";
+import PhysicsBody from "../components/PhysicsBody";
+import Transform from "../components/Transform";
 
 class Movement extends System {
   constructor(engine: Engine) {
@@ -11,12 +14,22 @@ class Movement extends System {
   }
 
   update(): void {
-    // throw new Error("Method not implemented.");
+    // apply PhysicsBody to transform
+    this.engine.query(this.updateTransforms, Transform, PhysicsBody);
   }
 
   destroy(): void {
     // throw new Error("Method not implemented.");
   }
+
+  private updateTransforms = (querySet: QuerySet) => {
+    const [transform, physicsBody] = querySet as [Transform, PhysicsBody];
+
+    transform.position.x = physicsBody.linearVelocity.x * this.deltaTime;
+    transform.position.y = physicsBody.linearVelocity.y * this.deltaTime;
+
+    transform.rotation.z = physicsBody.angularVelocity.z * this.deltaTime;
+  };
 }
 
 export default Movement;

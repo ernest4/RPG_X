@@ -5,6 +5,7 @@ import Manager from "../systems/Manager";
 import Render from "../systems/Render";
 import Input from "../systems/Input";
 import Movement from "../systems/Movement";
+import MovementControl from "../systems/MovementControl";
 // import Movement from "../behaviors/Movement";
 // import store from "../store";
 // import * as gameActions from "../store/actions/game";
@@ -27,9 +28,11 @@ export default class Main extends Scene {
   }
 
   create() {
-    this._engine = new Engine();
+    // this._engine = new Engine();
+    this._engine = new Engine(true);
     this._engine.addSystem(new Manager(this._engine));
     this._engine.addSystem(new Input(this._engine, this));
+    this._engine.addSystem(new MovementControl(this._engine));
     // ai
     // physics
     this._engine.addSystem(new Movement(this._engine));
