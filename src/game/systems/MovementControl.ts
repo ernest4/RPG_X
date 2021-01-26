@@ -30,6 +30,9 @@ class MovementControl extends System {
   }
 
   update(): void {
+    // flush the cache
+    this._filteredInputEvents = [];
+
     // get movement related input events
     this.engine.query(this.filterInputEvents, InputEvent);
 
@@ -56,7 +59,6 @@ class MovementControl extends System {
     const [player, physicsBody] = querySet as [Player, PhysicsBody];
 
     this._filteredInputEvents.forEach(inputEvent => this.applyInputEvent(inputEvent, physicsBody));
-    this._filteredInputEvents = [];
   };
 
   private applyInputEvent = ({ type, key }: InputEvent, physicsBody: PhysicsBody) => {
