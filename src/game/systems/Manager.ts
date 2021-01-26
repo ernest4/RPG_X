@@ -87,29 +87,11 @@ class Manager extends System {
     //   //   // delay: 1000,
     //   //   repeat: -1,
     //   // });
-
-    //   // this.tweens.add({
-    //   //   targets: sprite,
-    //   //   x: 400,
-    //   //   duration: 2000,
-    //   //   yoyo: true,
-    //   //   // delay: 1000,
-    //   //   repeat: -1,
-    //   // });
-
-    //   // this.tweens.add({
-    //   //   targets: spriteShadow,
-    //   //   x: 400,
-    //   //   duration: 2000,
-    //   //   yoyo: true,
-    //   //   // delay: 1000,
-    //   //   repeat: -1,
-    //   // });
     // }
 
     const entities = [];
 
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 600; i++) {
       let x = 100 + 20 * (i % 50);
       let y = 300;
 
@@ -124,7 +106,8 @@ class Manager extends System {
       this.engine.addComponent(transform);
 
       let sprite = new Sprite(entityId);
-      sprite.textureUrl = "assets/dude.png";
+      // sprite.textureUrl = "assets/dude.png";
+      sprite.textureUrl = i % 2 ? "assets/dude.png" : "assets/turtle.jpg";
       sprite.frameWidth = 32;
       sprite.frameHeight = 48;
       this.engine.addComponent(sprite);

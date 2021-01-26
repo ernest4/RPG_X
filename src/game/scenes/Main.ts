@@ -37,6 +37,7 @@ export default class Main extends Scene {
     // ai
     // physics
     this._engine.addSystem(new Movement(this._engine));
+    // this._engine.addSystem(new Animation(this._engine)); // will hook into state of the entity (animation state machine)
     this._engine.addSystem(new Render(this._engine, this));
     // analysis -> print how long each system is taking / where is the bottleneck?
 

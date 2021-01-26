@@ -35,56 +35,44 @@ class Render extends System {
   }
 
   update(): void {
-    // this.engine.query(this.updateCameras, Transform, Camera);
+    // this.engine.query(this.updateCameras, Transform, Camera); // TODO: move this out to its own 'Camera' system....
     this.engine.query(this.updateSprites, Transform, Sprite);
     // this.engine.query(this.updateMeshes, Transform, Mesh);
     this.disposeUnusedSceneItems();
     // this.__scene.render();
   }
 
-  updateCameras = (querySet: QuerySet) => {
-    // const [transform, camera] = querySet as [Transform, Camera];
-    // wip...
-    // if (...) create
-    // update
-  };
+  // TODO: move this out to its own 'Camera' system....
+  // updateCameras = (querySet: QuerySet) => {
+  //   // const [transform, camera] = querySet as [Transform, Camera];
+  //   // wip...
+  //   // if (...) create
+  //   // update
+  // };
 
   // TODO: currently, resources will load async thus introducing pop in... might be a better way
   updateSprites = (querySet: QuerySet) => {
     const [transform, sprite] = querySet as [Transform, Sprite];
 
-    let spriteItem = this.getSceneItem<Phaser.GameObjects.Sprite>(sprite.id, SceneItemType.SPRITE);
+    let spriteSceneItem = this.getSceneItem<Phaser.GameObjects.Sprite>(
+      sprite.id,
+      SceneItemType.SPRITE
+    );
+
+    // Cold path
+    if (!spriteSceneItem) return this.createSpriteSceneItem(sprite);
 
     // Hot path
-    if (spriteItem) {
-      this.updateSprite(spriteItem, transform);
-      return;
-    }
+    if (spriteSceneItem.loaded) return this.updateSpriteSceneItem(spriteSceneItem, transform);
 
-    // Initialization path
-    const { _scene } = this;
-    const { textureUrl, frameWidth, frameHeight, frame } = sprite;
-
-    // NOTE: not the most efficient, but not a hot path...
-    const onTextureLoaded = () => {
-      const phaserSprite = _scene.add.sprite(0, 0, textureUrl, frame);
-      const spriteItem = this.addSceneItem(sprite.id, SceneItemType.SPRITE, phaserSprite);
-
-      this.updateSprite(spriteItem, transform);
-    };
-
-    if (_scene.textures.get(textureUrl).key !== "__MISSING") return onTextureLoaded();
-
-    _scene.load.spritesheet(textureUrl, textureUrl, { frameWidth, frameHeight }); // add load task
-    _scene.load.once("complete", onTextureLoaded); // add callback of 'complete' event
-    _scene.load.start(); // start loading
+    // else, must still be loading...
   };
 
-  private updateSprite = (
-    spriteItem: SceneItem<Phaser.GameObjects.Sprite>,
+  private updateSpriteSceneItem = (
+    spriteSceneItem: SceneItem<Phaser.GameObjects.Sprite>,
     transform: Transform
   ) => {
-    const phaserSprite = spriteItem.itemRef;
+    const phaserSprite = spriteSceneItem.itemRef;
 
     phaserSprite.x = transform.position.x;
     phaserSprite.y = transform.position.y;
@@ -95,7 +83,55 @@ class Render extends System {
     phaserSprite.scaleY = transform.scale.y;
 
     // NOTE: mark scene items as rendered, so disposeUnusedSceneEntities() leaves it alone
-    spriteItem.rendered = true;
+    spriteSceneItem.rendered = true;
+  };
+
+  private createSpriteSceneItem = ({ textureUrl }: Sprite) => {
+    // Initialization path
+    // const { _scene } = this;
+    // const { textureUrl, frameWidth, frameHeight, frame } = sprite;
+
+    const spriteSceneItem = this.addSceneItem(sprite.id, SceneItemType.SPRITE);
+
+    if (this.isTextureLoaded(textureUrl)) return spriteSceneItem.init();
+
+    // initialization queue
+    this._loadingTextures[textureUrl].push(spriteSeneItem);
+
+    if (this.isTextureLoading(textureUrl)) return;
+
+    this.loadTexture(textureUrl);
+  };
+
+  private isTextureLoading = (textureUrl: string): boolean => {
+    return (
+      this._scene.textures.get(textureUrl).key === "__MISSING" && this._loadingTextures[textureUrl]
+    );
+  };
+
+  // NOTE: not the most efficient, but not a hot path...
+  private onTextureLoaded = (key, type, texture) => {
+    // const phaserSprite = _scene.add.sprite(0, 0, textureUrl, frame);
+    // const spriteItem = this.addSceneItem(sprite.id, SceneItemType.SPRITE, phaserSprite);
+
+    this._loadingTextures[key].forEach(spriteSceneItem => {
+      // const phaserSprite = _scene.add.sprite(0, 0, key, frame);
+      // spriteSceneItem.add(phaserSprite);
+      spriteSceneItem.init();
+    });
+
+    // this.updateSprite(spriteItem, transform);
+  };
+
+  private loadTexture = (textureUrl: string) => {
+    // console.log(_scene.textures.get(textureUrl).key); // TESTING
+
+    // if (_scene.textures.get(textureUrl).key !== "__MISSING") return onTextureLoaded();
+
+    // if (_scene.load.progress < 1) return; // continue loading
+    _scene.load.spritesheet(textureUrl, textureUrl, { frameWidth, frameHeight }); // add load task
+    _scene.load.on("filecomplete", this.onTextureLoaded); // add callback of 'complete' event
+    _scene.load.start(); // start loading (should be able to call this over and over, even when already loading...no harm)
   };
 
   private getSceneItem = <T>(
