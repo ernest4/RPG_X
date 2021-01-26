@@ -43,11 +43,6 @@ declare const enum ColliderValueIndexes {
 }
 
 // String enums are enforceable by typescript :), unlike numeric enums :/
-declare const enum SceneItemType {
-  SPRITE = "Sprite",
-  // TODO: will be others...
-}
-
 declare const enum InputEventType {
   KEYDOWN = "keydown",
   KEYUP = "keyup",
