@@ -89,8 +89,6 @@ class Manager extends System {
     //   // });
     // }
 
-    const entities = [];
-
     for (let i = 0; i < 5; i++) {
       let x = 100 + 20 * (i % 50);
       let y = 300;

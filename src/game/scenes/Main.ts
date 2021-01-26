@@ -6,6 +6,8 @@ import Render from "../systems/Render";
 import Input from "../systems/Input";
 import Movement from "../systems/Movement";
 import MovementControl from "../systems/MovementControl";
+import { DEVELOPMENT } from "../utils/environment";
+import SceneEditor from "../systems/SceneEditor";
 // import Movement from "../behaviors/Movement";
 // import store from "../store";
 // import * as gameActions from "../store/actions/game";
@@ -19,7 +21,7 @@ export default class Main extends Scene {
 
   preload() {
     // TODO: testing. Most assets will loaded async !!!
-    this.load.image("turtle", "assets/turtle.jpg");
+    // this.load.image("turtle", "assets/turtle.jpg");
     // this.load.image("sky", "assets/sky.png");
     // this.load.image("ground", "assets/platform.png");
     // this.load.image("star", "assets/star.png");
@@ -32,6 +34,8 @@ export default class Main extends Scene {
     this._engine = new Engine(true);
     // TODO: test all systems.
     this._engine.addSystem(new Manager(this._engine));
+    // this._engine.addSystem(new SceneLoader(this._engine)); // TODO: either make this system or do the loading in manager...
+    if (DEVELOPMENT) this._engine.addSystem(new SceneEditor(this._engine));
     this._engine.addSystem(new Input(this._engine, this));
     this._engine.addSystem(new MovementControl(this._engine));
     // ai
