@@ -8,9 +8,6 @@ import Movement from "../systems/Movement";
 import MovementControl from "../systems/MovementControl";
 import { DEVELOPMENT } from "../utils/environment";
 import SceneEditor from "../systems/SceneEditor";
-// import Movement from "../behaviors/Movement";
-// import store from "../store";
-// import * as gameActions from "../store/actions/game";
 
 export default class Main extends Scene {
   dudeQuads!: any[];
@@ -22,10 +19,6 @@ export default class Main extends Scene {
   preload() {
     // TODO: testing. Most assets will loaded async !!!
     // this.load.image("turtle", "assets/turtle.jpg");
-    // this.load.image("sky", "assets/sky.png");
-    // this.load.image("ground", "assets/platform.png");
-    // this.load.image("star", "assets/star.png");
-    // this.load.image("bomb", "assets/bomb.png");
     // this.load.spritesheet("dude", "assets/dude.png", { frameWidth: 32, frameHeight: 48 });
   }
 
@@ -34,7 +27,7 @@ export default class Main extends Scene {
     this._engine = new Engine(DEVELOPMENT);
     // TODO: test all systems.
     this._engine.addSystem(new Manager(this._engine));
-    // this._engine.addSystem(new SceneLoader(this._engine)); // TODO: either make this system or do the loading in manager...
+    // this._engine.addSystem(new SceneLoader(this._engine)); // TODO: either make this system or do the loading in manager... https://web.dev/file-system-access/#read-a-file-from-the-file-system
     if (DEVELOPMENT) this._engine.addSystem(new SceneEditor(this._engine));
     this._engine.addSystem(new Input(this._engine, this));
     this._engine.addSystem(new MovementControl(this._engine));

@@ -111,7 +111,7 @@ class Manager extends System {
       this.engine.addComponent(sprite);
 
       this.engine.addComponent(new PhysicsBody(entityId));
-      this.engine.addComponent(new Player(entityId));
+      if (i === 1) this.engine.addComponent(new Player(entityId));
 
       // entity = new Entity(this, i);
       // entity.addComponent(new Sprite(entity, x, y, "assets/dude.png", 0, 32, 48));

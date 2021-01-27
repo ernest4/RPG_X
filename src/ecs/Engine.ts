@@ -3,7 +3,6 @@ import EntityIdPool from "./engine/EntityIdPool";
 import Component from "./Component";
 import SparseSet from "./utils/SparseSet";
 import System from "./System";
-import Entity from "./Entity";
 
 // TODO: jest tests !!!!
 class Engine {
@@ -75,8 +74,17 @@ class Engine {
   // TODO: ...
   // removeComponent = (componentClass, entityId) => {};
 
-  // TODO: ...
-  // getComponent = (componentClass, entityId) => {};
+  // TODO: testing !!!
+  getComponent = (componentClass: ComponentClass, entityId: EntityId) => {
+    return this._componentLists[componentClass.name]?.get(entityId);
+  };
+
+  // TODO: testing !!!
+  getComponents = (entityId: EntityId) => {
+    return Object.values(this._componentLists)
+      .map(componentList => componentList?.get(entityId))
+      .filter(component => component);
+  };
 
   // createEntity = (): Entity => {
   //   return new Entity(this.generateEntityId(), this);
