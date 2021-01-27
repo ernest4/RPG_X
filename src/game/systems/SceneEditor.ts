@@ -1,9 +1,11 @@
 import System from "../../ecs/System";
-import "./sceneEditor/index"; // NOTE: importing this will run the editor app
+import initSceneEditor from "./sceneEditor/index"; // NOTE: importing this will run the editor app
 import store from "../store";
 import * as sceneEditorActions from "../store/actions/sceneEditor";
 class SceneEditor extends System {
   start(): void {
+    initSceneEditor();
+
     store.dispatch(sceneEditorActions.test("game message"));
   }
 

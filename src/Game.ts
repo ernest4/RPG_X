@@ -6,7 +6,7 @@ class Game {
 
   constructor() {
     this._config = {
-      type: Phaser.AUTO,
+      type: Phaser.WEBGL,
       width: window.innerWidth,
       height: window.innerHeight,
       parent: "phaser-game",

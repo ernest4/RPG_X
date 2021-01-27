@@ -11,11 +11,14 @@ const editorRootElement = document.createElement("div");
 editorRootElement.id = EDITOR_ROOT_ID;
 document.body.appendChild(editorRootElement);
 
-ReactDOM.render(
-  <StrictMode>
-    <Provider store={store}>
-      <EditorApp />
-    </Provider>
-  </StrictMode>,
-  document.getElementById(EDITOR_ROOT_ID)
-);
+const initSceneEditor = () =>
+  ReactDOM.render(
+    <StrictMode>
+      <Provider store={store}>
+        <EditorApp />
+      </Provider>
+    </StrictMode>,
+    document.getElementById(EDITOR_ROOT_ID)
+  );
+
+export default initSceneEditor;

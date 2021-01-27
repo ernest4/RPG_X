@@ -31,7 +31,7 @@ export default class Main extends Scene {
 
   create() {
     // this._engine = new Engine();
-    this._engine = new Engine(true);
+    this._engine = new Engine(DEVELOPMENT);
     // TODO: test all systems.
     this._engine.addSystem(new Manager(this._engine));
     // this._engine.addSystem(new SceneLoader(this._engine)); // TODO: either make this system or do the loading in manager...
