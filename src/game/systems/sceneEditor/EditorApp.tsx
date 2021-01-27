@@ -19,6 +19,7 @@ const EditorApp = () => {
     <div
       style={{ position: "fixed", top: 0, right: 0 }}
       onClick={() => dispatch(sceneEditorActions.test("editor message"))}
+      className="bg-blue-500" // tailwind.css test .... not working yet !!
     >
       editor wip: {test}
     </div>
