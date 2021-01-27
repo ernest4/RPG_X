@@ -19,6 +19,7 @@ class Interaction extends System {
     // this._inputs.forEach(this.registerInputCallback);
   }
 
+  // TODO: end goal is to generate event components ('InteractiveEvent') that correspond to the appropriate entity ??
   update(): void {
     this.engine.query(this.registerInteractiveEntityListeners, Sprite, Interactive);
     // this.engine.query(this.cleanUpEvents, InputEvent);
