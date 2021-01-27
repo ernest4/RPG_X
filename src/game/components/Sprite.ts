@@ -8,6 +8,7 @@ class Sprite extends Component {
   frameWidth!: number;
   frameHeight!: number;
   loaded: boolean;
+  phaserSpriteRef: Phaser.GameObjects.Sprite | undefined; // NOTE: this should be ignored / discarded by any serializer
 
   constructor(entityId: EntityId) {
     super(entityId);

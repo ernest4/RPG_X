@@ -8,6 +8,7 @@ import Movement from "../systems/Movement";
 import MovementControl from "../systems/MovementControl";
 import { DEVELOPMENT } from "../utils/environment";
 import SceneEditor from "../systems/SceneEditor";
+import Interaction from "../systems/Interaction";
 
 export default class Main extends Scene {
   dudeQuads!: any[];
@@ -30,6 +31,7 @@ export default class Main extends Scene {
     // this._engine.addSystem(new SceneLoader(this._engine)); // TODO: either make this system or do the loading in manager... https://web.dev/file-system-access/#read-a-file-from-the-file-system
     if (DEVELOPMENT) this._engine.addSystem(new SceneEditor(this._engine));
     this._engine.addSystem(new Input(this._engine, this));
+    this._engine.addSystem(new Interaction(this._engine));
     this._engine.addSystem(new MovementControl(this._engine));
     // ai
     // physics
