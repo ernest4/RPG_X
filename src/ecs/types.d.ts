@@ -50,6 +50,14 @@ declare const enum InputEventType {
 type InputKey = string;
 type InputObject = { type: InputEventType; key: InputKey };
 
+declare const enum InteractiveEventType {
+  POINTER_DOWN = "pointerdown",
+  POINTER_UP = "pointerup",
+  POINTER_OVER = "pointerover",
+  POINTER_OUT = "pointerout",
+}
+type InteractiveObject = { type: InteractiveEventType; entityId: EntityId };
+
 type BoxColliderSize = { x: number; y: number; z: number };
 
 type URL = string;

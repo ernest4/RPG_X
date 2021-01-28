@@ -2,7 +2,7 @@ import { Scene } from "phaser";
 import { Engine } from "../../ecs";
 import Component from "../../ecs/Component";
 import System from "../../ecs/System";
-import { QuerySet } from "../../ecs/types";
+import { InteractiveEventType, QuerySet } from "../../ecs/types";
 import SparseSet from "../../ecs/utils/SparseSet";
 import Sprite from "../components/Sprite";
 import Transform from "../components/Transform";
@@ -12,14 +12,14 @@ import SceneItem from "./render/SceneItem";
 // inlining of variables to reduce indirection and increase speed.
 class Render extends System {
   private _scene: Scene;
-  private _sceneItemsList: SparseSet;
+  private _sceneItemsSet: SparseSet;
   private _textureLoadLists: { [key: string]: SparseSet };
 
   constructor(engine: Engine, scene: Scene) {
     super(engine);
     this._scene = scene;
     this._textureLoadLists = {};
-    this._sceneItemsList = new SparseSet();
+    this._sceneItemsSet = new SparseSet();
   }
 
   start(): void {}
@@ -30,6 +30,8 @@ class Render extends System {
     this.engine.query(this.updateSprites, Transform, Sprite);
     this.disposeUnusedSceneItems();
   }
+
+  destroy(): void {}
 
   // TODO: move this out to its own 'Camera' system....
   // updateCameras = (querySet: QuerySet) => {
@@ -80,8 +82,8 @@ class Render extends System {
     phaserSprite.scaleX = transform.scale.x;
     phaserSprite.scaleY = transform.scale.y;
 
-    // NOTE: mark scene items as rendered, so disposeUnusedSceneItems() leaves it alone
-    phaserSpriteSceneItem.rendered = true;
+    // NOTE: mark scene items as processed, so disposeUnusedSceneItems() leaves it alone
+    phaserSpriteSceneItem.processed = true;
   };
 
   private loadSprite = (sprite: Sprite) => {
@@ -104,36 +106,42 @@ class Render extends System {
   };
 
   private getSceneItem = <T>(component: Component): SceneItem<T> | null => {
-    return this._sceneItemsList.get(component.id) as SceneItem<T> | null;
+    return this._sceneItemsSet.get(component.id) as SceneItem<T> | null;
   };
 
   private addSceneItem = <T>(component: Component, itemRef: T) => {
     const sceneItem = new SceneItem<T>(component.id, itemRef);
-    this._sceneItemsList.add(sceneItem);
+    this._sceneItemsSet.add(sceneItem);
     return sceneItem;
   };
 
   private removeSceneItem = (component: Component) => {
-    this._sceneItemsList.remove(component.id);
+    this._sceneItemsSet.remove(component.id);
   };
 
   private disposeUnusedSceneItems = () => {
-    this._sceneItemsList.stream((sceneItem: SceneItem<any>) =>
+    this._sceneItemsSet.stream((sceneItem: SceneItem<any>) =>
       this.disposeUnusedSceneItem(sceneItem)
     );
   };
 
   private disposeUnusedSceneItem = (sceneItem: SceneItem<any>) => {
-    if (sceneItem.rendered) {
-      sceneItem.rendered = false; // NOTE: reset the flag before next render
+    if (sceneItem.processed) {
+      sceneItem.processed = false; // NOTE: reset the flag before next render
       return;
     }
 
+    this.deregisterInteractiveListeners(sceneItem.itemRef);
     sceneItem.itemRef.destroy(); // TODO: pooling instead => active(false); visible(false); ???
     this.removeSceneItem(sceneItem.itemRef);
   };
 
-  destroy(): void {}
+  private deregisterInteractiveListeners = (phaserSprite: Phaser.GameObjects.Sprite) => {
+    phaserSprite.off(InteractiveEventType.POINTER_DOWN);
+    phaserSprite.off(InteractiveEventType.POINTER_UP);
+    phaserSprite.off(InteractiveEventType.POINTER_OVER);
+    phaserSprite.off(InteractiveEventType.POINTER_OUT);
+  };
 }
 
 export default Render;

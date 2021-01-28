@@ -8,10 +8,12 @@ class Interactive extends Component {
   private _onPointerUp: boolean;
   private _onPointerOver: boolean;
   private _onPointerOut: boolean;
+  processed: boolean;
 
   constructor(entityId: EntityId) {
     super(entityId);
     this.loaded = false;
+    this.processed = false;
     this._onPointerDown = false;
     this._onPointerUp = false;
     this._onPointerOver = false;

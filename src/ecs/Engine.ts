@@ -71,12 +71,18 @@ class Engine {
     componentList.remove(component);
   };
 
-  // TODO: ...
-  // removeComponent = (componentClass, entityId) => {};
+  // TODO: testing !!!
+  removeComponentById = (componentClass: ComponentClass, entityId: EntityId) => {
+    const componentList = this._componentLists[componentClass.name];
+    if (!componentList) return;
+
+    // const oldEntityId = componentList.remove(component);
+    componentList.remove(entityId);
+  };
 
   // TODO: testing !!!
-  getComponent = (componentClass: ComponentClass, entityId: EntityId) => {
-    return this._componentLists[componentClass.name]?.get(entityId);
+  getComponent = <T>(componentClass: ComponentClass, entityId: EntityId) => {
+    return this._componentLists[componentClass.name]?.get(entityId) as T | null;
   };
 
   // TODO: testing !!!
