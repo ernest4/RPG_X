@@ -34,9 +34,9 @@ const Inspector = () => {
       className="fixed top-0 right-0 bg-gray-600 flex flex-col w-96"
     >
       <Container>Entity Id: {currentEntityId}</Container>
-      {currentEntityComponents.map((currentEntityComponent: any) => {
+      {currentEntityComponents.map((currentEntityComponent: any, key: number) => {
         return (
-          <>
+          <div key={key}>
             <HorizontalSpace />
             <Container>
               {JSON.stringify({
@@ -44,7 +44,7 @@ const Inspector = () => {
                 ...currentEntityComponent,
               })}
             </Container>
-          </>
+          </div>
         );
       })}
     </div>

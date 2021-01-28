@@ -3,6 +3,7 @@ import EntityIdPool from "./engine/EntityIdPool";
 import Component from "./Component";
 import SparseSet from "./utils/SparseSet";
 import System from "./System";
+import { isNumber } from "./utils/Number";
 
 // TODO: jest tests !!!!
 class Engine {
@@ -67,8 +68,9 @@ class Engine {
     const componentList = this._componentLists[componentClassName];
     if (!componentList) return;
 
-    // const oldEntityId = componentList.remove(component);
+    const oldEntityId = component.id;
     componentList.remove(component);
+    if (oldEntityId) this.reclaimEntityIdIfFree(oldEntityId);
   };
 
   // TODO: testing !!!
@@ -76,8 +78,8 @@ class Engine {
     const componentList = this._componentLists[componentClass.name];
     if (!componentList) return;
 
-    // const oldEntityId = componentList.remove(component);
     componentList.remove(entityId);
+    if (entityId) this.reclaimEntityIdIfFree(entityId);
   };
 
   // TODO: testing !!!
@@ -202,6 +204,10 @@ class Engine {
   // private callSystemUpdateFunction = (systemUpdateFunction: () => void) => systemUpdateFunction();
 
   private updateSystem = (system: System) => system.update();
+
+  private reclaimEntityIdIfFree = (entityId: EntityId) => {
+    if (this.getComponents(entityId).length === 0) this._entityIdPool.reclaimId(entityId);
+  };
 }
 
 export default Engine;

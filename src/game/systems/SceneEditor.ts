@@ -4,6 +4,7 @@ import store from "../store";
 import * as sceneEditorActions from "../store/actions/sceneEditor";
 import Player from "../components/Player";
 import { QuerySet } from "../../ecs/types";
+import InteractiveEvent from "../components/InteractiveEvent";
 
 // TODO: to keep things sync, the SceneEditor systems pushes changes to redux and checks for changes
 // in redux store to flush buffers on entity edits / creation
@@ -17,10 +18,8 @@ class SceneEditor extends System {
   update(): void {
     // throw new Error("Method not implemented.");
     // TODO: attack clickable and draggable components to all entities with transform component
-    this.engine.query( ... attach Interactive component to all antities with Sprite); // later on, should print all entities in the scene for editor to select, without just relying on Sprite entities. Probably will need to Tag all entities with some recognizable name then....
-
+    // this.engine.query( ... attach Interactive component to all antities with Sprite); // later on, should print all entities in the scene for editor to select, without just relying on Sprite entities. Probably will need to Tag all entities with some recognizable name then....
     // store.dispatch(editorActions.showUI(!store.getState().showUi));
-
     // this.engine.query(this.pushEntityToInspector, Player); // TODO: Testing, later only 'clicked on' entity will be pushed
     this.engine.query(this.pushEntityToInspector, InteractiveEvent); // TODO: Testing, later only 'clicked on' entity will be pushed
   }
