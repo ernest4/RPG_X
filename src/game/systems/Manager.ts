@@ -114,12 +114,12 @@ class Manager extends System {
       this.engine.addComponent(new PhysicsBody(entityId));
       if (i === 1) this.engine.addComponent(new Player(entityId));
 
-      const interactive = new Interactive(entityId);
-      if (i === 1) interactive.onPointerDown = true;
-      if (i === 2) interactive.onPointerUp = true;
-      if (i === 3) interactive.onPointerOver = true;
-      if (i === 4) interactive.onPointerOut = true;
-      this.engine.addComponent(interactive);
+      // const interactive = new Interactive(entityId);
+      // if (i === 1) interactive.onPointerDown = true;
+      // if (i === 2) interactive.onPointerUp = true;
+      // if (i === 3) interactive.onPointerOver = true;
+      // if (i === 4) interactive.onPointerOut = true;
+      // this.engine.addComponent(interactive);
 
       // entity = new Entity(this, i);
       // entity.addComponent(new Sprite(entity, x, y, "assets/dude.png", 0, 32, 48));
