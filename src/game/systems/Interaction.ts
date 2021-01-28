@@ -126,7 +126,6 @@ class Interaction extends System {
   };
 
   // NOTE: these get attached to same entity (so only 1 exists at a time?? buggy ??)
-  // TODO: maybe create separate entity for the event and keep track of parent via extra entityId on the InteractiveEvent !!!
   private createInteractiveEventComponents = () => {
     this._interactiveEventObjectBuffer.forEach(({ type, entityId }) => {
       const interactiveEvent = new InteractiveEvent(entityId);
