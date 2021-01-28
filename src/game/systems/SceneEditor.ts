@@ -2,7 +2,7 @@ import System from "../../ecs/System";
 import initSceneEditor from "./sceneEditor/index"; // NOTE: importing this will run the editor app
 import store from "../store";
 import * as sceneEditorActions from "../store/actions/sceneEditor";
-import { QuerySet } from "../../ecs/types";
+import { EntityId, QuerySet } from "../../ecs/types";
 import InteractiveEvent from "../components/InteractiveEvent";
 import Sprite from "../components/Sprite";
 import Interactive from "../components/Interactive";
@@ -17,14 +17,13 @@ class SceneEditor extends System {
   }
 
   update(): void {
-    // TODO: attach clickable components to all entities
     // TODO: attach draggable to all entities
 
     // later on, should print all entities in the scene for editor to select, without just relying
     // on Sprite entities. Probably will need to Tag all entities with some recognizable name then....
     this.engine.query(this.attachInteractiveToAllSprites, Sprite);
-    // store.dispatch(editorActions.showUI(!store.getState().showUi));
-    this.engine.query(this.pushEntityToInspector, InteractiveEvent); // TODO: Testing, later only 'clicked on' entity will be pushed
+    this.engine.query(this.pushEntityToRedux, InteractiveEvent); // TODO: Testing, later only 'clicked on' entity will be pushed
+    this.streamCurrentEntityComponentsToRedux();
   }
 
   destroy(): void {
@@ -51,12 +50,23 @@ class SceneEditor extends System {
     this.engine.addComponent(interactive);
   };
 
-  private pushEntityToInspector = (querySet: QuerySet) => {
+  private pushEntityToRedux = (querySet: QuerySet) => {
     const [interactiveEvent] = querySet as [InteractiveEvent];
 
+    if (!interactiveEvent.pointerDown) return;
+
     store.dispatch(sceneEditorActions.setCurrentEntityId(interactiveEvent.id));
-    const components = this.engine.getComponents(interactiveEvent.id);
+    this.pushEntityComponentsToRedux(interactiveEvent.id);
+  };
+
+  private pushEntityComponentsToRedux = (entityId: EntityId) => {
+    const components = this.engine.getComponents(entityId);
     store.dispatch(sceneEditorActions.setCurrentEntityComponents(components));
+  };
+
+  private streamCurrentEntityComponentsToRedux = () => {
+    const currentEntityId = (store.getState().sceneEditor as any).currentEntityId;
+    if (currentEntityId) this.pushEntityComponentsToRedux(currentEntityId);
   };
 }
 
