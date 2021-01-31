@@ -7,6 +7,7 @@ import InteractiveEvent from "../components/InteractiveEvent";
 import Sprite from "../components/Sprite";
 import Interactive from "../components/Interactive";
 import DragEvent from "../components/DragEvent";
+import { isNumber } from "../../ecs/utils/Number";
 
 // TODO: to keep things sync, the SceneEditor systems pushes changes to redux and checks for changes
 // in redux store to flush buffers on entity edits / creation
@@ -73,7 +74,7 @@ class SceneEditor extends System {
 
   private streamCurrentEntityComponentsToRedux = () => {
     const currentEntityId = (store.getState().sceneEditor as any).currentEntityId;
-    if (currentEntityId) this.pushEntityComponentsToRedux(currentEntityId);
+    if (isNumber(currentEntityId)) this.pushEntityComponentsToRedux(currentEntityId);
   };
 }
 
