@@ -11,7 +11,7 @@ import Component from "./Component";
 //   weight: Pound;
 // };
 
-type DeltaTime = number;
+type DeltaTime = number; // ms
 type EntityId = number;
 type QuerySet = Component[];
 type QueryCallback = (querySet: QuerySet) => void;
