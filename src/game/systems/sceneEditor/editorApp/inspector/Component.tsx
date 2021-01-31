@@ -2,6 +2,9 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import HorizontalSpace from "../../HorizontalSpace";
 import * as sceneEditorActions from "../../../../store/actions/sceneEditor";
+import RemoveButton from "./component/RemoveButton";
+import Title from "./component/Title";
+import Value from "./component/Value";
 
 const Component = ({ currentEntityComponent }: any) => {
   return (
@@ -11,14 +14,19 @@ const Component = ({ currentEntityComponent }: any) => {
         <RemoveButton />
       </div>
       <HorizontalSpace />
-      {/* <div>{JSON.stringify({ ...currentEntityComponent })}</div> */}
       <div>
         {Object.entries(currentEntityComponent).map(([property, value]) => {
+          if (property === "_id") return <div />; // NOTE: just hiding redundant exposition of internal implementation
+          if (property === "_values") return <div />; // NOTE: just hiding redundant exposition of internal implementation
+
           return (
-            <div className="flex justify-between">
-              <div className="w-max">{property}</div>
-              <div className="w-max overflow-scroll">{JSON.stringify(value)}</div>
-            </div>
+            <>
+              <HorizontalSpace />
+              <div className="flex justify-between">
+                <div className="w-max">{property}</div>
+                <Value value={value} />
+              </div>
+            </>
           );
         })}
       </div>
@@ -27,22 +35,3 @@ const Component = ({ currentEntityComponent }: any) => {
 };
 
 export default Component;
-
-const Title = ({ title }: { title: string }) => {
-  return <div className="font-bold">{title}</div>;
-};
-
-const RemoveButton = () => {
-  const dispatch = useDispatch();
-
-  const onRemove = () => {
-    // dispatch(sceneEditorActions.test("editor message"));
-    // TODO: push to redux new component set
-  };
-
-  return (
-    <button className="px-1 bg-red-400 rounded capitalize" onClick={onRemove}>
-      remove
-    </button>
-  );
-};
