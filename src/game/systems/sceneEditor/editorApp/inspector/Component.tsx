@@ -9,7 +9,7 @@ import Value from "./component/Value";
 const Component = ({ currentEntityComponent }: any) => {
   return (
     <div>
-      <div className="flex justify-between">
+      <div className="flex justify-between pb-4 border-b-2">
         <Title title={currentEntityComponent.constructor.name} />
         <RemoveButton />
       </div>
@@ -18,6 +18,8 @@ const Component = ({ currentEntityComponent }: any) => {
         {Object.entries(currentEntityComponent).map(([property, value]) => {
           if (property === "_id") return <div />; // NOTE: just hiding redundant exposition of internal implementation
           if (property === "_values") return <div />; // NOTE: just hiding redundant exposition of internal implementation
+          if (property === "loaded") return <div />; // NOTE: just hiding redundant exposition of internal implementation
+          if (property === "processed") return <div />; // NOTE: just hiding redundant exposition of internal implementation
 
           return (
             <>
