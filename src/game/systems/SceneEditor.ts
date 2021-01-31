@@ -17,7 +17,7 @@ class SceneEditor extends System {
   }
 
   update(): void {
-    // TODO: attach draggable to all entities
+    // TODO: attach draggable to all entities (will be part of 'Interaction' system as relies on sprite.setInteractive() ...)
 
     // later on, should print all entities in the scene for editor to select, without just relying
     // on Sprite entities. Probably will need to Tag all entities with some recognizable name then....

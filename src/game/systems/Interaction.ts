@@ -1,24 +1,40 @@
 import { Engine } from "../../ecs";
 import System from "../../ecs/System";
-import { InteractiveEventType, InteractiveObject, QuerySet } from "../../ecs/types";
+import {
+  DraggableObject,
+  EntityId,
+  InteractiveEventType,
+  InteractiveObject,
+  QuerySet,
+} from "../../ecs/types";
 import Sprite from "../components/Sprite";
 import Interactive from "../components/Interactive";
 import InteractiveEvent from "../components/InteractiveEvent";
 import SparseSet from "../../ecs/utils/SparseSet";
+import { Scene } from "phaser";
+
+import DragEvent from "../components/DragEvent";
+import { isNumber } from "../../ecs/utils/Number";
 
 class Interaction extends System {
+  private _scene: Scene;
   private _interactiveEventObjectBuffer: InteractiveObject[];
+  private _dragEventObjectBuffer: DraggableObject[];
   private _interactiveComponentsSet: SparseSet;
 
-  constructor(engine: Engine) {
+  constructor(engine: Engine, scene: Scene) {
     super(engine);
+    this._scene = scene;
     this._interactiveEventObjectBuffer = [];
+    this._dragEventObjectBuffer = [];
     this._interactiveComponentsSet = new SparseSet();
   }
 
   start(): void {
-    // async collect input events into buffer
-    // this._inputs.forEach(this.registerInputCallback);
+    this._scene.input.on("drag", (pointer: any, gameObject: any, dragX: number, dragY: number) => {
+      const entityId = gameObject._ERNEST_GAME_entityId;
+      if (isNumber(entityId)) this.spriteDragEventHandler(entityId, dragX, dragY);
+    });
   }
 
   // TODO: end goal is to generate event components ('InteractiveEvent') that correspond to the appropriate entity ??
@@ -29,9 +45,17 @@ class Interaction extends System {
     // TODO: deal with creation and removal of InteractiveEvent components
     this.engine.query(this.cleanUpInteractiveEventComponents, InteractiveEvent);
     this.createInteractiveEventComponents();
+
+    // TODO: deal with creation and removal of DragEvent components
+    this.engine.query(this.cleanUpDragEventComponents, DragEvent);
+    this.createDragEventComponents();
   }
 
   destroy(): void {}
+
+  private spriteDragEventHandler = (entityId: EntityId, dragX: any, dragY: any) => {
+    this._dragEventObjectBuffer.push({ entityId, dragX, dragY });
+  };
 
   private registerInteractiveEntityListeners = (querySet: QuerySet) => {
     const [interactive] = querySet as [Interactive];
@@ -45,7 +69,7 @@ class Interaction extends System {
 
     // We have a a valid new Interactive component, or existing one with listener changes...
     const phaserSprite = sprite.phaserSpriteRef!;
-    phaserSprite.setInteractive();
+    phaserSprite.setInteractive(); // TODO: leak? once attached this wont go away... could clean up but does it matter ??
 
     const spriteInteractionEventHandler = (type: InteractiveEventType) => {
       this._interactiveEventObjectBuffer.push({ type, entityId: interactive.id });
@@ -79,6 +103,12 @@ class Interaction extends System {
       );
     }
 
+    if (interactive.onDrag) {
+      // @ts-ignore
+      phaserSprite._ERNEST_GAME_entityId = interactive.id; // NOTE: monkey patching Phaser 3 Sprite
+      this._scene.input.setDraggable(phaserSprite, true);
+    }
+
     interactive.loaded = true;
     interactive.processed = true; // NOTE: mark scene items as processed, so disposeUnusedInteractiveComponents() leaves it alone
 
@@ -86,11 +116,13 @@ class Interaction extends System {
     this._interactiveComponentsSet.add(interactive);
   };
 
-  private deregisterInteractiveListeners = (phaserSprite: Phaser.GameObjects.Sprite) => {
+  deregisterInteractiveListeners = (phaserSprite: Phaser.GameObjects.Sprite) => {
+    // TODO: if you update this, need to update same method in Render... maybe Render should call this methods itself !!!
     phaserSprite.off(InteractiveEventType.POINTER_DOWN);
     phaserSprite.off(InteractiveEventType.POINTER_UP);
     phaserSprite.off(InteractiveEventType.POINTER_OVER);
     phaserSprite.off(InteractiveEventType.POINTER_OUT);
+    this._scene.input.setDraggable(phaserSprite, false);
   };
 
   private disposeUnusedInteractiveComponents = () => {
@@ -125,6 +157,13 @@ class Interaction extends System {
     this.engine.removeComponent(interactiveEvent);
   };
 
+  // any input events that have travelled full circle and weren't removed by any system are removed
+  private cleanUpDragEventComponents = (querySet: QuerySet) => {
+    const [dragEvent] = querySet as [DragEvent];
+
+    this.engine.removeComponent(dragEvent);
+  };
+
   // NOTE: these get attached to same entity (so only 1 exists at a time?? buggy ??)
   private createInteractiveEventComponents = () => {
     this._interactiveEventObjectBuffer.forEach(({ type, entityId }) => {
@@ -134,6 +173,18 @@ class Interaction extends System {
     });
 
     this._interactiveEventObjectBuffer = [];
+  };
+
+  // NOTE: these get attached to same entity (so only 1 exists at a time?? buggy ??)
+  private createDragEventComponents = () => {
+    this._dragEventObjectBuffer.forEach(({ entityId, dragX, dragY }) => {
+      const dragEvent = new DragEvent(entityId);
+      dragEvent.dragX = dragX;
+      dragEvent.dragY = dragY;
+      this.engine.addComponent(dragEvent);
+    });
+
+    this._dragEventObjectBuffer = [];
   };
 }
 

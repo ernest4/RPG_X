@@ -58,6 +58,8 @@ declare const enum InteractiveEventType {
 }
 type InteractiveObject = { type: InteractiveEventType; entityId: EntityId };
 
+type DraggableObject = { entityId: EntityId; dragX: number; dragY: number };
+
 type BoxColliderSize = { x: number; y: number; z: number };
 
 type URL = string;

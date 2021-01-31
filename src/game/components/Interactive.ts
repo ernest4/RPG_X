@@ -8,6 +8,7 @@ class Interactive extends Component {
   private _onPointerUp: boolean;
   private _onPointerOver: boolean;
   private _onPointerOut: boolean;
+  private _onDrag: boolean;
   processed: boolean;
 
   constructor(entityId: EntityId) {
@@ -18,6 +19,7 @@ class Interactive extends Component {
     this._onPointerUp = false;
     this._onPointerOver = false;
     this._onPointerOut = false;
+    this._onDrag = false;
   }
 
   get onPointerDown() {
@@ -54,6 +56,15 @@ class Interactive extends Component {
   set onPointerOut(value) {
     this.loaded = false; // mark as dirty and in need of re-initialization
     this._onPointerOut = value;
+  }
+
+  get onDrag() {
+    return this._onDrag;
+  }
+
+  set onDrag(value) {
+    this.loaded = false; // mark as dirty and in need of re-initialization
+    this._onDrag = value;
   }
 }
 

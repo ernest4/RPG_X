@@ -7,6 +7,8 @@ import SparseSet from "../../ecs/utils/SparseSet";
 import Sprite from "../components/Sprite";
 import Transform from "../components/Transform";
 import SceneItem from "./render/SceneItem";
+import Interaction from "./Interaction";
+import Interactive from "../components/Interactive";
 
 // NOTE: Render tends to be the heaviest system, so the code is leaning towards lots of caching and
 // inlining of variables to reduce indirection and increase speed.
@@ -132,6 +134,7 @@ class Render extends System {
     }
 
     this.deregisterInteractiveListeners(sceneItem.itemRef);
+    // this.engine.getSystem(Interactive).deregisterInteractiveListeners(sceneItem.itemRef);
     sceneItem.itemRef.destroy(); // TODO: pooling instead => active(false); visible(false); ???
     this.removeSceneItem(sceneItem.itemRef);
   };
@@ -141,6 +144,7 @@ class Render extends System {
     phaserSprite.off(InteractiveEventType.POINTER_UP);
     phaserSprite.off(InteractiveEventType.POINTER_OVER);
     phaserSprite.off(InteractiveEventType.POINTER_OUT);
+    this._scene.input.setDraggable(phaserSprite, false);
   };
 }
 
