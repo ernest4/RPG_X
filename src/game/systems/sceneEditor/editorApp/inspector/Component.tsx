@@ -15,20 +15,20 @@ const Component = ({ currentEntityComponent }: any) => {
       </div>
       <HorizontalSpace />
       <div>
-        {Object.entries(currentEntityComponent).map(([property, value]) => {
-          if (property === "_id") return <div />; // NOTE: just hiding redundant exposition of internal implementation
-          if (property === "_values") return <div />; // NOTE: just hiding redundant exposition of internal implementation
-          if (property === "loaded") return <div />; // NOTE: just hiding redundant exposition of internal implementation
-          if (property === "processed") return <div />; // NOTE: just hiding redundant exposition of internal implementation
+        {Object.entries(currentEntityComponent).map(([property, value], key) => {
+          if (property === "_id") return <div key={key} />; // NOTE: just hiding redundant exposition of internal implementation
+          if (property === "_values") return <div key={key} />; // NOTE: just hiding redundant exposition of internal implementation
+          if (property === "loaded") return <div key={key} />; // NOTE: just hiding redundant exposition of internal implementation
+          if (property === "processed") return <div key={key} />; // NOTE: just hiding redundant exposition of internal implementation
 
           return (
-            <>
+            <div key={key}>
               <HorizontalSpace />
               <div className="flex justify-between">
                 <div className="w-max">{property}</div>
                 <Value value={value} />
               </div>
-            </>
+            </div>
           );
         })}
       </div>
