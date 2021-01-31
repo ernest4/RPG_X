@@ -19,15 +19,28 @@ class SceneEditor extends System {
   }
 
   update(): void {
+    this.streamCurrentEntityComponentsFromRedux();
     // later on, should print all entities in the scene for editor to select, without just relying
     // on Sprite entities. Probably will need to Tag all entities with some recognizable name then....
     this.engine.query(this.attachInteractiveToAllSprites, Sprite);
-    this.engine.query(this.pushInteractiveEntityToRedux, InteractiveEvent); // TODO: Testing, later only 'clicked on' entity will be pushed
-    this.engine.query(this.pushDragEntityToRedux, DragEvent); // TODO: Testing, later only 'clicked on' entity will be pushed
+    this.engine.query(this.pushInteractiveEntityToRedux, InteractiveEvent);
+    this.engine.query(this.pushDragEntityToRedux, DragEvent);
     this.streamCurrentEntityComponentsToRedux();
   }
 
   destroy(): void {}
+
+  private streamCurrentEntityComponentsFromRedux = () => {
+    const currentEntityId = (store.getState().sceneEditor as any).currentEntityId;
+    if (isNumber(currentEntityId)) this.pullEntityComponentsFromRedux(currentEntityId);
+  };
+
+  // TODO: wip ....
+  private pullEntityComponentsFromRedux = (entityId: EntityId) => {
+    // const components = this.engine.getComponents(entityId);
+
+    // const currentEntityComponents = (store.getState().sceneEditor as any).currentEntityComponents;
+  };
 
   private attachInteractiveToAllSprites = (querySet: QuerySet) => {
     const [sprite] = querySet as [Sprite];

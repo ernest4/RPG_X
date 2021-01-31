@@ -1,5 +1,7 @@
 import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import HorizontalSpace from "../../HorizontalSpace";
+import * as sceneEditorActions from "../../../../store/actions/sceneEditor";
 
 const Component = ({ currentEntityComponent }: any) => {
   return (
@@ -9,7 +11,17 @@ const Component = ({ currentEntityComponent }: any) => {
         <RemoveButton />
       </div>
       <HorizontalSpace />
-      <div>{JSON.stringify({ ...currentEntityComponent })}</div>
+      {/* <div>{JSON.stringify({ ...currentEntityComponent })}</div> */}
+      <div>
+        {Object.entries(currentEntityComponent).map(([property, value]) => {
+          return (
+            <div>
+              <div>{property}</div>
+              <div>{JSON.stringify(value)}</div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
@@ -21,5 +33,16 @@ const Title = ({ title }: { title: string }) => {
 };
 
 const RemoveButton = () => {
-  return <button className="px-1 bg-red-400 rounded capitalize">remove</button>;
+  const dispatch = useDispatch();
+
+  const onRemove = () => {
+    // dispatch(sceneEditorActions.test("editor message"));
+    // TODO: push to redux new component set
+  };
+
+  return (
+    <button className="px-1 bg-red-400 rounded capitalize" onClick={onRemove}>
+      remove
+    </button>
+  );
 };
