@@ -4,11 +4,9 @@ import { EntityId, InteractiveEventType } from "../../ecs/types";
 // TODO: optimize with ArrayBuffers ??
 class InteractiveEvent extends Component {
   type!: InteractiveEventType;
-  processed: boolean;
 
   constructor(entityId: EntityId) {
     super(entityId);
-    this.processed = false;
   }
 
   get pointerDown() {

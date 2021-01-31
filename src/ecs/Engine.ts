@@ -70,6 +70,7 @@ class Engine {
 
     const oldEntityId = component.id;
     componentList.remove(component);
+    // if (isNumber(oldEntityId)) this.reclaimEntityIdIfFree(oldEntityId); // NOTE: the extra check is probs not worth it, 0 will be the only missing ID
     if (oldEntityId) this.reclaimEntityIdIfFree(oldEntityId);
   };
 

@@ -106,13 +106,13 @@ class Manager extends System {
 
       let sprite = new Sprite(entityId);
       // sprite.textureUrl = "assets/dude.png";
-      sprite.textureUrl = i % 2 ? "assets/dude.png" : "assets/turtle.jpg";
+      sprite.textureUrl = i % 2 ? "assets/turtle.jpg" : "assets/dude.png";
       sprite.frameWidth = 32;
       sprite.frameHeight = 48;
       this.engine.addComponent(sprite);
 
       this.engine.addComponent(new PhysicsBody(entityId));
-      if (i === 1) this.engine.addComponent(new Player(entityId));
+      if (i === 0) this.engine.addComponent(new Player(entityId));
 
       // if (i === 1) {
       //   const interactive = new Interactive(entityId);

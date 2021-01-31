@@ -6,6 +6,7 @@ import { EntityId, QuerySet } from "../../ecs/types";
 import InteractiveEvent from "../components/InteractiveEvent";
 import Sprite from "../components/Sprite";
 import Interactive from "../components/Interactive";
+import DragEvent from "../components/DragEvent";
 
 // TODO: to keep things sync, the SceneEditor systems pushes changes to redux and checks for changes
 // in redux store to flush buffers on entity edits / creation
@@ -20,7 +21,8 @@ class SceneEditor extends System {
     // later on, should print all entities in the scene for editor to select, without just relying
     // on Sprite entities. Probably will need to Tag all entities with some recognizable name then....
     this.engine.query(this.attachInteractiveToAllSprites, Sprite);
-    this.engine.query(this.pushEntityToRedux, InteractiveEvent); // TODO: Testing, later only 'clicked on' entity will be pushed
+    this.engine.query(this.pushInteractiveEntityToRedux, InteractiveEvent); // TODO: Testing, later only 'clicked on' entity will be pushed
+    this.engine.query(this.pushDragEntityToRedux, DragEvent); // TODO: Testing, later only 'clicked on' entity will be pushed
     this.streamCurrentEntityComponentsToRedux();
   }
 
@@ -37,6 +39,7 @@ class SceneEditor extends System {
     if (existingInteractiveComponent) {
       if (!existingInteractiveComponent.onPointerDown) {
         existingInteractiveComponent.onPointerDown = true;
+        existingInteractiveComponent.onDrag = true;
       }
       return;
     }
@@ -47,13 +50,20 @@ class SceneEditor extends System {
     this.engine.addComponent(interactive);
   };
 
-  private pushEntityToRedux = (querySet: QuerySet) => {
+  private pushInteractiveEntityToRedux = (querySet: QuerySet) => {
     const [interactiveEvent] = querySet as [InteractiveEvent];
 
     if (!interactiveEvent.pointerDown) return;
 
     store.dispatch(sceneEditorActions.setCurrentEntityId(interactiveEvent.id));
     this.pushEntityComponentsToRedux(interactiveEvent.id);
+  };
+
+  private pushDragEntityToRedux = (querySet: QuerySet) => {
+    const [dragEvent] = querySet as [DragEvent];
+
+    store.dispatch(sceneEditorActions.setCurrentEntityId(dragEvent.id));
+    this.pushEntityComponentsToRedux(dragEvent.id);
   };
 
   private pushEntityComponentsToRedux = (entityId: EntityId) => {
