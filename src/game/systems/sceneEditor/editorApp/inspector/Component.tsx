@@ -15,9 +15,9 @@ const Component = ({ currentEntityComponent }: any) => {
       <div>
         {Object.entries(currentEntityComponent).map(([property, value]) => {
           return (
-            <div>
-              <div>{property}</div>
-              <div>{JSON.stringify(value)}</div>
+            <div className="flex justify-between">
+              <div className="w-max">{property}</div>
+              <div className="w-max overflow-scroll">{JSON.stringify(value)}</div>
             </div>
           );
         })}
