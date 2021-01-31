@@ -20,6 +20,7 @@ const EditorApp = () => {
 
 export default EditorApp;
 
+const STYLE = { height: "100vh" };
 const Inspector = () => {
   const dispatch = useDispatch();
   const test = useSelector((state: any) => state.sceneEditor.test);
@@ -31,7 +32,8 @@ const Inspector = () => {
   return (
     <div
       onClick={() => dispatch(sceneEditorActions.test("editor message"))}
-      className="fixed top-0 right-0 bg-gray-600 flex flex-col w-96"
+      className="fixed top-0 right-0 bg-gray-600 flex flex-col w-96 overflow-y-scroll"
+      style={STYLE}
     >
       <Container>Entity Id: {currentEntityId}</Container>
       {currentEntityComponents.map((currentEntityComponent: any, key: number) => {
@@ -39,14 +41,12 @@ const Inspector = () => {
           <div key={key}>
             <HorizontalSpace />
             <Container>
-              {JSON.stringify({
-                component: currentEntityComponent.name,
-                ...currentEntityComponent,
-              })}
+              <Component {...{ currentEntityComponent }} />
             </Container>
           </div>
         );
       })}
+      <HorizontalSpace />
     </div>
   );
 };
@@ -55,4 +55,29 @@ const HorizontalSpace = () => <div className="pt-4" />;
 
 const Container = ({ children }: any) => {
   return <div {...{ className: "p-4 bg-gray-500 text-white rounded", children }} />;
+};
+
+const Component = ({ currentEntityComponent }: any) => {
+  return (
+    <div>
+      <div className="flex justify-between">
+        <Title title={currentEntityComponent.constructor.name} />
+        <RemoveButton />
+      </div>
+      <HorizontalSpace />
+      <div>
+        {JSON.stringify({
+          ...currentEntityComponent,
+        })}
+      </div>
+    </div>
+  );
+};
+
+const Title = ({ title }: { title: string }) => {
+  return <div className="font-bold">{title}</div>;
+};
+
+const RemoveButton = () => {
+  return <button className="px-1 bg-red-400 rounded capitalize">remove</button>;
 };
