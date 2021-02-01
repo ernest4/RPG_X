@@ -6,7 +6,7 @@ const initialState = {
   test: "",
   currentEntityId: null,
   currentEntityComponents: [],
-  currentEntityComponentsUpdateList: [],
+  currentEntityComponentsUpdateHash: {},
   currentEntityComponentsAddList: [],
   currentEntityComponentsRemoveList: [],
   availableComponentsList: [],
@@ -32,8 +32,8 @@ const sceneEditorReducer = handleActions(
     SET_CURRENT_ENTITY_COMPONENTS: produce((state, action) => {
       state.currentEntityComponents = action.payload;
     }),
-    SET_CURRENT_ENTITY_COMPONENTS_UPDATE_LIST: produce((state, action) => {
-      state.currentEntityComponentsUpdateList = action.payload;
+    SET_CURRENT_ENTITY_COMPONENTS_UPDATE_HASH: produce((state, action) => {
+      state.currentEntityComponentsUpdateHash = action.payload;
     }),
     SET_CURRENT_ENTITY_COMPONENTS_ADD_LIST: produce((state, action) => {
       state.currentEntityComponentsAddList = action.payload;

@@ -26,7 +26,9 @@ const Component = ({ currentEntityComponent }: any) => {
               <HorizontalSpace />
               <div className="flex justify-between">
                 <div className="w-max">{property}</div>
-                <Value value={value} />
+                <Value
+                  {...{ componentName: currentEntityComponent.constructor.name, property, value }}
+                />
               </div>
             </div>
           );

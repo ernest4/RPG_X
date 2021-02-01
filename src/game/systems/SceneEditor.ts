@@ -68,21 +68,29 @@ class SceneEditor extends System {
     store.dispatch(sceneEditorActions.setCurrentEntityComponentsAddList([]));
   };
 
-  // TODO: wip ...
   private processUpdateList = (entityId: EntityId) => {
     const sceneEditorStore = store.getState().sceneEditor as any;
-    const components = this.engine.getComponents(entityId);
-    const currentEntityComponentsUpdateList = sceneEditorStore.currentEntityComponentsUpdateList;
+    const currentEntityComponentsUpdateHash = sceneEditorStore.currentEntityComponentsUpdateHash;
 
-    if (currentEntityComponentsUpdateList?.length === 0) return;
+    if (!currentEntityComponentsUpdateHash) return;
 
-    // currentEntityComponentsUpdateList.forEach((componentToAddName: string) => {
-    //   if (components.some(({ constructor: { name } }) => componentToAddName === name)) return;
+    Object.entries(currentEntityComponentsUpdateHash).forEach(
+      ([componentName, componentProperties]: [string, any]) => {
+        const componentClass = (availableComponents as any)[componentName];
+        const component = this.engine.getComponent(componentClass, entityId);
 
-    //   this.engine.addComponent(new (availableComponents as any)[componentToAddName](entityId));
-    // });
+        if (!component) return;
 
-    store.dispatch(sceneEditorActions.setCurrentEntityComponentsUpdateList([]));
+        Object.entries(componentProperties).forEach(([property, value]: [string, any]) => {
+          if (property.indexOf(".") === -1) return ((component as any)[property] = value);
+
+          const [propertyVector, propertyVectorAxis] = property.split(".");
+          (component as any)[propertyVector][propertyVectorAxis] = value;
+        });
+      }
+    );
+
+    store.dispatch(sceneEditorActions.setCurrentEntityComponentsUpdateHash({}));
   };
 
   private processRemoveList = (entityId: EntityId) => {

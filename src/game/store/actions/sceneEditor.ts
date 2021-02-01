@@ -4,8 +4,8 @@ export const test = createAction("TEST");
 export const setCurrentEntityId = createAction("SET_CURRENT_ENTITY_ID");
 export const setCurrentEntityComponents = createAction("SET_CURRENT_ENTITY_COMPONENTS");
 
-export const setCurrentEntityComponentsUpdateList = createAction(
-  "SET_CURRENT_ENTITY_COMPONENTS_UPDATE_LIST"
+export const setCurrentEntityComponentsUpdateHash = createAction(
+  "SET_CURRENT_ENTITY_COMPONENTS_UPDATE_HASH"
 );
 export const setCurrentEntityComponentsAddList = createAction(
   "SET_CURRENT_ENTITY_COMPONENTS_ADD_LIST"
