@@ -117,10 +117,6 @@ class Render extends System {
     return sceneItem;
   };
 
-  private removeSceneItem = (component: Component) => {
-    this._sceneItemsSet.remove(component.id);
-  };
-
   private disposeUnusedSceneItems = () => {
     this._sceneItemsSet.stream((sceneItem: SceneItem<any>) =>
       this.disposeUnusedSceneItem(sceneItem)
@@ -136,7 +132,11 @@ class Render extends System {
     this.deregisterInteractiveListeners(sceneItem.itemRef);
     // this.engine.getSystem(Interactive).deregisterInteractiveListeners(sceneItem.itemRef);
     sceneItem.itemRef.destroy(); // TODO: pooling instead => active(false); visible(false); ???
-    this.removeSceneItem(sceneItem.itemRef);
+    this.removeSceneItem(sceneItem);
+  };
+
+  private removeSceneItem = (sceneItem: SceneItem<any>) => {
+    this._sceneItemsSet.remove(sceneItem.id);
   };
 
   private deregisterInteractiveListeners = (phaserSprite: Phaser.GameObjects.Sprite) => {
