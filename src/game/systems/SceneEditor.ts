@@ -45,21 +45,16 @@ class SceneEditor extends System {
     if (isNumber(currentEntityId)) this.pullEntityComponentsFromRedux(currentEntityId);
   };
 
-  // TODO: wip ....
   private pullEntityComponentsFromRedux = (entityId: EntityId) => {
-    // const currentEntityComponents = (store.getState().sceneEditor as any).currentEntityComponents;
-
     // NOTE: call order is important here !!
     this.processAddList(entityId);
-    // this.processUpdateList(entityId); // TODO: ...
+    this.processUpdateList(entityId);
     this.processRemoveList(entityId);
   };
 
   private processAddList = (entityId: EntityId) => {
     const sceneEditorStore = store.getState().sceneEditor as any;
-
     const components = this.engine.getComponents(entityId);
-
     const currentEntityComponentsAddList = sceneEditorStore.currentEntityComponentsAddList;
 
     if (currentEntityComponentsAddList?.length === 0) return;
@@ -73,11 +68,26 @@ class SceneEditor extends System {
     store.dispatch(sceneEditorActions.setCurrentEntityComponentsAddList([]));
   };
 
+  // TODO: wip ...
+  private processUpdateList = (entityId: EntityId) => {
+    const sceneEditorStore = store.getState().sceneEditor as any;
+    const components = this.engine.getComponents(entityId);
+    const currentEntityComponentsUpdateList = sceneEditorStore.currentEntityComponentsUpdateList;
+
+    if (currentEntityComponentsUpdateList?.length === 0) return;
+
+    // currentEntityComponentsUpdateList.forEach((componentToAddName: string) => {
+    //   if (components.some(({ constructor: { name } }) => componentToAddName === name)) return;
+
+    //   this.engine.addComponent(new (availableComponents as any)[componentToAddName](entityId));
+    // });
+
+    store.dispatch(sceneEditorActions.setCurrentEntityComponentsUpdateList([]));
+  };
+
   private processRemoveList = (entityId: EntityId) => {
     const sceneEditorStore = store.getState().sceneEditor as any;
-
     const components = this.engine.getComponents(entityId);
-
     const currentEntityComponentsRemoveList = sceneEditorStore.currentEntityComponentsRemoveList;
 
     if (currentEntityComponentsRemoveList?.length === 0) return;
