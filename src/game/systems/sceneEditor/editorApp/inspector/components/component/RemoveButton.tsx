@@ -1,14 +1,25 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import HorizontalSpace from "../../../../HorizontalSpace";
 import * as sceneEditorActions from "../../../../../../store/actions/sceneEditor";
 
-const RemoveButton = () => {
+const RemoveButton = ({ component }: any) => {
   const dispatch = useDispatch();
 
-  const onRemove = () => {
-    // dispatch(sceneEditorActions.test("editor message"));
-    // TODO: push to redux new component set
+  const componentsRemoveList = useSelector(
+    (state: any) => state.sceneEditor.currentEntityComponentsRemoveList
+  );
+
+  const onRemove = (event: any) => {
+    // console.log(component.constructor.name);
+
+    if (!componentsRemoveList) return;
+
+    const componentToRemoveName = component.constructor.name;
+    if (componentsRemoveList.some((component: string) => component === componentToRemoveName))
+      return;
+
+    const newComponentsRemoveList = componentsRemoveList.push(componentToRemoveName);
+    dispatch(sceneEditorActions.setCurrentEntityComponentsRemoveList(newComponentsRemoveList));
   };
 
   return (

@@ -6,7 +6,9 @@ const initialState = {
   test: "",
   currentEntityId: null,
   currentEntityComponents: [],
-  newCurrentEntityComponents: [],
+  currentEntityComponentsUpdateList: [],
+  currentEntityComponentsAddList: [],
+  currentEntityComponentsRemoveList: [],
   availableComponents: [],
   // cameraPosition: { x: 0, y: 0 },
   cameraPosition: null,
@@ -30,8 +32,14 @@ const sceneEditorReducer = handleActions(
     SET_CURRENT_ENTITY_COMPONENTS: produce((state, action) => {
       state.currentEntityComponents = action.payload;
     }),
-    SET_NEW_CURRENT_ENTITY_COMPONENTS: produce((state, action) => {
-      state.currentEntityComponents = action.payload;
+    SET_CURRENT_ENTITY_COMPONENTS_UPDATE_LIST: produce((state, action) => {
+      state.currentEntityComponentsUpdateList = action.payload;
+    }),
+    SET_CURRENT_ENTITY_COMPONENTS_ADD_LIST: produce((state, action) => {
+      state.currentEntityComponentsAddList = action.payload;
+    }),
+    SET_CURRENT_ENTITY_COMPONENTS_REMOVE_LIST: produce((state, action) => {
+      state.currentEntityComponentsRemoveList = action.payload;
     }),
   },
   initialState

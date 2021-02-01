@@ -73,6 +73,11 @@ class Engine {
     if (isNumber(oldEntityId)) this.reclaimEntityIdIfFree(oldEntityId);
   };
 
+  // TODO: testing !!!
+  removeComponents = (components: Component[]) => {
+    components.forEach((component: Component) => this.removeComponent(component));
+  };
+
   removeComponentById = (componentClass: ComponentClass, entityId: EntityId) => {
     const componentList = this._componentLists[componentClass.name];
     if (!componentList) return;

@@ -8,6 +8,7 @@ import Sprite from "../components/Sprite";
 import Interactive from "../components/Interactive";
 import DragEvent from "../components/DragEvent";
 import { isNumber } from "../../ecs/utils/Number";
+import Component from "../../ecs/Component";
 
 // TODO: to keep things sync, the SceneEditor systems pushes changes to redux and checks for changes
 // in redux store to flush buffers on entity edits / creation
@@ -37,9 +38,36 @@ class SceneEditor extends System {
 
   // TODO: wip ....
   private pullEntityComponentsFromRedux = (entityId: EntityId) => {
-    // const components = this.engine.getComponents(entityId);
-
     // const currentEntityComponents = (store.getState().sceneEditor as any).currentEntityComponents;
+
+    // NOTE: call order is important here !!
+    // this.processAddList(entityId); // TODO: ...
+    // this.processUpdateList(entityId); // TODO: ...
+    this.processRemoveList(entityId);
+  };
+
+  private processRemoveList = (entityId: EntityId) => {
+    const sceneEditorStore = store.getState().sceneEditor as any;
+
+    const components = this.engine.getComponents(entityId);
+
+    const currentEntityComponentsRemoveList = sceneEditorStore.currentEntityComponentsRemoveList;
+
+    if (currentEntityComponentsRemoveList?.length === 0) return;
+
+    // @ts-ignore
+    components.forEach((component: Component) => {
+      if (
+        !currentEntityComponentsRemoveList.some(
+          (componentToRemove: string) => componentToRemove === component.constructor.name
+        )
+      )
+        return;
+
+      this.engine.removeComponent(component);
+    });
+
+    store.dispatch(sceneEditorActions.setCurrentEntityComponentsRemoveList([]));
   };
 
   private attachInteractiveToAllSprites = (querySet: QuerySet) => {

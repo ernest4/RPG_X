@@ -11,7 +11,7 @@ const Component = ({ currentEntityComponent }: any) => {
     <div>
       <div className="flex justify-between pb-4 border-b-2">
         <Title title={currentEntityComponent.constructor.name} />
-        <RemoveButton />
+        <RemoveButton component={currentEntityComponent} />
       </div>
       <HorizontalSpace />
       <div>
