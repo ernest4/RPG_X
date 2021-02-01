@@ -9,14 +9,23 @@ import Interactive from "../components/Interactive";
 import DragEvent from "../components/DragEvent";
 import { isNumber } from "../../ecs/utils/Number";
 import Component from "../../ecs/Component";
+import * as availableComponents from "../components";
 
-// TODO: to keep things sync, the SceneEditor systems pushes changes to redux and checks for changes
-// in redux store to flush buffers on entity edits / creation
+const NON_EDITOR_COMPONENTS = [DragEvent, InputEvent, InteractiveEvent].map(({ name }) => name);
+
 class SceneEditor extends System {
   start(): void {
     initSceneEditor();
 
-    store.dispatch(sceneEditorActions.test("game message"));
+    const permittedEditorComponents = Object.keys(availableComponents).filter(
+      availableComponentName => {
+        return !NON_EDITOR_COMPONENTS.some(
+          nonEditorComponentName => nonEditorComponentName === availableComponentName
+        );
+      }
+    );
+
+    store.dispatch(sceneEditorActions.setAvailableComponentsList(permittedEditorComponents));
   }
 
   update(): void {
@@ -55,7 +64,6 @@ class SceneEditor extends System {
 
     if (currentEntityComponentsRemoveList?.length === 0) return;
 
-    // @ts-ignore
     components.forEach((component: Component) => {
       if (
         !currentEntityComponentsRemoveList.some(

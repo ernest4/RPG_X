@@ -93,7 +93,7 @@ class Engine {
   getComponents = (entityId: EntityId) => {
     return Object.values(this._componentLists)
       .map(componentList => componentList.get(entityId))
-      .filter(component => component);
+      .filter(component => component) as Component[];
   };
 
   // createEntity = (): Entity => {
