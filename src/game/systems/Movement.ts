@@ -9,18 +9,14 @@ class Movement extends System {
     super(engine);
   }
 
-  start(): void {
-    // throw new Error("Method not implemented.");
-  }
+  start(): void {}
 
   update(): void {
     // apply PhysicsBody to transform
     this.engine.query(this.updateTransforms, Transform, PhysicsBody);
   }
 
-  destroy(): void {
-    // throw new Error("Method not implemented.");
-  }
+  destroy(): void {}
 
   private updateTransforms = (querySet: QuerySet) => {
     const [transform, physicsBody] = querySet as [Transform, PhysicsBody];
@@ -31,6 +27,7 @@ class Movement extends System {
     transform.position.y += physicsBody.linearVelocity.y * seconds;
 
     transform.rotation.z += physicsBody.angularVelocity.z * seconds;
+    if (360 < transform.rotation.z) transform.rotation.z = transform.rotation.z - 360;
   };
 }
 
