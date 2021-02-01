@@ -40,7 +40,7 @@ export default class Main extends Scene {
     this._engine.addSystem(new Movement(this._engine));
     // this._engine.addSystem(new Animation(this._engine)); // will hook into state of the entity (animation state machine)
     // this._engine.addSystem(new Collision(this._engine));
-    this._engine.addSystem(new Render(this._engine, this));
+    this._engine.addSystem(new Render(this._engine, this)); // shadows will be handled under sprite? or should it be separate system...? 
     // analysis -> print how long each system is taking / where is the bottleneck?
 
     // TODO: move to camera component

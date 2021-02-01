@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import HorizontalSpace from "../../HorizontalSpace";
-import * as sceneEditorActions from "../../../../store/actions/sceneEditor";
+import HorizontalSpace from "../../../HorizontalSpace";
+import * as sceneEditorActions from "../../../../../store/actions/sceneEditor";
 import RemoveButton from "./component/RemoveButton";
 import Title from "./component/Title";
 import Value from "./component/Value";

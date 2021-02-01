@@ -1,13 +1,15 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import HorizontalSpace from "../../../HorizontalSpace";
-import * as sceneEditorActions from "../../../../../store/actions/sceneEditor";
+import HorizontalSpace from "../../../../HorizontalSpace";
+import * as sceneEditorActions from "../../../../../../store/actions/sceneEditor";
 
 const Value = ({ value }: any) => {
   return <div className="w-max overflow-scroll">{getValueEditor(value)}</div>;
 };
 
 export default Value;
+
+// TODO: figure out how to push changes to redux and sync them to game...
 
 const getValueEditor = (value: any) => {
   if (value._values) return VectorEditor(value);

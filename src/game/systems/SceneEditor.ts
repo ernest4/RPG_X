@@ -19,7 +19,7 @@ class SceneEditor extends System {
   }
 
   update(): void {
-    this.streamCurrentEntityComponentsFromRedux();
+    this.pullCurrentEntityComponentsFromRedux();
     // later on, should print all entities in the scene for editor to select, without just relying
     // on Sprite entities. Probably will need to Tag all entities with some recognizable name then....
     this.engine.query(this.attachInteractiveToAllSprites, Sprite);
@@ -30,7 +30,7 @@ class SceneEditor extends System {
 
   destroy(): void {}
 
-  private streamCurrentEntityComponentsFromRedux = () => {
+  private pullCurrentEntityComponentsFromRedux = () => {
     const currentEntityId = (store.getState().sceneEditor as any).currentEntityId;
     if (isNumber(currentEntityId)) this.pullEntityComponentsFromRedux(currentEntityId);
   };
