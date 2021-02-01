@@ -9,9 +9,9 @@ const AddComponentButton = () => {
 
   const currentEntityId = useSelector((state: any) => state.sceneEditor.currentEntityId);
 
-  // const componentsRemoveList = useSelector(
-  //   (state: any) => state.sceneEditor.currentEntityComponentsRemoveList
-  // );
+  const componentsAddList = useSelector(
+    (state: any) => state.sceneEditor.currentEntityComponentsAddList
+  );
 
   const availableComponentsList = useSelector(
     (state: any) => state.sceneEditor.availableComponentsList
@@ -30,34 +30,14 @@ const AddComponentButton = () => {
     }
   );
 
-  // TODO: diff between current entity components and available to only offer components entity doesnt already have
-  // const availableComponents = ["Transform", "Sprite"]; // TODO: testing placeholder, this will hold component class names (or classes?)
-  // const availableComponents = Object.keys(availableComponentsHash);
-
-  // const onRemove = (event: any) => {
-  //   if (!componentsRemoveList) return;
-
-  //   const componentToRemoveName = component.constructor.name;
-  //   if (componentsRemoveList.some((component: string) => component === componentToRemoveName))
-  //     return;
-
-  //   dispatch(
-  //     sceneEditorActions.setCurrentEntityComponentsRemoveList([
-  //       ...componentsRemoveList,
-  //       componentToRemoveName,
-  //     ])
-  //   );
-  // };
-
   const onChange = (event: any) => {
-    console.log(event.target); // WIP
-    console.log(event.target.value); // WIP
+    if (!componentsAddList) return;
 
-    // register component class with values to a buffer, game engine will pull that in and initialize the classes.
-
-    // or
-
-    // could just initialize yourself. you have the entityId which wont change since you're added components to same entity...
+    dispatch(
+      sceneEditorActions.setCurrentEntityComponentsAddList([
+        ...new Set([...componentsAddList, event.target.value]), // NOTE: Set is for easy way to get unique values
+      ])
+    );
   };
 
   if (!isNumber(currentEntityId)) return <div />;

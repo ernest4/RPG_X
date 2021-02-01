@@ -50,9 +50,27 @@ class SceneEditor extends System {
     // const currentEntityComponents = (store.getState().sceneEditor as any).currentEntityComponents;
 
     // NOTE: call order is important here !!
-    // this.processAddList(entityId); // TODO: ...
+    this.processAddList(entityId);
     // this.processUpdateList(entityId); // TODO: ...
     this.processRemoveList(entityId);
+  };
+
+  private processAddList = (entityId: EntityId) => {
+    const sceneEditorStore = store.getState().sceneEditor as any;
+
+    const components = this.engine.getComponents(entityId);
+
+    const currentEntityComponentsAddList = sceneEditorStore.currentEntityComponentsAddList;
+
+    if (currentEntityComponentsAddList?.length === 0) return;
+
+    currentEntityComponentsAddList.forEach((componentToAddName: string) => {
+      if (components.some(({ constructor: { name } }) => componentToAddName === name)) return;
+
+      this.engine.addComponent(new (availableComponents as any)[componentToAddName](entityId));
+    });
+
+    store.dispatch(sceneEditorActions.setCurrentEntityComponentsAddList([]));
   };
 
   private processRemoveList = (entityId: EntityId) => {

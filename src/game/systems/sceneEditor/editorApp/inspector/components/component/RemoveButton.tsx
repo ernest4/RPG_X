@@ -12,14 +12,9 @@ const RemoveButton = ({ component }: any) => {
   const onRemove = (event: any) => {
     if (!componentsRemoveList) return;
 
-    const componentToRemoveName = component.constructor.name;
-    if (componentsRemoveList.some((component: string) => component === componentToRemoveName))
-      return;
-
     dispatch(
       sceneEditorActions.setCurrentEntityComponentsRemoveList([
-        ...componentsRemoveList,
-        componentToRemoveName,
+        ...new Set([...componentsRemoveList, component.constructor.name]), // NOTE: Set is for easy way to get unique values
       ])
     );
   };
