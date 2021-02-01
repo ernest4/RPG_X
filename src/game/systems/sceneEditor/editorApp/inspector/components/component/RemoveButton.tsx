@@ -10,16 +10,18 @@ const RemoveButton = ({ component }: any) => {
   );
 
   const onRemove = (event: any) => {
-    // console.log(component.constructor.name);
-
     if (!componentsRemoveList) return;
 
     const componentToRemoveName = component.constructor.name;
     if (componentsRemoveList.some((component: string) => component === componentToRemoveName))
       return;
 
-    const newComponentsRemoveList = componentsRemoveList.push(componentToRemoveName);
-    dispatch(sceneEditorActions.setCurrentEntityComponentsRemoveList(newComponentsRemoveList));
+    dispatch(
+      sceneEditorActions.setCurrentEntityComponentsRemoveList([
+        ...componentsRemoveList,
+        componentToRemoveName,
+      ])
+    );
   };
 
   return (

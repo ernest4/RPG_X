@@ -59,7 +59,7 @@ class SceneEditor extends System {
     components.forEach((component: Component) => {
       if (
         !currentEntityComponentsRemoveList.some(
-          (componentToRemove: string) => componentToRemove === component.constructor.name
+          (componentToRemoveName: string) => componentToRemoveName === component.constructor.name
         )
       )
         return;
