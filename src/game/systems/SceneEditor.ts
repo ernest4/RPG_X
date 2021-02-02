@@ -7,6 +7,7 @@ import InteractiveEvent from "../components/InteractiveEvent";
 import Sprite from "../components/Sprite";
 import Interactive from "../components/Interactive";
 import DragEvent from "../components/DragEvent";
+import Transform from "../components/Transform";
 import { isNumber } from "../../ecs/utils/Number";
 import Component from "../../ecs/Component";
 import * as availableComponents from "../components";
@@ -48,9 +49,17 @@ class SceneEditor extends System {
     if (!createEntity) return;
 
     const entityId = this.engine.generateEntityId();
+
+    let transform = new Transform(entityId);
+    // transform.position.x = ...; // TODO: set to camera position ??
+    // transform.position.y = ...;
+    transform.scale.x = 1;
+    transform.scale.y = 1;
+    this.engine.addComponent(transform);
+
     store.dispatch(sceneEditorActions.setCreateEntity(false));
     store.dispatch(sceneEditorActions.setCurrentEntityId(entityId));
-    store.dispatch(sceneEditorActions.setCurrentEntityComponents([]));
+    store.dispatch(sceneEditorActions.setCurrentEntityComponents([transform]));
   };
 
   private removeCurrentEntity = () => {

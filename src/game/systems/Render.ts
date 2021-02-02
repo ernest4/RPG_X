@@ -7,8 +7,6 @@ import SparseSet from "../../ecs/utils/SparseSet";
 import Sprite from "../components/Sprite";
 import Transform from "../components/Transform";
 import SceneItem from "./render/SceneItem";
-import Interaction from "./Interaction";
-import Interactive from "../components/Interactive";
 
 const PERMITTED_IMAGE_FILE_TYPES = ["png", "jpg"];
 
@@ -107,22 +105,27 @@ class Render extends System {
   };
 
   private loadSprite = (sprite: Sprite) => {
+    this.disposeIfPreviouslyLoaded(sprite);
+
     const { textureUrl, frameWidth, frameHeight } = sprite;
 
     if (!this._textureLoadLists[textureUrl]) {
       // First instance, initiate texture load once !!
       this._textureLoadLists[textureUrl] = new SparseSet();
-      this._textureLoadLists[textureUrl].add(sprite); // Add first sprite to initialize when ready
 
       // add load task
       this._scene.load.spritesheet(textureUrl, textureUrl, { frameWidth, frameHeight });
       // start loading (can call this over and over, even when already loading...no harm)
       this._scene.load.start();
-      return;
     }
 
     // NOTE: sparse sets prevent duplication by default, so safe to add over and over
     this._textureLoadLists[textureUrl].add(sprite);
+  };
+
+  private disposeIfPreviouslyLoaded = (sprite: Sprite) => {
+    const phaserSpriteSceneItem = this.getSceneItem<Phaser.GameObjects.Sprite>(sprite);
+    if (phaserSpriteSceneItem) this.disposeUnusedSceneItem(phaserSpriteSceneItem);
   };
 
   private getSceneItem = <T>(component: Component): SceneItem<T> | null => {
