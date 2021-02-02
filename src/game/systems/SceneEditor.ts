@@ -29,7 +29,7 @@ class SceneEditor extends System {
   }
 
   update(): void {
-    // this.createNewEntity(); // TODO: ...
+    this.createEntity();
     this.removeCurrentEntity();
     this.pullCurrentEntityComponentsFromRedux();
     // later on, should print all entities in the scene for editor to select, without just relying
@@ -41,6 +41,18 @@ class SceneEditor extends System {
   }
 
   destroy(): void {}
+
+  private createEntity = () => {
+    const createEntity = (store.getState().sceneEditor as any).createEntity;
+
+    if (!createEntity) return;
+
+    // TODO: preload some default components here (transform) ??
+    const entityId = this.engine.generateEntityId();
+    store.dispatch(sceneEditorActions.setCreateEntity(false));
+    store.dispatch(sceneEditorActions.setCurrentEntityId(entityId));
+    store.dispatch(sceneEditorActions.setCurrentEntityComponents([]));
+  };
 
   private removeCurrentEntity = () => {
     const currentEntityId = (store.getState().sceneEditor as any).currentEntityId;

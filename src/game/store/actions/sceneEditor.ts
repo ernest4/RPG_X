@@ -15,3 +15,4 @@ export const setCurrentEntityComponentsRemoveList = createAction(
 );
 export const setAvailableComponentsList = createAction("SET_AVAILABLE_COMPONENTS_LIST");
 export const setRemoveEntity = createAction("SET_REMOVE_ENTITY");
+export const setCreateEntity = createAction("SET_CREATE_ENTITY");

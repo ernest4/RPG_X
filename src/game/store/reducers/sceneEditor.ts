@@ -11,6 +11,7 @@ const initialState = {
   currentEntityComponentsRemoveList: [],
   availableComponentsList: [],
   removeEntity: false,
+  createEntity: false,
   entities: [],
 };
 
@@ -45,6 +46,9 @@ const sceneEditorReducer = handleActions(
     }),
     SET_REMOVE_ENTITY: produce((state, action) => {
       state.removeEntity = action.payload;
+    }),
+    SET_CREATE_ENTITY: produce((state, action) => {
+      state.createEntity = action.payload;
     }),
   },
   initialState
