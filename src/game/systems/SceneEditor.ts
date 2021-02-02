@@ -32,6 +32,7 @@ class SceneEditor extends System {
   update(): void {
     this.createEntity();
     this.removeCurrentEntity();
+    this.cloneEntity();
     this.pullCurrentEntityComponentsFromRedux();
     // later on, should print all entities in the scene for editor to select, without just relying
     // on Sprite entities. Probably will need to Tag all entities with some recognizable name then....
@@ -72,6 +73,45 @@ class SceneEditor extends System {
     store.dispatch(sceneEditorActions.setRemoveEntity(false));
     store.dispatch(sceneEditorActions.setCurrentEntityId(null));
     store.dispatch(sceneEditorActions.setCurrentEntityComponents([]));
+  };
+
+  private cloneEntity = () => {
+    const originalEntityId = (store.getState().sceneEditor as any).currentEntityId;
+    const cloneEntity = (store.getState().sceneEditor as any).cloneEntity;
+
+    if (!cloneEntity) return;
+
+    const originalEntityComponents = this.engine.getComponents(originalEntityId);
+
+    const entityId = this.engine.generateEntityId();
+
+    originalEntityComponents.forEach((component: Component) => {
+      const clonedComponent = new (availableComponents as any)[component.constructor.name](
+        entityId
+      );
+
+      Object.entries(component).forEach(([property, value]) => {
+        if (property === "_id") return;
+        if (property === "_values") return;
+        if (property === "loaded") return;
+        if (property === "processed") return;
+
+        if (value?.constructor?.name !== "Vector3BufferView") {
+          return (clonedComponent[property] = value);
+        }
+
+        clonedComponent[property].x = value.x;
+        clonedComponent[property].y = value.y;
+        clonedComponent[property].z = value.z;
+      });
+
+      this.engine.addComponent(clonedComponent);
+    });
+
+    store.dispatch(sceneEditorActions.setCloneEntity(false));
+    store.dispatch(sceneEditorActions.setCurrentEntityId(entityId));
+    const components = this.engine.getComponents(entityId);
+    store.dispatch(sceneEditorActions.setCurrentEntityComponents([components]));
   };
 
   private pullCurrentEntityComponentsFromRedux = () => {

@@ -95,24 +95,24 @@ class Manager extends System {
       let y = 300;
 
       // TODO: finish the Entity abstraction in ECS
-      let entityId = this.engine.generateEntityId();
+      // let entityId = this.engine.generateEntityId();
 
-      let transform = new Transform(entityId);
-      transform.position.x = x;
-      transform.position.y = 200;
-      transform.scale.x = 1;
-      transform.scale.y = 1;
-      this.engine.addComponent(transform);
+      // let transform = new Transform(entityId);
+      // transform.position.x = x;
+      // transform.position.y = 200;
+      // transform.scale.x = 1;
+      // transform.scale.y = 1;
+      // this.engine.addComponent(transform);
 
-      let sprite = new Sprite(entityId);
-      // sprite.textureUrl = "assets/dude.png";
-      sprite.textureUrl = i % 2 ? "assets/turtle.jpg" : "assets/dude.png";
-      sprite.frameWidth = 32;
-      sprite.frameHeight = 48;
-      this.engine.addComponent(sprite);
+      // let sprite = new Sprite(entityId);
+      // // sprite.textureUrl = "assets/dude.png";
+      // sprite.textureUrl = i % 2 ? "assets/turtle.jpg" : "assets/dude.png";
+      // sprite.frameWidth = 32;
+      // sprite.frameHeight = 48;
+      // this.engine.addComponent(sprite);
 
-      this.engine.addComponent(new PhysicsBody(entityId));
-      if (i === 0) this.engine.addComponent(new Player(entityId));
+      // this.engine.addComponent(new PhysicsBody(entityId));
+      // if (i === 0) this.engine.addComponent(new Player(entityId));
 
       // if (i === 1) {
       //   const interactive = new Interactive(entityId);
@@ -161,13 +161,9 @@ class Manager extends System {
     }
   }
 
-  update(): void {
-    // throw new Error("Method not implemented.");
-  }
+  update(): void {}
 
-  destroy(): void {
-    // throw new Error("Method not implemented.");
-  }
+  destroy(): void {}
 }
 
 export default Manager;

@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import Container from "../Container";
 import HorizontalSpace from "../HorizontalSpace";
 import AddComponentButton from "./inspector/AddComponentButton";
+import CloneEntityButton from "./inspector/CloneEntityButton";
 import Components from "./inspector/Components";
 import CreateEntityButton from "./inspector/CreateEntityButton";
 import RemoveEntityButton from "./inspector/RemoveEntityButton";
@@ -21,6 +22,7 @@ const Inspector = () => {
       <div className="p-4 bg-gray-500 text-white rounded sticky top-0 border-b-2">
         <div className="flex justify-between">
           <div>Entity Id: {currentEntityId}</div>
+          <CloneEntityButton />
           <RemoveEntityButton />
         </div>
       </div>

@@ -12,6 +12,7 @@ const initialState = {
   availableComponentsList: [],
   removeEntity: false,
   createEntity: false,
+  cloneEntity: false,
   entities: [],
 };
 
@@ -49,6 +50,9 @@ const sceneEditorReducer = handleActions(
     }),
     SET_CREATE_ENTITY: produce((state, action) => {
       state.createEntity = action.payload;
+    }),
+    SET_CLONE_ENTITY: produce((state, action) => {
+      state.cloneEntity = action.payload;
     }),
   },
   initialState
