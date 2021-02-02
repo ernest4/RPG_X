@@ -10,8 +10,7 @@ const initialState = {
   currentEntityComponentsAddList: [],
   currentEntityComponentsRemoveList: [],
   availableComponentsList: [],
-  // cameraPosition: { x: 0, y: 0 },
-  cameraPosition: null,
+  removeEntity: false,
   entities: [],
 };
 
@@ -43,6 +42,9 @@ const sceneEditorReducer = handleActions(
     }),
     SET_AVAILABLE_COMPONENTS_LIST: produce((state, action) => {
       state.availableComponentsList = action.payload;
+    }),
+    SET_REMOVE_ENTITY: produce((state, action) => {
+      state.removeEntity = action.payload;
     }),
   },
   initialState
