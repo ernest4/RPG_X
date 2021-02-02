@@ -10,6 +10,8 @@ import SceneItem from "./render/SceneItem";
 import Interaction from "./Interaction";
 import Interactive from "../components/Interactive";
 
+const PERMITTED_IMAGE_FILE_TYPES = ["png", "jpg"];
+
 // NOTE: Render tends to be the heaviest system, so the code is leaning towards lots of caching and
 // inlining of variables to reduce indirection and increase speed.
 class Render extends System {
@@ -66,7 +68,23 @@ class Render extends System {
   private updateSprites = (querySet: QuerySet) => {
     const [transform, sprite] = querySet as [Transform, Sprite];
 
+    if (!this.spriteReady(sprite)) return;
+
     sprite.loaded ? this.updateSprite(sprite, transform) : this.loadSprite(sprite);
+  };
+
+  private spriteReady = (sprite: Sprite) => {
+    if (
+      !PERMITTED_IMAGE_FILE_TYPES.some(imageFileType =>
+        sprite.textureUrl.includes(`.${imageFileType}`)
+      )
+    )
+      return false;
+
+    if (sprite.frameWidth <= 0) return false;
+    if (sprite.frameHeight <= 0) return false;
+
+    return true;
   };
 
   private updateSprite = (sprite: Sprite, transform: Transform) => {

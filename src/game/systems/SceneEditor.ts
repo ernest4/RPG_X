@@ -47,7 +47,6 @@ class SceneEditor extends System {
 
     if (!createEntity) return;
 
-    // TODO: preload some default components here (transform) ??
     const entityId = this.engine.generateEntityId();
     store.dispatch(sceneEditorActions.setCreateEntity(false));
     store.dispatch(sceneEditorActions.setCurrentEntityId(entityId));
