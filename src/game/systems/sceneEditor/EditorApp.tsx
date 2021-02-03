@@ -1,5 +1,7 @@
 import React from "react";
 import Inspector from "./editorApp/Inspector";
+import SerializeButton from "./editorApp/SerializeButton";
+import VerticalSpace from "./VerticalSpace";
 
 const EditorApp = () => {
   // const dispatch = useDispatch();
@@ -14,7 +16,15 @@ const EditorApp = () => {
   //   };
   // }, []);
 
-  return <Inspector />;
+  // TODO: serialize button & functionality (system, event entity driven) ....
+
+  return (
+    <div className="fixed top-0 flex justify-end w-screen">
+      <SerializeButton />
+      <VerticalSpace />
+      <Inspector />
+    </div>
+  );
 };
 
 export default EditorApp;

@@ -10,6 +10,7 @@ import { DEVELOPMENT } from "../utils/environment";
 import SceneEditor from "../systems/SceneEditor";
 import Interaction from "../systems/Interaction";
 import Dragging from "../systems/Dragging";
+import Serialization from "../systems/Serialization";
 
 export default class Main extends Scene {
   dudeQuads!: any[];
@@ -29,7 +30,7 @@ export default class Main extends Scene {
     this._engine = new Engine(DEVELOPMENT);
     // TODO: test all systems.
     this._engine.addSystem(new Manager(this._engine));
-    // this._engine.addSystem(new SceneLoader(this._engine)); // TODO: either make this system or do the loading in manager... https://web.dev/file-system-access/#read-a-file-from-the-file-system
+    this._engine.addSystem(new Serialization(this._engine));
     if (DEVELOPMENT) this._engine.addSystem(new SceneEditor(this._engine));
     this._engine.addSystem(new Input(this._engine, this));
     this._engine.addSystem(new Interaction(this._engine, this));
@@ -40,7 +41,7 @@ export default class Main extends Scene {
     this._engine.addSystem(new Movement(this._engine));
     // this._engine.addSystem(new Animation(this._engine)); // will hook into state of the entity (animation state machine)
     // this._engine.addSystem(new Collision(this._engine));
-    this._engine.addSystem(new Render(this._engine, this)); // shadows will be handled under sprite? or should it be separate system...? 
+    this._engine.addSystem(new Render(this._engine, this)); // shadows will be handled under sprite? or should it be separate system...?
     // analysis -> print how long each system is taking / where is the bottleneck?
 
     // TODO: move to camera component

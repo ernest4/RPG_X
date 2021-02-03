@@ -8,6 +8,7 @@ import Sprite from "../components/Sprite";
 import Interactive from "../components/Interactive";
 import DragEvent from "../components/DragEvent";
 import Transform from "../components/Transform";
+import SerializeEvent from "../components/SerializeEvent";
 import { isNumber } from "../../ecs/utils/Number";
 import Component from "../../ecs/Component";
 import * as availableComponents from "../components";
@@ -40,6 +41,7 @@ class SceneEditor extends System {
     this.engine.query(this.pushInteractiveEntityToRedux, InteractiveEvent);
     this.engine.query(this.pushDragEntityToRedux, DragEvent);
     this.streamCurrentEntityComponentsToRedux();
+    this.serialize();
   }
 
   destroy(): void {}
@@ -234,6 +236,19 @@ class SceneEditor extends System {
   private streamCurrentEntityComponentsToRedux = () => {
     const currentEntityId = (store.getState().sceneEditor as any).currentEntityId;
     if (isNumber(currentEntityId)) this.pushEntityComponentsToRedux(currentEntityId);
+  };
+
+  private serialize = () => {
+    const serialize = (store.getState().sceneEditor as any).serialize;
+
+    if (!serialize) return;
+
+    const entityId = this.engine.generateEntityId();
+
+    let serializeEvent = new SerializeEvent(entityId);
+    this.engine.addComponent(serializeEvent);
+
+    store.dispatch(sceneEditorActions.setSerialize(false));
   };
 }
 

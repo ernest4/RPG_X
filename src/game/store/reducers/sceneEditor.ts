@@ -13,6 +13,7 @@ const initialState = {
   removeEntity: false,
   createEntity: false,
   cloneEntity: false,
+  serialize: false,
   entities: [],
 };
 
@@ -53,6 +54,9 @@ const sceneEditorReducer = handleActions(
     }),
     SET_CLONE_ENTITY: produce((state, action) => {
       state.cloneEntity = action.payload;
+    }),
+    SET_SERIALIZE: produce((state, action) => {
+      state.serialize = action.payload;
     }),
   },
   initialState

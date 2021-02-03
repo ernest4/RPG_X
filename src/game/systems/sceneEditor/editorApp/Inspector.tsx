@@ -14,7 +14,7 @@ const Inspector = () => {
 
   return (
     <div
-      className="fixed top-0 right-0 bg-gray-600 flex flex-col w-96 overflow-y-scroll"
+      className="bg-gray-600 flex flex-col w-96 overflow-y-scroll"
       style={STYLE}
     >
       <CreateEntityButton />
