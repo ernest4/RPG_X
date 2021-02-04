@@ -15,6 +15,8 @@ class Manager extends System {
     // this.renderer.pipelines.add("grayscale", new GrayscalePipeline(this.game));
     // @ts-ignore
     // this.renderer.pipelines.add("skewQuad", new SkewQuadPipeline(this.game));
+    // OR
+    // (this.renderer as Phaser.Renderer.WebGL.WebGLRenderer).pipelines.add("skewQuad", new SkewQuadPipeline(this.game));
 
     // const text = this.add.text(250, 250, "Toggle UI", {
     //   backgroundColor: "white",

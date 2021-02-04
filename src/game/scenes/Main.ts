@@ -20,17 +20,15 @@ export default class Main extends Scene {
   private _engine!: Engine;
 
   preload() {
-    // TODO: testing. Most assets will loaded async !!!
-    // this.load.image("turtle", "assets/turtle.jpg");
-    // this.load.spritesheet("dude", "assets/dude.png", { frameWidth: 32, frameHeight: 48 });
+    // NOTE: Most other assets will be loaded async !!!
+    this.load.json("state_scenes_main", "assets/state/scenes/main.json");
   }
 
   create() {
-    // this._engine = new Engine();
     this._engine = new Engine(DEVELOPMENT);
     // TODO: test all systems.
     this._engine.addSystem(new Manager(this._engine));
-    this._engine.addSystem(new Serialization(this._engine));
+    this._engine.addSystem(new Serialization(this._engine, this));
     if (DEVELOPMENT) this._engine.addSystem(new SceneEditor(this._engine));
     this._engine.addSystem(new Input(this._engine, this));
     this._engine.addSystem(new Interaction(this._engine, this));

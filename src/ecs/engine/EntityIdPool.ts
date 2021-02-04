@@ -1,4 +1,4 @@
-import { EntityId } from "../types";
+import { EntityId, EntityIdPoolParams } from "../types";
 
 // TODO: jest tests !!!!
 class EntityIdPool {
@@ -13,6 +13,26 @@ class EntityIdPool {
     this._reclaimedEntityIdPool = []; // TODO: optimize with ArrayBuffer
     this._reclaimedEntityIdPoolSize = 0;
   }
+
+  // TODO: jests
+  import = ({
+    lastUsedEntityId,
+    reclaimedEntityIdPool,
+    reclaimedEntityIdPoolSize,
+  }: EntityIdPoolParams) => {
+    this._lastUsedEntityId = lastUsedEntityId;
+    this._reclaimedEntityIdPool = reclaimedEntityIdPool;
+    this._reclaimedEntityIdPoolSize = reclaimedEntityIdPoolSize;
+  };
+
+  // TODO: jests
+  export = (): EntityIdPoolParams => {
+    return {
+      lastUsedEntityId: this._lastUsedEntityId,
+      reclaimedEntityIdPool: this._reclaimedEntityIdPool,
+      reclaimedEntityIdPoolSize: this._reclaimedEntityIdPoolSize,
+    };
+  };
 
   reclaimId = (entityId: EntityId) => {
     this._reclaimedEntityIdPool[this._reclaimedEntityIdPoolSize++] = entityId;

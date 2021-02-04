@@ -1,0 +1,20 @@
+{
+  "name": "main",
+  "entityIdPool": {
+    "lastUsedEntityId": 0,
+    "reclaimedEntityIdPool": [],
+    "reclaimedEntityIdPoolSize": 0
+  },
+  "components": [
+    {
+      "entityId" : 0,
+      "name" : "Transform",
+      "properties": {
+        "position.x": 100,
+        "position.y": 200,
+        "scale.x": 1,
+        "scale.y": 1
+      }
+    }
+  ]
+}

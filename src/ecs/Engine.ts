@@ -1,4 +1,11 @@
-import { ComponentClass, DeltaTime, EntityId, QueryCallback, QuerySet } from "./types";
+import {
+  ComponentClass,
+  DeltaTime,
+  EntityId,
+  EntityIdPoolParams,
+  QueryCallback,
+  QuerySet,
+} from "./types";
 import EntityIdPool from "./engine/EntityIdPool";
 import Component from "./Component";
 import SparseSet from "./utils/SparseSet";
@@ -28,6 +35,14 @@ class Engine {
     // this.updateComplete = new signals.Signal(); // TODO: signals?? https://github.com/millermedeiros/js-signals
     this._entityIdPool = new EntityIdPool();
   }
+
+  // TODO: jests
+  importEntityIdPool = (params: EntityIdPoolParams) => {
+    this._entityIdPool.import(params);
+  };
+
+  // TODO: jests
+  exportEntityIdPool = () => this._entityIdPool.export();
 
   addSystem = (system: System) => {
     // addSystem = (system: System, priority?: number) => {
