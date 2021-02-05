@@ -4,7 +4,7 @@ import { EntityId } from "../../ecs/types";
 // TODO: optimize with ArrayBuffers ??
 class Tag extends Component {
   constructor(entityId: EntityId) {
-    super(entityId);
+    super(entityId, true);
   }
 }
 

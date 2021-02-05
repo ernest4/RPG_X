@@ -9,7 +9,7 @@ class Transform extends Component {
   scale: Vector3BufferView;
 
   constructor(entityId: EntityId) {
-    super(entityId);
+    super(entityId, true);
     this._values = new Float32Array(9);
     this.position = new Vector3BufferView(this._values);
     this.rotation = new Vector3BufferView(this._values, 3 * 4);

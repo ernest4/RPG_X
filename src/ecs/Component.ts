@@ -2,11 +2,18 @@ import { EntityId } from "./types";
 import { SparseSetItem } from "./utils/SparseSet";
 
 // NOTE: custom components will extend this.
+// NOTE: NO METHODS ON COMPONENTS !!!
 abstract class Component extends SparseSetItem {
-  // NOTE: NO METHODS ON COMPONENTS !!!
+  private _serializable: boolean;
 
-  constructor(entityId: EntityId) {
+  constructor(entityId: EntityId, serializable?: boolean) {
     super(entityId);
+    this._serializable = !!serializable;
+  }
+
+  // TODO: jests...
+  get serializable() {
+    return this._serializable;
   }
 }
 

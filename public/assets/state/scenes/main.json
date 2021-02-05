@@ -15,6 +15,16 @@
         "scale.x": 1,
         "scale.y": 1
       }
+    },
+    {
+      "entityId" : 0,
+      "name" : "Sprite",
+      "properties": {
+        "frame": 0,
+        "textureUrl": "assets/dude.png",
+        "frameWidth": 32,
+        "frameHeight": 48
+      }
     }
   ]
 }

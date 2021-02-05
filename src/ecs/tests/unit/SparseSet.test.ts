@@ -1,6 +1,6 @@
 import { context } from "../../../../tests/testAliases";
 import Component from "../../Component";
-import SparseSet from "../../utils/SparseSet";
+import SparseSet, { SparseSetItem } from "../../utils/SparseSet";
 import NumberComponent from "../helpers/components/NumberComponent";
 
 describe(SparseSet, () => {
@@ -59,7 +59,7 @@ describe(SparseSet, () => {
   });
 
   describe("#get", () => {
-    let getComponentForEntity: Component | null;
+    let getComponentForEntity: SparseSetItem | null;
 
     beforeEach(() => (getComponentForEntity = subject.get(entityId1)));
 

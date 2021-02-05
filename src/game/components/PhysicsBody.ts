@@ -19,7 +19,7 @@ class PhysicsBody extends Component {
 
   // TODO: ...
   constructor(entityId: EntityId) {
-    super(entityId);
+    super(entityId, true);
     this._values = new Float32Array(6);
     this.linearVelocity = new Vector3BufferView(this._values);
     this.angularVelocity = new Vector3BufferView(this._values, 3 * 4);

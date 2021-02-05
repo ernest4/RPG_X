@@ -183,7 +183,7 @@ class Engine {
         const componentClassName = componentClasses[i].name;
         const anotherComponent = this._componentLists[componentClassName]?.get(entityId);
 
-        if (anotherComponent) querySet.push(anotherComponent);
+        if (anotherComponent) querySet.push(anotherComponent as Component);
         else break; // NOTE: soon as we discover a missing component, abandon further pointless search for that entityId !
 
         if (i + 1 === componentClassesLength) callback(querySet);

@@ -20,6 +20,7 @@ const Component = ({ currentEntityComponent }: any) => {
           if (property === "_values") return <div key={key} />; // NOTE: just hiding redundant exposition of internal implementation
           if (property === "loaded") return <div key={key} />; // NOTE: just hiding redundant exposition of internal implementation
           if (property === "processed") return <div key={key} />; // NOTE: just hiding redundant exposition of internal implementation
+          if (property === "_serializable") return <div key={key} />; // NOTE: just hiding redundant exposition of internal implementation
 
           return (
             <div key={key}>

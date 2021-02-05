@@ -12,7 +12,7 @@ class Interactive extends Component {
   processed: boolean;
 
   constructor(entityId: EntityId) {
-    super(entityId);
+    super(entityId, true);
     this.loaded = false;
     this.processed = false;
     this._onPointerDown = false;
