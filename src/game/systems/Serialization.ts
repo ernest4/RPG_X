@@ -5,6 +5,7 @@ import { QuerySet } from "../../ecs/types";
 import SerializeEvent from "../components/SerializeEvent";
 import Transform from "../components/Transform";
 import * as availableComponents from "../components";
+import Vector3BufferView from "../../ecs/utils/Vector3BufferView";
 
 class Serialization extends System {
   private _scene: Scene;
@@ -77,16 +78,90 @@ class Serialization extends System {
     const permittedComponents = components.filter(({ serializable }) => serializable);
 
     permittedComponents.forEach(component => {
-      // TODO: ...
-      const properties = Object.entries(component);
-      console.log(properties); // TESTING
+      const componentHash = {
+        entityId: component.id,
+        name: component.constructor.name,
+        properties: {},
+      };
 
-      // if (property === "_id") return;
-      // if (property === "_values") return;
-      // if (property === "loaded") return;
-      // if (property === "processed") return;
-      // if (property === "_serializable") return;
+      Object.entries(component).forEach(([property, value]) => {
+        if (property === "_id") return;
+        if (property === "_values") return;
+        if (property === "loaded") return;
+        if (property === "processed") return;
+        if (property === "_serializable") return;
+
+        if (value.constructor.name === "Vector3BufferView") {
+          return this.vectorSerialize({ property, value, properties: componentHash.properties });
+        }
+
+        if (typeof value === "boolean") {
+          return this.booleanSerialize({ property, value, properties: componentHash.properties });
+        }
+
+        if (typeof value === "string") {
+          return this.stringSerialize({ property, value, properties: componentHash.properties });
+        }
+
+        if (!isNaN(value)) {
+          return this.numberSerialize({ property, value, properties: componentHash.properties });
+        }
+
+        // return JSON.stringify(value); // unknown / ref / catch all
+      });
+
+      console.log(componentHash); // TESTING
     });
+  };
+
+  private vectorSerialize = ({
+    property,
+    value,
+    properties,
+  }: {
+    property: string;
+    value: Vector3BufferView;
+    properties: any;
+  }) => {
+    properties[`${property}.x`] = value.x;
+    properties[`${property}.y`] = value.y;
+    properties[`${property}.z`] = value.z;
+  };
+
+  private booleanSerialize = ({
+    property,
+    value,
+    properties,
+  }: {
+    property: string;
+    value: boolean;
+    properties: any;
+  }) => {
+    properties[property] = value;
+  };
+
+  private stringSerialize = ({
+    property,
+    value,
+    properties,
+  }: {
+    property: string;
+    value: string;
+    properties: any;
+  }) => {
+    properties[property] = value;
+  };
+
+  private numberSerialize = ({
+    property,
+    value,
+    properties,
+  }: {
+    property: string;
+    value: number;
+    properties: any;
+  }) => {
+    properties[property] = value;
   };
 }
 
