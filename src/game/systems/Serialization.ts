@@ -6,15 +6,18 @@ import SerializeEvent from "../components/SerializeEvent";
 import Transform from "../components/Transform";
 import * as availableComponents from "../components";
 import Vector3BufferView from "../../ecs/utils/Vector3BufferView";
+import fs from "fs";
 
 class Serialization extends System {
   private _scene: Scene;
   private _state: any;
   private _serialize!: boolean;
+  private _sceneHashBuffer: {};
 
   constructor(engine: Engine, scene: Scene) {
     super(engine);
     this._scene = scene;
+    this._sceneHashBuffer = {};
   }
 
   start(): void {
@@ -26,8 +29,10 @@ class Serialization extends System {
     this.engine.query(this.handleSerializeEvents, SerializeEvent);
 
     if (this._serialize) {
+      this.prepareSceneHashBuffer();
       this.engine.query(this.serializeEntities, Transform); // NOTE: any entity with Transform only
       this._serialize = false; // NOTE: resetting the flag
+      this.flushSceneHashBuffer();
     }
   }
 
@@ -69,15 +74,23 @@ class Serialization extends System {
     this._serialize = true;
   };
 
+  private prepareSceneHashBuffer = () => {
+    this._sceneHashBuffer = {
+      name: "main",
+      entityIdPool: this.engine.exportEntityIdPool(),
+      components: [],
+    };
+  };
+
   private serializeEntities = (querySet: QuerySet) => {
     const [transform] = querySet as [Transform];
 
-    // TODO: serialize https://web.dev/file-system-access/#read-a-file-from-the-file-system
+    // NOTE: serialize https://web.dev/file-system-access/#read-a-file-from-the-file-system
 
     const components = this.engine.getComponents(transform.id);
     const permittedComponents = components.filter(({ serializable }) => serializable);
 
-    permittedComponents.forEach(component => {
+    permittedComponents.forEach(async component => {
       const componentHash = {
         entityId: component.id,
         name: component.constructor.name,
@@ -90,6 +103,8 @@ class Serialization extends System {
         if (property === "loaded") return;
         if (property === "processed") return;
         if (property === "_serializable") return;
+
+        property = this.normalizePropertyName(property);
 
         if (value.constructor.name === "Vector3BufferView") {
           return this.vectorSerialize({ property, value, properties: componentHash.properties });
@@ -111,8 +126,38 @@ class Serialization extends System {
       });
 
       console.log(componentHash); // TESTING
+
+      (this._sceneHashBuffer as any)["components"].push(componentHash);
     });
   };
+
+  private flushSceneHashBuffer = () => {
+    this.saveSceneToFile(this._sceneHashBuffer);
+    this._sceneHashBuffer = {};
+  };
+
+  private saveSceneToFile = async (data: any) => {
+    const fileHandle = await this.getFileHandle();
+    this.writeFile(fileHandle, JSON.stringify(data));
+  };
+
+  private getFileHandle = async () => {
+    const options = { types: [{ description: "JSON scene state file" }] };
+
+    // @ts-ignore
+    return await window.showSaveFilePicker(options);
+  };
+
+  private writeFile = async (fileHandle: any, contents: any) => {
+    // Create a FileSystemWritableFileStream to write to.
+    const writable = await fileHandle.createWritable();
+    // Write the contents of the file to the stream.
+    await writable.write(contents);
+    // Close the file and write the contents to disk.
+    await writable.close();
+  };
+
+  private normalizePropertyName = (property: string) => property.replace(/^_/, "");
 
   private vectorSerialize = ({
     property,
