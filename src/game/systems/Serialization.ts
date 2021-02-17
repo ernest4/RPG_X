@@ -6,22 +6,26 @@ import SerializeEvent from "../components/SerializeEvent";
 import Transform from "../components/Transform";
 import * as availableComponents from "../components";
 import Vector3BufferView from "../../ecs/utils/Vector3BufferView";
-import fs from "fs";
+
+const MAX_SCENE_JSON_STRING_SIZE = 268435440; // NOTE: this is hard limit from chrome v8
 
 class Serialization extends System {
   private _scene: Scene;
   private _state: any;
   private _serialize!: boolean;
   private _sceneHashBuffer: {};
+  private _currentSceneJsonStringSize: number;
 
   constructor(engine: Engine, scene: Scene) {
     super(engine);
     this._scene = scene;
     this._sceneHashBuffer = {};
+    this._currentSceneJsonStringSize = 0;
   }
 
   start(): void {
     this._state = this._scene.cache.json.get("state_scenes_main");
+    this._currentSceneJsonStringSize = JSON.stringify(this._state).length; // TODO: not efficient to stringify entire scene again... probably need to cache this on the scene file??
     this.loadStateIntoEngine();
   }
 
@@ -125,7 +129,7 @@ class Serialization extends System {
         // return JSON.stringify(value); // unknown / ref / catch all
       });
 
-      console.log(componentHash); // TESTING
+      // console.log(componentHash); // TESTING
 
       (this._sceneHashBuffer as any)["components"].push(componentHash);
     });
@@ -138,7 +142,18 @@ class Serialization extends System {
 
   private saveSceneToFile = async (data: any) => {
     const fileHandle = await this.getFileHandle();
-    this.writeFile(fileHandle, JSON.stringify(data));
+    const currentSceneJsonString = JSON.stringify(data);
+    this._currentSceneJsonStringSize = currentSceneJsonString.length;
+    // TODO: display this in the editor
+    // console.log(this._currentSceneJsonStringSize); // TESTING
+    // console.log((this._currentSceneJsonStringSize / MAX_SCENE_JSON_STRING_SIZE) * 100); // TESTING
+    alert(`
+      current Scene Json String Size: ${this._currentSceneJsonStringSize}
+      current Scene Json String Size Percent: ${
+        (this._currentSceneJsonStringSize / MAX_SCENE_JSON_STRING_SIZE) * 100
+      }
+    `);
+    this.writeFile(fileHandle, currentSceneJsonString);
   };
 
   private getFileHandle = async () => {
