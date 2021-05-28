@@ -65,6 +65,12 @@ class Input extends System {
   };
 
   private createInputEventEntities = () => {
+    // TODO: need to swap the buffer here. Probably build a buffer abstraction class.
+    // Swapping buffers allows you to process old messages while still allowing new messages to come
+    // in - they can comme in any time remember!
+    // Otherwise with single buffer only, message can come in mid iteration and be lost if iterator
+    // is past that point !!!
+
     this._inputEventObjectBuffer.forEach(({ type, key }) => {
       const entityId = this.engine.generateEntityId();
       const inputEvent = new InputEvent(entityId);
