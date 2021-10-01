@@ -1,3 +1,4 @@
+[0] move out ECS into npm package and install it from github.
 [1] keep game react separate from rest of app view templates.
     - play is the only endpoint that returns react game...
     - rest of app is react + tailwind css
@@ -37,3 +38,5 @@ so no need to worry about it.
 General JS perf:
 use FOR loops over MAP or FOREACH as map is x4 times slower, while foreach is x2 slower.
 
+[13] Server optimization: Use workers on separate cores. 1 for webapp, 1 for websocket.
+https://github.com/uNetworking/uWebSockets.js/blob/master/examples/WorkerThreads.js
